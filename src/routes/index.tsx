@@ -1,18 +1,16 @@
-import { convexQuery } from "@convex-dev/react-query";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { GitHubStarsWidget } from "@/components/widgets/github-stars/GitHubStarsWidget";
 import { createFileRoute } from "@tanstack/react-router";
-import { api } from "convex/_generated/api";
 
 export const Route = createFileRoute("/")({ component: App });
 
 function App() {
-  const { data } = useSuspenseQuery(convexQuery(api.tasks.get, {}));
-
   return (
-    <div>
-      {data.map(({ _id, text }) => (
-        <div key={_id}>{text}</div>
-      ))}
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-8">GitBoard Demo</h1>
+
+      <div className="grid gap-4 max-w-md">
+        <GitHubStarsWidget />
+      </div>
     </div>
   );
 }
