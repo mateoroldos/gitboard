@@ -12,7 +12,8 @@ import {
   fetchSession,
   getCookieName,
 } from "@convex-dev/better-auth/react-start";
-import { authClient } from "@/lib/auth-client";
+import { authClient, signIn, signOut } from "@/lib/auth-client";
+import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 
 import appCss from "../styles.css?url";
 
@@ -72,12 +73,22 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   const context = useRouteContext({ from: Route.id });
+  const { data: session } = authClient.useSession();
+
   return (
     <ConvexBetterAuthProvider
       client={context.convexClient}
       authClient={authClient}
     >
       <RootDocument>
+        <Unauthenticated>
+          <button onClick={signIn}>Signin</button>
+        </Unauthenticated>
+        <Authenticated>
+          {session?.user.email}
+          <button onClick={signOut}>Signout</button>
+        </Authenticated>
+        <AuthLoading>Loading...</AuthLoading>
         <Outlet />
       </RootDocument>
     </ConvexBetterAuthProvider>

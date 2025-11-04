@@ -4,6 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     SITE_URL: z.url(),
+    GITHUB_CLIENT_ID: z.string(),
+    GITHUB_CLIENT_SECRET: z.string(),
   },
 
   /**
@@ -23,6 +25,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     SITE_URL: process.env.SITE_URL,
+    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     VITE_CONVEX_URL: import.meta.env.VITE_CONVEX_URL,
     VITE_CONVEX_SITE_URL: import.meta.env.VITE_CONVEX_SITE_URL,
   },
