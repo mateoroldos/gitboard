@@ -12,6 +12,8 @@ import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import { RepoSelector } from "@/components/RepoSelector";
+import { useMutation } from "@tanstack/react-query";
+import { Loader, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
@@ -21,7 +23,9 @@ function HomePage() {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [error, setError] = useState("");
 
-  const createBoard = useAction(api.boards.createBoardAction);
+  const { mutate: createBoard, isPending } = useMutation({
+    mutationFn: useAction(api.boards.createBoardAction),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +42,17 @@ function HomePage() {
 
     const [owner, name] = selectedRepo.trim().split("/");
 
-    await createBoard({
-      name,
-      repo: selectedRepo.trim(),
-    });
-
-    window.location.href = `/${owner}/${name}`;
+    createBoard(
+      {
+        name,
+        repo: selectedRepo.trim(),
+      },
+      {
+        onSuccess: () => {
+          window.location.href = `/${owner}/${name}`;
+        },
+      },
+    );
   };
 
   if (isLoading) {
@@ -79,7 +88,10 @@ function HomePage() {
               {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
             </div>
 
-            <Button type="submit">Create Board</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Loader className="animate-spin" /> : <Plus />}
+              Create Board
+            </Button>
           </form>
         </Authenticated>
       </div>

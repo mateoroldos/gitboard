@@ -1,5 +1,6 @@
 import { Id } from "convex/_generated/dataModel";
 import { MutationCtx, QueryCtx } from "convex/_generated/server";
+import { ConvexError } from "convex/values";
 
 export async function getWidgetsByBoard(
   ctx: QueryCtx,
@@ -16,7 +17,16 @@ export async function getWidgetById(
   ctx: QueryCtx,
   { widgetId }: { widgetId: Id<"widgets"> },
 ) {
-  return await ctx.db.get(widgetId);
+  const widget = await ctx.db.get(widgetId);
+
+  if (!widget) {
+    throw new ConvexError({
+      message: "Widget not found",
+      code: 404,
+    });
+  }
+
+  return widget;
 }
 
 export async function createWidget(
@@ -30,7 +40,14 @@ export async function createWidget(
     title,
   }: {
     boardId: Id<"boards">;
-    widgetType: "github-stars" | "github-issues" | "github-prs" | "github-commits" | "npm-downloads" | "text-note" | "link-collection";
+    widgetType:
+      | "github-stars"
+      | "github-issues"
+      | "github-prs"
+      | "github-commits"
+      | "npm-downloads"
+      | "text-note"
+      | "link-collection";
     config: any;
     position: { x: number; y: number };
     size: { width: number; height: number };
@@ -68,7 +85,9 @@ export async function updateWidget(
   },
 ) {
   const updates = Object.fromEntries(
-    Object.entries({ config, position, size, title }).filter(([_, value]) => value !== undefined),
+    Object.entries({ config, position, size, title }).filter(
+      ([_, value]) => value !== undefined,
+    ),
   );
 
   if (Object.keys(updates).length === 0) {
@@ -87,3 +106,4 @@ export async function deleteWidget(
 ) {
   return await ctx.db.delete(id);
 }
+

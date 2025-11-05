@@ -1,13 +1,19 @@
 import { parseRepoString } from "@/lib/github";
 import { ActionCtx } from "convex/_generated/server";
 import { authComponent, createAuth } from "convex/auth";
+import { ConvexError } from "convex/values";
 
-export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
+export async function requireSession(ctx: ActionCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (identity === null) {
-    throw new Error("Not authenticated");
+    throw new ConvexError({
+      message: "Unauthorized",
+      code: 401,
+    });
   }
+}
 
+export async function getAccessToken(ctx: ActionCtx) {
   const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
 
   const { accessToken } = await auth.api.getAccessToken({
@@ -16,6 +22,19 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
       providerId: "github",
     },
   });
+
+  if (!accessToken) {
+    throw new ConvexError({
+      message: "Unauthorized",
+      code: 401,
+    });
+  }
+
+  return accessToken;
+}
+
+export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
+  const accessToken = getAccessToken(ctx);
 
   const { owner, name } = parseRepoString(repo);
 
@@ -30,16 +49,21 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
   );
 
   if (!repoResponse.ok) {
-    throw new Error("No access to repository");
+    console.error("Github API Error");
+    throw new ConvexError({
+      message: "Internal Error",
+      code: 500,
+    });
   }
 
   const repoData = await repoResponse.json();
 
   // Check if user has write access (push or admin permissions)
   if (!repoData.permissions?.push && !repoData.permissions?.admin) {
-    throw new Error(
-      "Insufficient repository permissions - write access required",
-    );
+    throw new ConvexError({
+      message: "Unauthorized",
+      code: 401,
+    });
   }
 
   return { repo };

@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
+import { Button } from "@/components/ui/button";
+import { Loader, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/$owner/$name")({
   component: RepoBoard,
@@ -12,7 +13,6 @@ export const Route = createFileRoute("/$owner/$name")({
 function RepoBoard() {
   const { owner, name } = Route.useParams();
   const repoString = `${owner}/${name}`;
-  const [isCreating, setIsCreating] = useState(false);
 
   const { data: board } = useSuspenseQuery(
     convexQuery(api.boards.getBoardByRepo, { repo: repoString }),
@@ -22,24 +22,22 @@ function RepoBoard() {
       boardId: board?._id!,
     }),
   );
-  const createWidget = useAction(api.widgets.createWidgetAction);
+
+  const { mutate: createWidget, isPending } = useMutation({
+    mutationFn: useAction(api.widgets.createWidgetAction),
+  });
 
   const handleCreateWidget = async () => {
     if (!board) return;
 
-    setIsCreating(true);
-    try {
-      await createWidget({
-        boardId: board._id,
-        widgetType: "text-note",
-        config: { text: "New widget" },
-        position: { x: 100, y: 100 },
-        size: { width: 200, height: 150 },
-        title: "New Widget",
-      });
-    } finally {
-      setIsCreating(false);
-    }
+    createWidget({
+      boardId: board._id,
+      widgetType: "text-note",
+      config: { text: "New widget" },
+      position: { x: 100, y: 100 },
+      size: { width: 200, height: 150 },
+      title: "New Widget",
+    });
   };
 
   if (!board) {
@@ -63,13 +61,10 @@ function RepoBoard() {
             <h1 className="text-2xl font-bold text-gray-900">{repoString}</h1>
             <p className="text-gray-600 mt-1">GitHub Repository Board</p>
           </div>
-          <button
-            onClick={handleCreateWidget}
-            disabled={isCreating}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50"
-          >
-            {isCreating ? "Creating..." : "Add Widget"}
-          </button>
+          <Button onClick={handleCreateWidget} disabled={isPending}>
+            {isPending ? <Loader className="animate-spin" /> : <Plus />}
+            Add Widget
+          </Button>
         </div>
       </header>
 

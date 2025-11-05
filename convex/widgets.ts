@@ -65,10 +65,6 @@ export const createWidgetAction = action({
       boardId: args.boardId,
     });
 
-    if (!board) {
-      throw new Error("Board not found");
-    }
-
     await requireRepoAccess(ctx, board.repo);
 
     await ctx.runMutation(internal.widgets.createWidget, {
@@ -83,16 +79,7 @@ export const getWidgetWithBoard = internalQuery({
   },
   handler: async (ctx, { widgetId }) => {
     const widget = await Widgets.getWidgetById(ctx, { widgetId });
-
-    if (!widget) {
-      throw new Error("Widget not found");
-    }
-
     const board = await Boards.getBoardById(ctx, { boardId: widget.boardId });
-
-    if (!board) {
-      throw new Error("Board not found");
-    }
 
     return {
       ...widget,

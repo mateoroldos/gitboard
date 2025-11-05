@@ -1,11 +1,13 @@
 import { createRouter } from "@tanstack/react-router";
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryClient } from "@tanstack/react-query";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 import { routeTree } from "./routeTree.gen";
 import { env } from "./env";
+import { toast } from "sonner";
+import { ConvexError } from "convex/values";
 
 export function getRouter() {
   const CONVEX_URL = env.VITE_CONVEX_URL;
@@ -22,6 +24,18 @@ export function getRouter() {
         queryFn: convexQueryClient.queryFn(),
       },
     },
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        const errorMessage =
+          error instanceof ConvexError
+            ? (error.data as { message: string }).message
+            : "Unexpected error occurred";
+
+        if (error.message) {
+          toast.error(errorMessage);
+        }
+      },
+    }),
   });
   convexQueryClient.connect(queryClient);
 

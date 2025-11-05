@@ -1,21 +1,40 @@
 import { Id } from "convex/_generated/dataModel";
 import { MutationCtx, QueryCtx } from "convex/_generated/server";
+import { ConvexError } from "convex/values";
 
 export async function getBoardById(
   ctx: QueryCtx,
   { boardId }: { boardId: Id<"boards"> },
 ) {
-  return await ctx.db.get(boardId);
+  const board = await ctx.db.get(boardId);
+
+  if (!board) {
+    throw new ConvexError({
+      message: "Board not found",
+      code: 404,
+    });
+  }
+
+  return board;
 }
 
 export async function getBoardByRepo(
   ctx: QueryCtx,
   { repo }: { repo: string },
 ) {
-  return await ctx.db
+  const board = await ctx.db
     .query("boards")
     .withIndex("by_repo", (q) => q.eq("repo", repo))
     .first();
+
+  if (!board) {
+    throw new ConvexError({
+      message: "Board not found",
+      code: 404,
+    });
+  }
+
+  return board;
 }
 
 export async function createBoard(
@@ -32,7 +51,10 @@ export async function createBoard(
     .first();
 
   if (existing) {
-    return existing._id;
+    throw new ConvexError({
+      message: "Board already exists",
+      code: 409,
+    });
   }
 
   const now = Date.now();

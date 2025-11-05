@@ -19,14 +19,12 @@ export async function getAllRepos({ accessToken }: { accessToken: string }) {
       organizations,
     };
   } catch (error) {
+    // Catch errors and throw empty data - we will allow users to type repos manually
     console.error("Error fetching GitHub data:", error);
     return {
       userRepos: [],
       orgRepos: [],
       organizations: [],
-      error:
-        error instanceof Error ? error.message : "Failed to fetch GitHub data",
     };
   }
 }
-
