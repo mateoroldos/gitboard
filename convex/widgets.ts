@@ -1,18 +1,21 @@
-import { query, internalMutation, action } from "./_generated/server";
+import {
+  query,
+  internalMutation,
+  action,
+  internalQuery,
+} from "./_generated/server";
 import { v } from "convex/values";
-import { requireRepoAccess } from "./authHelpers";
+import { requireRepoAccess } from "./model/auth";
 import { api, internal } from "./_generated/api";
+import * as Widgets from "./model/widgets";
+import * as Boards from "./model/boards";
 
 export const getWidgetsByBoard = query({
   args: {
     boardId: v.id("boards"),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("widgets")
-      .withIndex("by_board", (q) => q.eq("boardId", args.boardId))
-      .order("asc")
-      .collect();
+  handler: async (ctx, { boardId }) => {
+    return await Widgets.getWidgetsByBoard(ctx, { boardId });
   },
 });
 
@@ -20,8 +23,8 @@ export const getWidgetById = query({
   args: {
     widgetId: v.id("widgets"),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.widgetId);
+  handler: async (ctx, { widgetId }) => {
+    return await Widgets.getWidgetById(ctx, { widgetId });
   },
 });
 
@@ -51,18 +54,7 @@ const createWidgetArgs = {
 export const createWidget = internalMutation({
   args: createWidgetArgs,
   handler: async (ctx, args) => {
-    const now = Date.now();
-
-    return await ctx.db.insert("widgets", {
-      boardId: args.boardId,
-      widgetType: args.widgetType,
-      config: args.config,
-      position: args.position,
-      size: args.size,
-      title: args.title,
-      createdAt: now,
-      updatedAt: now,
-    });
+    return await Widgets.createWidget(ctx, args);
   },
 });
 
@@ -82,6 +74,30 @@ export const createWidgetAction = action({
     await ctx.runMutation(internal.widgets.createWidget, {
       ...args,
     });
+  },
+});
+
+export const getWidgetWithBoard = internalQuery({
+  args: {
+    widgetId: v.id("widgets"),
+  },
+  handler: async (ctx, { widgetId }) => {
+    const widget = await Widgets.getWidgetById(ctx, { widgetId });
+
+    if (!widget) {
+      throw new Error("Widget not found");
+    }
+
+    const board = await Boards.getBoardById(ctx, { boardId: widget.boardId });
+
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    return {
+      ...widget,
+      board,
+    };
   },
 });
 
@@ -106,44 +122,18 @@ const updateWidgetArgs = {
 export const updateWidget = internalMutation({
   args: updateWidgetArgs,
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
-
-    // Filter out undefined values
-    const filteredUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, value]) => value !== undefined),
-    );
-
-    if (Object.keys(filteredUpdates).length === 0) {
-      return null; // No updates to apply
-    }
-
-    return await ctx.db.patch(id, {
-      ...filteredUpdates,
-      updatedAt: Date.now(),
-    });
+    return await Widgets.updateWidget(ctx, args);
   },
 });
 
 export const updateWidgetAction = action({
   args: updateWidgetArgs,
   handler: async (ctx, args) => {
-    const widget = await ctx.runQuery(api.widgets.getWidgetById, {
+    const widget = await ctx.runQuery(internal.widgets.getWidgetWithBoard, {
       widgetId: args.id,
     });
 
-    if (!widget) {
-      throw new Error("Widget not found");
-    }
-
-    const board = await ctx.runQuery(api.boards.getBoardById, {
-      boardId: widget.boardId,
-    });
-
-    if (!board) {
-      throw new Error("Board not found");
-    }
-
-    await requireRepoAccess(ctx, board.repo);
+    await requireRepoAccess(ctx, widget.board.repo);
 
     await ctx.runMutation(internal.widgets.updateWidget, {
       ...args,
@@ -158,30 +148,18 @@ const deleteWidgetArgs = {
 export const deleteWidget = internalMutation({
   args: deleteWidgetArgs,
   handler: async (ctx, args) => {
-    return await ctx.db.delete(args.id);
+    return await Widgets.deleteWidget(ctx, args);
   },
 });
 
 export const deleteWidgetAction = action({
   args: deleteWidgetArgs,
   handler: async (ctx, args) => {
-    const widget = await ctx.runQuery(api.widgets.getWidgetById, {
+    const widget = await ctx.runQuery(internal.widgets.getWidgetWithBoard, {
       widgetId: args.id,
     });
 
-    if (!widget) {
-      throw new Error("Widget not found");
-    }
-
-    const board = await ctx.runQuery(api.boards.getBoardById, {
-      boardId: widget.boardId,
-    });
-
-    if (!board) {
-      throw new Error("Board not found");
-    }
-
-    await requireRepoAccess(ctx, board.repo);
+    await requireRepoAccess(ctx, widget.board.repo);
 
     await ctx.runMutation(internal.widgets.deleteWidget, {
       ...args,

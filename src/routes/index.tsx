@@ -4,8 +4,8 @@ import { validateRepoString } from "@/lib/github";
 import {
   Authenticated,
   Unauthenticated,
+  useAction,
   useConvexAuth,
-  useMutation,
 } from "convex/react";
 import { api } from "convex/_generated/api";
 import { signIn } from "@/lib/auth-client";
@@ -21,7 +21,7 @@ function HomePage() {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [error, setError] = useState("");
 
-  const createBoard = useMutation(api.boards.createBoard);
+  const createBoard = useAction(api.boards.createBoardAction);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

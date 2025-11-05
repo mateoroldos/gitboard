@@ -9,10 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as authHelpers from "../authHelpers.js";
 import type * as boards from "../boards.js";
 import type * as github from "../github.js";
 import type * as http from "../http.js";
+import type * as model_auth from "../model/auth.js";
+import type * as model_boards from "../model/boards.js";
+import type * as model_github from "../model/github.js";
+import type * as model_widgets from "../model/widgets.js";
 import type * as widgets from "../widgets.js";
 
 import type {
@@ -31,10 +34,13 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  authHelpers: typeof authHelpers;
   boards: typeof boards;
   github: typeof github;
   http: typeof http;
+  "model/auth": typeof model_auth;
+  "model/boards": typeof model_boards;
+  "model/github": typeof model_github;
+  "model/widgets": typeof model_widgets;
   widgets: typeof widgets;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
