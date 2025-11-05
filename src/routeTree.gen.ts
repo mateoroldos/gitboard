@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as OwnerRepoRouteImport } from './routes/$owner.$repo'
+import { Route as OwnerNameRouteImport } from './routes/$owner.$name'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,9 +18,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OwnerRepoRoute = OwnerRepoRouteImport.update({
-  id: '/$owner/$repo',
-  path: '/$owner/$repo',
+const OwnerNameRoute = OwnerNameRouteImport.update({
+  id: '/$owner/$name',
+  path: '/$owner/$name',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -31,31 +31,31 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$owner/$repo': typeof OwnerRepoRoute
+  '/$owner/$name': typeof OwnerNameRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$owner/$repo': typeof OwnerRepoRoute
+  '/$owner/$name': typeof OwnerNameRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$owner/$repo': typeof OwnerRepoRoute
+  '/$owner/$name': typeof OwnerNameRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$owner/$repo' | '/api/auth/$'
+  fullPaths: '/' | '/$owner/$name' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$owner/$repo' | '/api/auth/$'
-  id: '__root__' | '/' | '/$owner/$repo' | '/api/auth/$'
+  to: '/' | '/$owner/$name' | '/api/auth/$'
+  id: '__root__' | '/' | '/$owner/$name' | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  OwnerRepoRoute: typeof OwnerRepoRoute
+  OwnerNameRoute: typeof OwnerNameRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -68,11 +68,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$owner/$repo': {
-      id: '/$owner/$repo'
-      path: '/$owner/$repo'
-      fullPath: '/$owner/$repo'
-      preLoaderRoute: typeof OwnerRepoRouteImport
+    '/$owner/$name': {
+      id: '/$owner/$name'
+      path: '/$owner/$name'
+      fullPath: '/$owner/$name'
+      preLoaderRoute: typeof OwnerNameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -87,7 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  OwnerRepoRoute: OwnerRepoRoute,
+  OwnerNameRoute: OwnerNameRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

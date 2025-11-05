@@ -1,28 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 
-export const Route = createFileRoute("/$owner/$repo")({
+export const Route = createFileRoute("/$owner/$name")({
   component: RepoBoard,
 });
 
 function RepoBoard() {
-  const { owner, repo } = Route.useParams();
-  const repoString = `${owner}/${repo}`;
+  const { owner, name } = Route.useParams();
+  const repoString = `${owner}/${name}`;
   const [isCreating, setIsCreating] = useState(false);
 
   const { data: board } = useSuspenseQuery(
-    convexQuery(api.boards.getBoardByRepo, { repo }),
+    convexQuery(api.boards.getBoardByRepo, { repo: repoString }),
   );
   const { data: widgets } = useSuspenseQuery(
     convexQuery(api.widgets.getWidgetsByBoard, {
       boardId: board?._id!,
     }),
   );
-  const createWidget = useMutation(api.widgets.createWidget);
+  const createWidget = useAction(api.widgets.createWidgetAction);
 
   const handleCreateWidget = async () => {
     if (!board) return;

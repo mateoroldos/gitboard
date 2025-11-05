@@ -40,7 +40,7 @@ function HomePage() {
 
     await createBoard({
       name,
-      repo: name,
+      repo: selectedRepo.trim(),
     });
 
     window.location.href = `/${owner}/${name}`;

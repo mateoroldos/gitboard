@@ -35,4 +35,3 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_board", ["boardId"]),
 });
-

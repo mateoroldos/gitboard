@@ -1,10 +1,13 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import * as Boards from "./model/boards";
 
-export const getBoards = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("boards").order("desc").collect();
+export const getBoardById = query({
+  args: {
+    boardId: v.id("boards"),
+  },
+  handler: async (ctx, { boardId }) => {
+    return await Boards.getBoardById(ctx, { boardId });
   },
 });
 
@@ -12,11 +15,8 @@ export const getBoardByRepo = query({
   args: {
     repo: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("boards")
-      .withIndex("by_repo", (q) => q.eq("repo", args.repo))
-      .first();
+  handler: async (ctx, { repo }) => {
+    return await Boards.getBoardByRepo(ctx, { repo });
   },
 });
 
@@ -26,25 +26,11 @@ export const createBoard = mutation({
     repo: v.string(),
     description: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
-    // Check if board already exists for this repo
-    const existing = await ctx.db
-      .query("boards")
-      .withIndex("by_repo", (q) => q.eq("repo", args.repo))
-      .first();
-    
-    if (existing) {
-      return existing._id;
-    }
-
-    const now = Date.now();
-    return await ctx.db.insert("boards", {
-      name: args.name,
-      repo: args.repo,
-      description: args.description,
-      createdAt: now,
-      updatedAt: now,
+  handler: async (ctx, { name, repo, description }) => {
+    return await Boards.createBoard(ctx, {
+      name,
+      repo,
+      description,
     });
   },
 });
-
