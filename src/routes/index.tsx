@@ -61,7 +61,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-8">
-      <div className="max-w-md w-full space-y-8 flex items-center flex-col">
+      <div className="max-w-sm w-full space-y-8 flex items-center flex-col">
         <div className="text-center">
           <h1 className="text-4xl font-bold">GitBoard</h1>
           <p className="text-muted-foreground">
@@ -74,7 +74,7 @@ function HomePage() {
         </Unauthenticated>
 
         <Authenticated>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 w-full">
             <div>
               <Label htmlFor="repo">GitHub Repository</Label>
               <RepoSelector
@@ -88,7 +88,7 @@ function HomePage() {
               {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
             </div>
 
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? <Loader className="animate-spin" /> : <Plus />}
               Create Board
             </Button>

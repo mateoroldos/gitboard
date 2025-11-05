@@ -31,6 +31,7 @@ export function RepoSelector({
   placeholder = "Select repository...",
 }: RepoSelectorProps) {
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const { data: githubData } = useSuspenseQuery(
     convexAction(api.github.getAllRepos, {}),
@@ -42,11 +43,25 @@ export function RepoSelector({
 
   const allRepos = [...userRepos, ...orgRepos];
 
+  const filteredRepos = allRepos.filter(
+    (repo) =>
+      repo.full_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      repo.name.toLowerCase().includes(searchValue.toLowerCase()),
+  );
+
+  const isValidRepoFormat = (input: string) => {
+    return /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/.test(input);
+  };
+
   const groupedRepos = {
-    personal: userRepos,
+    personal: filteredRepos.filter((repo) =>
+      userRepos.some((ur) => ur.id === repo.id),
+    ),
     organizations: organizations.reduce(
       (acc, org) => {
-        const repos = orgRepos.filter((repo) => repo.owner.login === org.login);
+        const repos = filteredRepos.filter(
+          (repo) => repo.owner.login === org.login,
+        );
         if (repos.length > 0) {
           acc[org.login] = repos;
         }
@@ -56,6 +71,7 @@ export function RepoSelector({
     ),
   };
   const selectedRepo = allRepos.find((repo) => repo.full_name === value);
+  const isManualEntry = value && !selectedRepo && isValidRepoFormat(value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -72,20 +88,45 @@ export function RepoSelector({
               <span className="truncate">{selectedRepo.full_name}</span>
               {selectedRepo.private && <Lock className="h-3 w-3" />}
             </div>
+          ) : isManualEntry ? (
+            <div className="flex items-center gap-2">
+              <GitBranch className="h-4 w-4" />
+              <span className="truncate">{value}</span>
+            </div>
           ) : (
             placeholder
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full max-w-[350px] p-0" align="start">
+      <PopoverContent className="w-full max-w-sm p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search repositories..." />
+          <CommandInput
+            placeholder="Search repositories or type owner/repo..."
+            value={searchValue}
+            onValueChange={setSearchValue}
+          />
           <CommandList>
-            {githubData?.error ? (
-              <CommandEmpty>{githubData.error}</CommandEmpty>
-            ) : allRepos.length === 0 ? (
-              <CommandEmpty>No repositories found.</CommandEmpty>
+            {filteredRepos.length === 0 && !isValidRepoFormat(searchValue) ? (
+              <CommandEmpty>
+                No repositories found. Try typing owner/repo to add manually.
+              </CommandEmpty>
+            ) : filteredRepos.length === 0 && isValidRepoFormat(searchValue) ? (
+              <CommandGroup heading="Manual entry">
+                <CommandItem
+                  value={searchValue}
+                  onSelect={() => {
+                    onValueChange(searchValue);
+                    setOpen(false);
+                    setSearchValue("");
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <GitBranch className="h-4 w-4" />
+                    <span>Add repository: {searchValue}</span>
+                  </div>
+                </CommandItem>
+              </CommandGroup>
             ) : (
               <>
                 {groupedRepos.personal.length > 0 && (
@@ -105,7 +146,7 @@ export function RepoSelector({
                           <div className="flex-1 min-w-0">
                             <div className="flex gap-2">
                               <span className="truncate font-medium">
-                                {repo.name}
+                                {repo.full_name}
                               </span>
                             </div>
                             {repo.description && (
@@ -176,6 +217,27 @@ export function RepoSelector({
                     </CommandGroup>
                   ),
                 )}
+
+                {isValidRepoFormat(searchValue) &&
+                  !filteredRepos.find(
+                    (repo) => repo.full_name === searchValue,
+                  ) && (
+                    <CommandGroup heading="Manual entry">
+                      <CommandItem
+                        value={searchValue}
+                        onSelect={() => {
+                          onValueChange(searchValue);
+                          setOpen(false);
+                          setSearchValue("");
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <GitBranch className="h-4 w-4" />
+                          <span>Add repository: {searchValue}</span>
+                        </div>
+                      </CommandItem>
+                    </CommandGroup>
+                  )}
               </>
             )}
           </CommandList>

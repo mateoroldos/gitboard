@@ -34,7 +34,7 @@ export async function getAccessToken(ctx: ActionCtx) {
 }
 
 export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
-  const accessToken = getAccessToken(ctx);
+  const accessToken = await getAccessToken(ctx);
 
   const { owner, name } = parseRepoString(repo);
 
@@ -48,8 +48,14 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
     },
   );
 
+  if (!repoResponse.ok && repoResponse.status === 404) {
+    throw new ConvexError({
+      message: "Repo not found",
+      code: 404,
+    });
+  }
+
   if (!repoResponse.ok) {
-    console.error("Github API Error");
     throw new ConvexError({
       message: "Internal Error",
       code: 500,
@@ -61,7 +67,7 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
   // Check if user has write access (push or admin permissions)
   if (!repoData.permissions?.push && !repoData.permissions?.admin) {
     throw new ConvexError({
-      message: "Unauthorized",
+      message: "You don't have write access to this repo",
       code: 401,
     });
   }
