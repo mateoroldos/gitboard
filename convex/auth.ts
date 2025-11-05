@@ -2,8 +2,8 @@ import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
-import { query } from "./_generated/server";
 import { betterAuth, env } from "better-auth";
+import { customSession } from "better-auth/plugins";
 
 const siteUrl = env.SITE_URL;
 
@@ -21,27 +21,17 @@ export const createAuth = (
     logger: {
       disabled: optionsOnly,
     },
+    account: {
+      encryptOAuthTokens: true,
+    },
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
-    // Configure simple, non-verified email/password to get started
     socialProviders: {
       github: {
         clientId: env.GITHUB_CLIENT_ID as string,
         clientSecret: env.GITHUB_CLIENT_SECRET as string,
       },
     },
-    plugins: [
-      // The Convex plugin is required for Convex compatibility
-      convex(),
-    ],
+    plugins: [convex()],
   });
 };
-
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
-  },
-});

@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as boards from "../boards.js";
+import type * as github from "../github.js";
 import type * as http from "../http.js";
 import type * as widgets from "../widgets.js";
 
@@ -30,6 +31,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   boards: typeof boards;
+  github: typeof github;
   http: typeof http;
   widgets: typeof widgets;
 }>;
