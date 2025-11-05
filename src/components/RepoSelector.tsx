@@ -33,7 +33,7 @@ export function RepoSelector({
   const [open, setOpen] = useState(false);
 
   const { data: githubData } = useSuspenseQuery(
-    convexAction(api.github.getAllGitHubData, {}),
+    convexAction(api.github.getAllRepos, {}),
   );
 
   const userRepos = githubData?.userRepos || [];
@@ -78,7 +78,7 @@ export function RepoSelector({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-full max-w-[350px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Search repositories..." />
           <CommandList>
@@ -101,24 +101,12 @@ export function RepoSelector({
                           setOpen(false);
                         }}
                       >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value === repo.full_name
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <GitBranch className="h-4 w-4 shrink-0" />
+                        <div className="flex items-center justify-between gap-2 flex-1 min-w-0">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex gap-2">
                               <span className="truncate font-medium">
                                 {repo.name}
                               </span>
-                              {repo.private && (
-                                <Lock className="h-3 w-3 shrink-0" />
-                              )}
                             </div>
                             {repo.description && (
                               <p className="text-xs text-muted-foreground truncate">

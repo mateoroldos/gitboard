@@ -3,7 +3,6 @@ import { convex } from "@convex-dev/better-auth/plugins";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { betterAuth, env } from "better-auth";
-import { customSession } from "better-auth/plugins";
 
 const siteUrl = env.SITE_URL;
 

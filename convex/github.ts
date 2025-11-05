@@ -2,22 +2,7 @@ import { fetchUserRepos, fetchUserOrgs, fetchOrgRepos } from "@/lib/github";
 import { action } from "./_generated/server";
 import { authComponent, createAuth } from "./auth";
 
-export const getUserRepos = action({
-  handler: async (ctx) => {
-    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-
-    const { accessToken } = await auth.api.getAccessToken({
-      headers,
-      body: {
-        providerId: "github",
-      },
-    });
-
-    return fetchUserRepos(accessToken);
-  },
-});
-
-export const getAllGitHubData = action({
+export const getAllRepos = action({
   handler: async (ctx) => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
 
