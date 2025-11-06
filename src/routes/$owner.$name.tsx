@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
@@ -5,6 +6,8 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { convexAction, convexQuery } from "@convex-dev/react-query";
 import { WidgetSelector } from "@/components/widgets/WidgetSelector";
 import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
+import { WidgetConfigDialog } from "@/components/widgets/WidgetConfigDialog";
+import { getWidgetById } from "@/components/widgets/registry";
 import type { WidgetDefinition } from "@/components/widgets/types";
 
 
@@ -22,6 +25,10 @@ export const Route = createFileRoute("/$owner/$name")({
 function RepoBoard() {
   const { owner, name } = Route.useParams();
   const repoString = `${owner}/${name}`;
+  
+  // Configuration dialog state
+  const [configDialogOpen, setConfigDialogOpen] = useState(false);
+  const [selectedWidget, setSelectedWidget] = useState<any>(null);
 
   const { data: hasAccess } = useSuspenseQuery(
     convexAction(api.auth.checkRepoWriteAccess, { repo: repoString }),
@@ -39,6 +46,14 @@ function RepoBoard() {
     mutationFn: useAction(api.widgets.createWidgetAction),
   });
 
+  const { mutate: updateWidget } = useMutation({
+    mutationFn: useAction(api.widgets.updateWidgetAction),
+  });
+
+  const { mutate: deleteWidget } = useMutation({
+    mutationFn: useAction(api.widgets.deleteWidgetAction),
+  });
+
   const handleSelectWidget = async (widgetDef: WidgetDefinition) => {
     if (!board) return;
 
@@ -50,6 +65,26 @@ function RepoBoard() {
       position: { x: 100, y: 100 },
       size: widgetDef.size.default,
       title: widgetDef.name,
+    });
+  };
+
+  const handleEditWidget = (widget: any) => {
+    setSelectedWidget(widget);
+    setConfigDialogOpen(true);
+  };
+
+  const handleDeleteWidget = (widget: any) => {
+    if (confirm("Are you sure you want to delete this widget?")) {
+      deleteWidget({ id: widget._id });
+    }
+  };
+
+  const handleSaveConfig = async (config: Record<string, any>) => {
+    if (!selectedWidget) return;
+    
+    updateWidget({
+      id: selectedWidget._id,
+      config,
     });
   };
 
@@ -94,12 +129,14 @@ function RepoBoard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {widgets.map((widget) => (
-                  <div key={widget._id}>
+                  <div key={widget._id} className="group">
                     <WidgetRenderer
                       widgetType={widget.widgetType}
                       config={widget.config}
                       instanceId={widget._id}
                       repository={repoString}
+                      onConfigChange={() => handleEditWidget(widget)}
+                      onDelete={() => handleDeleteWidget(widget)}
                     />
                   </div>
                 ))}
@@ -108,6 +145,18 @@ function RepoBoard() {
           </div>
         </div>
       </main>
+
+      {/* Configuration Dialog */}
+      {selectedWidget && (
+        <WidgetConfigDialog
+          widget={selectedWidget}
+          widgetDefinition={getWidgetById(selectedWidget.widgetType)!}
+          repository={repoString}
+          open={configDialogOpen}
+          onOpenChange={setConfigDialogOpen}
+          onSave={handleSaveConfig}
+        />
+      )}
     </div>
   );
 }

@@ -21,15 +21,6 @@ const githubStarsWidget: WidgetDefinition<{
       description: "Display star icon next to count",
       defaultValue: true,
     },
-    theme: {
-      type: "select",
-      label: "Theme",
-      options: [
-        { label: "Light", value: "light" },
-        { label: "Dark", value: "dark" },
-      ],
-      defaultValue: "light",
-    },
   },
 
   defaultConfig: {

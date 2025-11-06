@@ -1,6 +1,6 @@
 import type React from "react";
 
-export type ConfigFieldType = "string" | "number" | "boolean" | "select";
+export type ConfigFieldType = "string" | "number" | "boolean" | "select" | "color" | "repository";
 
 export interface ConfigField {
   type: ConfigFieldType;

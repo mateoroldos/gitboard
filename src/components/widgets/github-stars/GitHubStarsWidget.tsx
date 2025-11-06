@@ -28,7 +28,7 @@ export function GitHubStarsWidget({
   return (
     <WidgetRoot
       title="GitHub Stars"
-      onEdit={onConfigChange ? () => {} : undefined}
+      onEdit={onConfigChange ? () => onConfigChange(config) : undefined}
       onDelete={onDelete}
     >
       <div className="flex items-center gap-3">
