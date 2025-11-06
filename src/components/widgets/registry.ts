@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { GitHubStarsWidget } from "./github-stars/GitHubStarsWidget";
 import type { WidgetDefinition, WidgetCategory } from "./types";
+import { createWidgetSchema } from "./zod-helpers";
 
-const githubStarsConfigSchema = z.object({
+const githubStarsConfigSchema = createWidgetSchema({
   showIcon: z.boolean(),
 });
 
