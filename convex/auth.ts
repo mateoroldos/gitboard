@@ -3,6 +3,9 @@ import { convex } from "@convex-dev/better-auth/plugins";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { betterAuth, env } from "better-auth";
+import { action } from "./_generated/server";
+import { v } from "convex/values";
+import { requireRepoAccess } from "./model/auth";
 
 const siteUrl = env.SITE_URL;
 
@@ -34,3 +37,18 @@ export const createAuth = (
     plugins: [convex()],
   });
 };
+
+export const checkRepoWriteAccess = action({
+  args: {
+    repo: v.string(),
+  },
+  handler: async (ctx, { repo }) => {
+    try {
+      await requireRepoAccess(ctx, repo);
+
+      return true;
+    } catch {
+      return false;
+    }
+  },
+});

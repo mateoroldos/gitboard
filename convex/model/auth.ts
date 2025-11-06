@@ -1,5 +1,5 @@
 import { parseRepoString } from "@/lib/github";
-import { ActionCtx } from "convex/_generated/server";
+import { ActionCtx, QueryCtx } from "convex/_generated/server";
 import { authComponent, createAuth } from "convex/auth";
 import { ConvexError } from "convex/values";
 
@@ -73,4 +73,17 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
   }
 
   return { repo };
+}
+
+export async function getAccessTokenForQuery(ctx: QueryCtx) {
+  const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+
+  const { accessToken } = await auth.api.getAccessToken({
+    headers,
+    body: {
+      providerId: "github",
+    },
+  });
+
+  return accessToken;
 }

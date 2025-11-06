@@ -2,11 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { convexQuery } from "@convex-dev/react-query";
+import { convexAction, convexQuery } from "@convex-dev/react-query";
 import { Button } from "@/components/ui/button";
 import { Loader, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/$owner/$name")({
+  loader: async (opts) => {
+    const { owner, name } = opts.params;
+
+    await opts.context.queryClient.ensureQueryData(
+      convexAction(api.auth.checkRepoWriteAccess, { repo: `${owner}/${name}` }),
+    );
+  },
   component: RepoBoard,
 });
 
@@ -14,6 +21,9 @@ function RepoBoard() {
   const { owner, name } = Route.useParams();
   const repoString = `${owner}/${name}`;
 
+  const { data: hasAccess } = useSuspenseQuery(
+    convexAction(api.auth.checkRepoWriteAccess, { repo: repoString }),
+  );
   const { data: board } = useSuspenseQuery(
     convexQuery(api.boards.getBoardByRepo, { repo: repoString }),
   );
@@ -61,10 +71,12 @@ function RepoBoard() {
             <h1 className="text-2xl font-bold text-gray-900">{repoString}</h1>
             <p className="text-gray-600 mt-1">GitHub Repository Board</p>
           </div>
-          <Button onClick={handleCreateWidget} disabled={isPending}>
-            {isPending ? <Loader className="animate-spin" /> : <Plus />}
-            Add Widget
-          </Button>
+          {hasAccess && (
+            <Button onClick={handleCreateWidget} disabled={isPending}>
+              {isPending ? <Loader className="animate-spin" /> : <Plus />}
+              Add Widget
+            </Button>
+          )}
         </div>
       </header>
 
