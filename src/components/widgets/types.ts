@@ -32,7 +32,6 @@ export type WidgetCategory =
   | "analytics"
   | "notes"
   | "links"
-  | "repository"
   | "custom";
 
 export interface WidgetDefinition<TConfig = Record<string, any>> {
@@ -61,8 +60,8 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
 }
 
 export interface WidgetInstanceData {
-  instanceId: string;
-  widgetId: string;
+  _id: string;
+  widgetType: string;
   config: Record<string, any>;
   position: {
     x: number;

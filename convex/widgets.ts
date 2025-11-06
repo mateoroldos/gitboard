@@ -10,6 +10,7 @@ import { api, internal } from "./_generated/api";
 import * as Widgets from "./model/widgets";
 import * as Boards from "./model/boards";
 
+
 export const getWidgetsByBoard = query({
   args: {
     boardId: v.id("boards"),
@@ -30,15 +31,7 @@ export const getWidgetById = query({
 
 const createWidgetArgs = {
   boardId: v.id("boards"),
-  widgetType: v.union(
-    v.literal("github-stars"),
-    v.literal("github-issues"),
-    v.literal("github-prs"),
-    v.literal("github-commits"),
-    v.literal("npm-downloads"),
-    v.literal("text-note"),
-    v.literal("link-collection"),
-  ),
+  widgetType: v.string(),
   config: v.any(),
   position: v.object({
     x: v.number(),

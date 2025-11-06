@@ -12,15 +12,7 @@ export default defineSchema({
 
   widgets: defineTable({
     boardId: v.id("boards"),
-    widgetType: v.union(
-      v.literal("github-stars"),
-      v.literal("github-issues"),
-      v.literal("github-prs"),
-      v.literal("github-commits"),
-      v.literal("npm-downloads"),
-      v.literal("text-note"),
-      v.literal("link-collection"),
-    ),
+    widgetType: v.string(),
     config: v.any(),
     position: v.object({
       x: v.number(),

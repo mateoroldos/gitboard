@@ -40,14 +40,7 @@ export async function createWidget(
     title,
   }: {
     boardId: Id<"boards">;
-    widgetType:
-      | "github-stars"
-      | "github-issues"
-      | "github-prs"
-      | "github-commits"
-      | "npm-downloads"
-      | "text-note"
-      | "link-collection";
+    widgetType: string;
     config: any;
     position: { x: number; y: number };
     size: { width: number; height: number };

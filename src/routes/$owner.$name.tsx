@@ -7,6 +7,7 @@ import { WidgetSelector } from "@/components/widgets/WidgetSelector";
 import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
 import type { WidgetDefinition } from "@/components/widgets/types";
 
+
 export const Route = createFileRoute("/$owner/$name")({
   loader: async (opts) => {
     const { owner, name } = opts.params;
@@ -44,7 +45,7 @@ function RepoBoard() {
     // Use widget definition to create widget with proper defaults
     createWidget({
       boardId: board._id,
-      widgetType: widgetDef.id as any, // Type assertion needed for now
+      widgetType: widgetDef.id,
       config: { ...widgetDef.defaultConfig, repository: repoString },
       position: { x: 100, y: 100 },
       size: widgetDef.size.default,
