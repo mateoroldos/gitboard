@@ -3,8 +3,9 @@ import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { convexAction, convexQuery } from "@convex-dev/react-query";
-import { Button } from "@/components/ui/button";
-import { Loader, Plus } from "lucide-react";
+import { WidgetSelector } from "@/components/widgets/WidgetSelector";
+import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
+import type { WidgetDefinition } from "@/components/widgets/types";
 
 export const Route = createFileRoute("/$owner/$name")({
   loader: async (opts) => {
@@ -37,16 +38,17 @@ function RepoBoard() {
     mutationFn: useAction(api.widgets.createWidgetAction),
   });
 
-  const handleCreateWidget = async () => {
+  const handleSelectWidget = async (widgetDef: WidgetDefinition) => {
     if (!board) return;
 
+    // Use widget definition to create widget with proper defaults
     createWidget({
       boardId: board._id,
-      widgetType: "text-note",
-      config: { text: "New widget" },
+      widgetType: widgetDef.id as any, // Type assertion needed for now
+      config: { ...widgetDef.defaultConfig, repository: repoString },
       position: { x: 100, y: 100 },
-      size: { width: 200, height: 150 },
-      title: "New Widget",
+      size: widgetDef.size.default,
+      title: widgetDef.name,
     });
   };
 
@@ -72,10 +74,10 @@ function RepoBoard() {
             <p className="text-gray-600 mt-1">GitHub Repository Board</p>
           </div>
           {hasAccess && (
-            <Button onClick={handleCreateWidget} disabled={isPending}>
-              {isPending ? <Loader className="animate-spin" /> : <Plus />}
-              Add Widget
-            </Button>
+            <WidgetSelector 
+              onSelectWidget={handleSelectWidget} 
+              disabled={isPending}
+            />
           )}
         </div>
       </header>
@@ -91,19 +93,13 @@ function RepoBoard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {widgets.map((widget) => (
-                  <div
-                    key={widget._id}
-                    className="bg-gray-50 rounded-lg border border-gray-200 p-4"
-                  >
-                    <h3 className="font-medium text-gray-900 mb-2">
-                      {widget.title || widget.widgetType}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Type: {widget.widgetType}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Created: {new Date(widget.createdAt).toLocaleDateString()}
-                    </p>
+                  <div key={widget._id}>
+                    <WidgetRenderer
+                      widgetType={widget.widgetType}
+                      config={widget.config}
+                      instanceId={widget._id}
+                      repository={repoString}
+                    />
                   </div>
                 ))}
               </div>
