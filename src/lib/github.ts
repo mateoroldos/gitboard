@@ -71,6 +71,36 @@ export async function fetchGitHubRepo(
   }
 }
 
+export async function fetchGitHubStars(
+  owner: string,
+  name: string,
+  token?: string,
+): Promise<number | null> {
+  try {
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github.v3+json",
+    };
+    
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(
+      `https://api.github.com/repos/${owner}/${name}`,
+      { headers }
+    );
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const repo = await response.json();
+    return repo.stargazers_count;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchUserRepos(token: string): Promise<GitHubRepo[]> {
   try {
     const response = await fetch(

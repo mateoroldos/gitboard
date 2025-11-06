@@ -1,5 +1,9 @@
 import type { WidgetProps } from "../types";
 import { WidgetRoot } from "../WidgetRoot";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { convexAction } from "@convex-dev/react-query";
+import { parseRepoString } from "@/lib/github";
+import { api } from "convex/_generated/api";
 
 interface GitHubStarsConfig {
   repository: string;
@@ -13,7 +17,13 @@ export function GitHubStarsWidget({
   onConfigChange,
   onDelete,
 }: WidgetProps<GitHubStarsConfig>) {
-  const starCount = 1337;
+  const { owner, name } = parseRepoString(repository);
+
+  const { data: starsData } = useSuspenseQuery(
+    convexAction(api.github.getRepoStars, { owner, name }),
+  );
+
+  const starCount = starsData?.stars ?? 0;
 
   return (
     <WidgetRoot

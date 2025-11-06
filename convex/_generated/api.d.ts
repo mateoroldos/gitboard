@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as boards from "../boards.js";
 import type * as github from "../github.js";
 import type * as http from "../http.js";
+import type * as internal_github from "../internal/github.js";
 import type * as model_auth from "../model/auth.js";
 import type * as model_boards from "../model/boards.js";
 import type * as model_github from "../model/github.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   boards: typeof boards;
   github: typeof github;
   http: typeof http;
+  "internal/github": typeof internal_github;
   "model/auth": typeof model_auth;
   "model/boards": typeof model_boards;
   "model/github": typeof model_github;
@@ -2152,6 +2154,48 @@ export declare const components: {
       findOne: FunctionReference<"query", "internal", any, any>;
       update: FunctionReference<"mutation", "internal", any, any>;
       updateMany: FunctionReference<"mutation", "internal", any, any>;
+    };
+  };
+  actionCache: {
+    crons: {
+      purge: FunctionReference<
+        "mutation",
+        "internal",
+        { expiresAt?: number },
+        null
+      >;
+    };
+    lib: {
+      get: FunctionReference<
+        "query",
+        "internal",
+        { args: any; name: string; ttl: number | null },
+        { kind: "hit"; value: any } | { expiredEntry?: string; kind: "miss" }
+      >;
+      put: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          args: any;
+          expiredEntry?: string;
+          name: string;
+          ttl: number | null;
+          value: any;
+        },
+        { cacheHit: boolean; deletedExpiredEntry: boolean }
+      >;
+      remove: FunctionReference<
+        "mutation",
+        "internal",
+        { args: any; name: string },
+        null
+      >;
+      removeAll: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; before?: number; name?: string },
+        null
+      >;
     };
   };
 };
