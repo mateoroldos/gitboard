@@ -1,32 +1,25 @@
+import { z } from "zod";
 import { GitHubStarsWidget } from "./github-stars/GitHubStarsWidget";
 import type { WidgetDefinition, WidgetCategory } from "./types";
 
-const githubStarsWidget: WidgetDefinition<{
-  repository: string;
-  showIcon: boolean;
-  theme: "light" | "dark";
-}> = {
+const githubStarsConfigSchema = z.object({
+  showIcon: z.boolean(),
+});
+
+type GitHubStarsConfig = z.infer<typeof githubStarsConfigSchema>;
+
+const githubStarsWidget: WidgetDefinition<GitHubStarsConfig> = {
   id: "github-stars",
   name: "GitHub Stars",
   description: "Display repository star count with customizable appearance",
   category: "github",
-  emoji: "⭐",
+  icon: "⭐",
 
   component: GitHubStarsWidget,
-
-  configSchema: {
-    showIcon: {
-      type: "boolean",
-      label: "Show Star Icon",
-      description: "Display star icon next to count",
-      defaultValue: true,
-    },
-  },
+  configSchema: githubStarsConfigSchema,
 
   defaultConfig: {
-    repository: "",
     showIcon: true,
-    theme: "light",
   },
 
   size: {

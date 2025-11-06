@@ -1,27 +1,10 @@
 import type React from "react";
-
-export type ConfigFieldType = "string" | "number" | "boolean" | "select" | "color" | "repository";
-
-export interface ConfigField {
-  type: ConfigFieldType;
-  label: string;
-  description?: string;
-  required?: boolean;
-  defaultValue?: any;
-  options?: Array<{ label: string; value: any }>; // For select fields
-  validation?: {
-    min?: number;
-    max?: number;
-    pattern?: string;
-  };
-}
-
-export type ConfigSchema = Record<string, ConfigField>;
+import type { z } from "zod";
 
 export interface WidgetProps<TConfig = Record<string, any>> {
   config: TConfig;
   instanceId: string;
-  repository: string;
+  repository: string; // owner/name format
   onConfigChange?: (config: TConfig) => void;
   onDelete?: () => void;
   isEditing?: boolean;
@@ -39,11 +22,11 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   name: string;
   description: string;
   category: WidgetCategory;
-  emoji: string;
+  icon: string;
 
   component: React.ComponentType<WidgetProps<any>>;
 
-  configSchema: ConfigSchema;
+  configSchema: z.ZodObject<any>;
   defaultConfig: TConfig;
 
   size: {

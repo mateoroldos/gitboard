@@ -27,6 +27,7 @@ export function WidgetRoot({
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {onEdit && (
               <button
+                type="button"
                 onClick={onEdit}
                 className="p-1 hover:bg-accent rounded text-xs transition-colors"
                 aria-label="Edit widget"
@@ -37,6 +38,7 @@ export function WidgetRoot({
             )}
             {onDelete && (
               <button
+                type="button"
                 onClick={onDelete}
                 className="p-1 hover:bg-destructive hover:text-destructive-foreground rounded text-xs transition-colors"
                 aria-label="Delete widget"

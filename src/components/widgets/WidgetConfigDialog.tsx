@@ -34,64 +34,28 @@ export function WidgetConfigDialog({
   onOpenChange,
   onSave,
 }: WidgetConfigDialogProps) {
-  const [formValues, setFormValues] = useState<Record<string, any>>(widget.config);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formValues, setFormValues] = useState<Record<string, any>>(
+    widget.config,
+  );
+  const [isFormValid, setIsFormValid] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   // Reset form when dialog opens or widget changes
   useEffect(() => {
     if (open) {
       setFormValues(widget.config);
-      setErrors({});
+      setIsFormValid(true);
     }
   }, [open, widget.config]);
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    Object.entries(widgetDefinition.configSchema).forEach(([key, field]) => {
-      const value = formValues[key];
-
-      // Required field validation
-      if (field.required && (!value || value === "")) {
-        newErrors[key] = `${field.label} is required`;
-      }
-
-      // Number validation
-      if (field.type === "number" && value !== undefined && value !== "") {
-        const numValue = Number(value);
-        if (isNaN(numValue)) {
-          newErrors[key] = `${field.label} must be a number`;
-        } else {
-          if (field.validation?.min !== undefined && numValue < field.validation.min) {
-            newErrors[key] = `${field.label} must be at least ${field.validation.min}`;
-          }
-          if (field.validation?.max !== undefined && numValue > field.validation.max) {
-            newErrors[key] = `${field.label} must be at most ${field.validation.max}`;
-          }
-        }
-      }
-
-      // Repository validation
-      if (field.type === "repository" && value) {
-        if (!/^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/.test(value)) {
-          newErrors[key] = "Repository must be in format: owner/name";
-        }
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSave = async () => {
-    if (!validateForm()) {
+    if (!isFormValid) {
       return;
     }
 
     setIsLoading(true);
     try {
-      await onSave(formValues);
+      onSave(formValues);
       onOpenChange(false);
     } catch (error) {
       console.error("Failed to save widget config:", error);
@@ -103,12 +67,12 @@ export function WidgetConfigDialog({
 
   const handleReset = () => {
     setFormValues(widgetDefinition.defaultConfig);
-    setErrors({});
+    setIsFormValid(true);
   };
 
   const handleCancel = () => {
     setFormValues(widget.config);
-    setErrors({});
+    setIsFormValid(true);
     onOpenChange(false);
   };
 
@@ -118,8 +82,9 @@ export function WidgetConfigDialog({
         <DialogHeader>
           <DialogTitle>Configure {widgetDefinition.name}</DialogTitle>
           <DialogDescription>
-            Customize the settings for your {widgetDefinition.name.toLowerCase()} widget.
-            Changes will be reflected in the preview on the right.
+            Customize the settings for your{" "}
+            {widgetDefinition.name.toLowerCase()} widget. Changes will be
+            reflected in the preview on the right.
           </DialogDescription>
         </DialogHeader>
 
@@ -130,7 +95,7 @@ export function WidgetConfigDialog({
               schema={widgetDefinition.configSchema}
               values={formValues}
               onChange={setFormValues}
-              errors={errors}
+              onValidationChange={setIsFormValid}
             />
           </div>
 
@@ -150,11 +115,7 @@ export function WidgetConfigDialog({
         </div>
 
         <DialogFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={handleReset} disabled={isLoading}>
             Reset to Defaults
           </Button>
           <div className="flex gap-2">
@@ -165,10 +126,7 @@ export function WidgetConfigDialog({
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleSave}
-              disabled={isLoading || Object.keys(errors).length > 0}
-            >
+            <Button onClick={handleSave} disabled={isLoading || !isFormValid}>
               {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
@@ -177,3 +135,4 @@ export function WidgetConfigDialog({
     </Dialog>
   );
 }
+

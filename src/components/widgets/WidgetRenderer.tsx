@@ -28,6 +28,7 @@ export function WidgetRenderer({
           <h3 className="font-medium text-destructive">Unknown Widget</h3>
           {onDelete && (
             <button
+              type="button"
               onClick={onDelete}
               className="opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/20 rounded text-xs transition-all"
               aria-label="Delete widget"
