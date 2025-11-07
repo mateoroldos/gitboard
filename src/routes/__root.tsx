@@ -14,6 +14,8 @@ import {
 } from "@convex-dev/better-auth/react-start";
 import { authClient } from "@/lib/auth-client";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+import { getThemeServerFn } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/Header";
@@ -56,6 +58,8 @@ export const Route = createRootRouteWithContext<{
     ],
   }),
 
+  loader: () => getThemeServerFn(),
+
   beforeLoad: async (ctx) => {
     // all queries, mutations and action made with TanStack Query will be
     // authenticated by an identity token.
@@ -74,23 +78,28 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   const context = useRouteContext({ from: Route.id });
+  const theme = Route.useLoaderData();
 
   return (
     <ConvexBetterAuthProvider
       client={context.convexClient}
       authClient={authClient}
     >
-      <RootDocument>
-        <Header />
-        <Outlet />
-      </RootDocument>
+      <ThemeProvider theme={theme}>
+        <RootDocument>
+          <Header />
+          <Outlet />
+        </RootDocument>
+      </ThemeProvider>
     </ConvexBetterAuthProvider>
   );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const theme = Route.useLoaderData();
+  
   return (
-    <html lang="en">
+    <html className={theme} lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

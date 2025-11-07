@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Plus } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Header() {
   const { data: session } = authClient.useSession();
@@ -22,19 +23,18 @@ export function Header() {
         Gitboard
       </Link>
 
-      <AuthLoading>
-        <div className="flex flex-row gap-3">
-          <Skeleton className="w-24 h-8 rounded-md" />
-          <Skeleton className="rounded-full size-8" />
-        </div>
-      </AuthLoading>
+      <div className="flex flex-row gap-3">
+        <ThemeToggle />
+        <AuthLoading>
+          <Skeleton className="border w-30 h-8 rounded-md" />
+          <Skeleton className="border rounded-full size-8" />
+        </AuthLoading>
 
-      <Unauthenticated>
-        <Button onClick={signIn}>Sign In</Button>
-      </Unauthenticated>
+        <Unauthenticated>
+          <Button onClick={signIn}>Sign In</Button>
+        </Unauthenticated>
 
-      <Authenticated>
-        <div className="flex flex-row gap-3">
+        <Authenticated>
           <Link
             to="/create"
             className={buttonVariants({ size: "sm", variant: "outline" })}
@@ -56,8 +56,8 @@ export function Header() {
               <DropdownMenuItem onSelect={signOut}>Sign Out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-      </Authenticated>
+        </Authenticated>
+      </div>
     </header>
   );
 }
