@@ -1,5 +1,5 @@
 import type React from "react";
-import type { z } from "zod";
+import type * as z from "zod";
 
 export interface WidgetProps<TConfig = Record<string, any>> {
   config: TConfig;
@@ -25,8 +25,9 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   icon: string;
 
   component: React.ComponentType<WidgetProps<any>>;
+  previewComponent?: React.ComponentType<WidgetProps<any>>;
 
-  configSchema: z.ZodObject<any>;
+  configSchema: z.ZodObject<z.ZodType>;
   defaultConfig: TConfig;
 
   size: {

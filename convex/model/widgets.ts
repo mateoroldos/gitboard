@@ -1,6 +1,7 @@
 import { Id } from "convex/_generated/dataModel";
 import { MutationCtx, QueryCtx } from "convex/_generated/server";
 import { ConvexError } from "convex/values";
+import { executeWidgetLifecycleHook } from "./widget_lifecycle";
 
 export async function getWidgetsByBoard(
   ctx: QueryCtx,
@@ -49,7 +50,7 @@ export async function createWidget(
 ) {
   const now = Date.now();
 
-  return await ctx.db.insert("widgets", {
+  const widgetId = await ctx.db.insert("widgets", {
     boardId,
     widgetType,
     config,
@@ -59,6 +60,16 @@ export async function createWidget(
     createdAt: now,
     updatedAt: now,
   });
+
+  await executeWidgetLifecycleHook(
+    ctx,
+    widgetType,
+    "onCreate",
+    widgetId,
+    config,
+  );
+
+  return widgetId;
 }
 
 export async function updateWidget(
@@ -87,6 +98,20 @@ export async function updateWidget(
     return null;
   }
 
+  // Execute widget-specific onUpdate lifecycle hook if config is being updated
+  if (config) {
+    const widget = await ctx.db.get(id);
+    if (widget) {
+      await executeWidgetLifecycleHook(
+        ctx,
+        widget.widgetType,
+        "onUpdate",
+        id,
+        config,
+      );
+    }
+  }
+
   return await ctx.db.patch(id, {
     ...updates,
     updatedAt: Date.now(),
@@ -97,6 +122,11 @@ export async function deleteWidget(
   ctx: MutationCtx,
   { id }: { id: Id<"widgets"> },
 ) {
+  const widget = await ctx.db.get(id);
+
+  if (widget) {
+    await executeWidgetLifecycleHook(ctx, widget.widgetType, "onDelete", id);
+  }
+
   return await ctx.db.delete(id);
 }
-

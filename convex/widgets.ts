@@ -10,7 +10,6 @@ import { api, internal } from "./_generated/api";
 import * as Widgets from "./model/widgets";
 import * as Boards from "./model/boards";
 
-
 export const getWidgetsByBoard = query({
   args: {
     boardId: v.id("boards"),

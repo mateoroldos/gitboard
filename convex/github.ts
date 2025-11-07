@@ -1,6 +1,7 @@
-import { action } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { getAccessToken } from "./model/auth";
 import * as GitHub from "./model/github";
+import { fetchGitHubStars } from "@/lib/github";
 import { ActionCache } from "@convex-dev/action-cache";
 import { components } from "./_generated/api";
 import { v } from "convex/values";

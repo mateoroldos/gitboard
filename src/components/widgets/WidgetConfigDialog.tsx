@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useAction } from "convex/react";
+import { useMutation } from "@tanstack/react-query";
+import { useForm, useStore } from "@tanstack/react-form";
+import * as z from "zod";
+import { api } from "convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,9 +13,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ConfigFormGenerator } from "./ConfigFormGenerator";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { WidgetRenderer } from "./WidgetRenderer";
-import type { WidgetDefinition } from "./types";
+import { getWidgetById } from "./registry";
+import {
+  getEnumOptions,
+  inferFieldType,
+  getFieldMetadata,
+} from "./zod-helpers";
+import { WidgetDefinition } from "./types";
+import { Id } from "convex/_generated/dataModel";
+import { Loader } from "lucide-react";
+import { Textarea } from "../ui/textarea";
 
 interface WidgetConfigDialogProps {
   widget: {
@@ -19,66 +40,54 @@ interface WidgetConfigDialogProps {
     config: Record<string, any>;
     title?: string;
   };
-  widgetDefinition: WidgetDefinition;
   repository: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (config: Record<string, any>) => void;
 }
 
 export function WidgetConfigDialog({
   widget,
-  widgetDefinition,
   repository,
   open,
   onOpenChange,
-  onSave,
 }: WidgetConfigDialogProps) {
-  const [formValues, setFormValues] = useState<Record<string, any>>(
-    widget.config,
-  );
-  const [isFormValid, setIsFormValid] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const widgetDefinition = getWidgetById(widget.widgetType) as WidgetDefinition;
 
-  // Reset form when dialog opens or widget changes
+  const { mutate: updateWidget, isPending } = useMutation({
+    mutationFn: useAction(api.widgets.updateWidgetAction),
+  });
+
+  const form = useForm({
+    defaultValues: widget.config,
+    validators: {
+      onSubmit: widgetDefinition.configSchema,
+    },
+    onSubmit: async ({ value }) => {
+      updateWidget(
+        {
+          id: widget._id as Id<"widgets">,
+          config: value,
+        },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+          },
+        },
+      );
+    },
+  });
+
+  const previewValues = useStore(form.store, (state) => state.values);
+
   useEffect(() => {
     if (open) {
-      setFormValues(widget.config);
-      setIsFormValid(true);
+      form.reset();
     }
-  }, [open, widget.config]);
-
-  const handleSave = async () => {
-    if (!isFormValid) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      onSave(formValues);
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to save widget config:", error);
-      // Could add error toast here
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleReset = () => {
-    setFormValues(widgetDefinition.defaultConfig);
-    setIsFormValid(true);
-  };
-
-  const handleCancel = () => {
-    setFormValues(widget.config);
-    setIsFormValid(true);
-    onOpenChange(false);
-  };
+  }, [open, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="!max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Configure {widgetDefinition.name}</DialogTitle>
           <DialogDescription>
@@ -91,12 +100,161 @@ export function WidgetConfigDialog({
         <div className="flex gap-6 overflow-hidden">
           {/* Configuration Form */}
           <div className="flex-1 overflow-y-auto max-h-[500px] pr-2">
-            <ConfigFormGenerator
-              schema={widgetDefinition.configSchema}
-              values={formValues}
-              onChange={setFormValues}
-              onValidationChange={setIsFormValid}
-            />
+            <form
+              id="widget-config-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+              }}
+            >
+              <FieldGroup>
+                {Object.entries(widgetDefinition.configSchema.shape).map(
+                  ([fieldKey, zodType]) => {
+                    return (
+                      <form.Field
+                        key={fieldKey}
+                        name={fieldKey}
+                        children={(field) => {
+                          const fieldMetadata = getFieldMetadata(zodType);
+                          const fieldType =
+                            fieldMetadata?.inputType || inferFieldType(zodType);
+                          const enumOptions = getEnumOptions(zodType);
+
+                          const isInvalid =
+                            field.state.meta.isTouched &&
+                            !field.state.meta.isValid;
+
+                          const fieldLabel =
+                            fieldMetadata?.label ||
+                            fieldKey.charAt(0).toUpperCase() +
+                              fieldKey.slice(1);
+
+                          return (
+                            <Field data-invalid={isInvalid}>
+                              <FieldLabel htmlFor={fieldKey}>
+                                {fieldLabel}
+                                {!(zodType instanceof z.ZodOptional) && (
+                                  <span className="text-red-500 ml-1">*</span>
+                                )}
+                              </FieldLabel>
+
+                              {fieldType === "textarea" ? (
+                                <Textarea
+                                  id={fieldKey}
+                                  name={field.name}
+                                  value={field.state.value || ""}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  onBlur={field.handleBlur}
+                                  placeholder={fieldMetadata?.placeholder}
+                                  rows={fieldMetadata?.rows || 4}
+                                  aria-invalid={isInvalid}
+                                />
+                              ) : fieldType === "input" ||
+                                fieldType === "string" ? (
+                                <Input
+                                  id={fieldKey}
+                                  name={field.name}
+                                  type="text"
+                                  value={field.state.value || ""}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                  placeholder={fieldMetadata?.placeholder}
+                                />
+                              ) : fieldType === "number" ? (
+                                <Input
+                                  id={fieldKey}
+                                  name={field.name}
+                                  type="number"
+                                  value={field.state.value || ""}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    field.handleChange(
+                                      value === "" ? undefined : Number(value),
+                                    );
+                                  }}
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                  placeholder={fieldMetadata?.placeholder}
+                                />
+                              ) : fieldType === "checkbox" ||
+                                fieldType === "boolean" ? (
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    id={fieldKey}
+                                    name={field.name}
+                                    type="checkbox"
+                                    checked={field.state.value || false}
+                                    onChange={(e) =>
+                                      field.handleChange(e.target.checked)
+                                    }
+                                    onBlur={field.handleBlur}
+                                    aria-invalid={isInvalid}
+                                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <FieldLabel
+                                    htmlFor={fieldKey}
+                                    className="text-sm font-normal"
+                                  >
+                                    {fieldMetadata?.label ||
+                                      `Enable ${fieldKey}`}
+                                  </FieldLabel>
+                                </div>
+                              ) : fieldType === "select" && enumOptions ? (
+                                <select
+                                  id={fieldKey}
+                                  name={field.name}
+                                  value={field.state.value || ""}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  <option value="">Select an option...</option>
+                                  {enumOptions.map((option) => (
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <div className="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                                  <p className="text-sm text-yellow-800">
+                                    Unsupported field type: {fieldType}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Generic description from metadata */}
+                              {fieldMetadata?.description && (
+                                <FieldDescription>
+                                  {fieldMetadata.description}
+                                </FieldDescription>
+                              )}
+
+                              {/* Error messages */}
+                              {isInvalid && (
+                                <FieldError errors={field.state.meta.errors} />
+                              )}
+                            </Field>
+                          );
+                        }}
+                      ></form.Field>
+                    );
+                  },
+                )}
+              </FieldGroup>
+            </form>
           </div>
 
           {/* Live Preview */}
@@ -105,7 +263,7 @@ export function WidgetConfigDialog({
             <div className="border rounded-lg p-4 bg-gray-50">
               <WidgetRenderer
                 widgetType={widget.widgetType}
-                config={formValues}
+                config={previewValues}
                 instanceId={widget._id}
                 repository={repository}
                 isEditing={true}
@@ -115,19 +273,34 @@ export function WidgetConfigDialog({
         </div>
 
         <DialogFooter className="flex justify-between">
-          <Button variant="outline" onClick={handleReset} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              Object.entries(widgetDefinition.defaultConfig).forEach(
+                ([key, value]) => {
+                  form.setFieldValue(key, value);
+                },
+              );
+            }}
+            disabled={isPending}
+          >
             Reset to Defaults
           </Button>
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={handleCancel}
-              disabled={isLoading}
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isLoading || !isFormValid}>
-              {isLoading ? "Saving..." : "Save Changes"}
+            <Button
+              type="submit"
+              form="widget-config-form"
+              disabled={isPending}
+            >
+              {isPending && <Loader className="animate-spin" />}
+              Save
             </Button>
           </div>
         </DialogFooter>
@@ -135,4 +308,3 @@ export function WidgetConfigDialog({
     </Dialog>
   );
 }
-

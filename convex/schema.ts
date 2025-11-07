@@ -26,4 +26,13 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_board", ["boardId"]),
+
+  pollVotes: defineTable({
+    widgetId: v.id("widgets"),
+    userId: v.string(),
+    optionId: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_widget", ["widgetId"])
+    .index("by_user_widget", ["userId", "widgetId"]),
 });
