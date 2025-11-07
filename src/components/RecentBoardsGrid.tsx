@@ -10,7 +10,7 @@ import { convexQuery } from "@convex-dev/react-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
-import { Plus } from "lucide-react";
+import { Plus, GitBranch, Calendar } from "lucide-react";
 
 interface RecentBoardsGridProps {
   limit?: number;
@@ -40,32 +40,32 @@ export function RecentBoardsGrid({ limit = 6 }: RecentBoardsGridProps) {
       {boards.map((board) => {
         const [owner, name] = board.repo.split("/");
         return (
-          <Card key={board._id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg">{board.name}</CardTitle>
-              <CardDescription>{board.repo}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {board.description && (
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {board.description}
-                </p>
-              )}
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">
+          <Link key={board._id} to="/$owner/$name" params={{ owner, name }}>
+            <Card className="h-full cursor-pointer transition-all duration-200 border-border/50 hover:border-primary/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-semibold leading-tight">
+                  {board.name}
+                </CardTitle>
+                <CardDescription className="flex items-center gap-1.5 text-sm">
+                  <GitBranch className="h-3.5 w-3.5" />
+                  {board.repo}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {board.description && (
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+                    {board.description}
+                  </p>
+                )}
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-auto">
+                  <Calendar className="h-3 w-3" />
                   {new Date(board.createdAt).toLocaleDateString()}
-                </span>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/$owner/$name" params={{ owner, name }}>
-                    View Board
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         );
       })}
     </div>
   );
 }
-

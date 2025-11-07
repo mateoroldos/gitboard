@@ -25,17 +25,22 @@ export function GridSkeleton({
       )}
     >
       {Array.from({ length: count }).map((_, i) => (
-        <Card key={i} className={cardClassName}>
-          <CardHeader>
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-full" />
+        <Card key={i} className={cn("h-full border-border/50", cardClassName)}>
+          <CardHeader className="pb-3">
+            <Skeleton className="h-6 w-3/4" />
+            <div className="flex items-center gap-1.5">
+              <Skeleton className="h-3.5 w-3.5 rounded" />
+              <Skeleton className="h-4 w-full" />
+            </div>
           </CardHeader>
-          <CardContent>
-            {showDescription && <Skeleton className="h-3 w-full mb-4" />}
+          <CardContent className="pt-0">
+            {showDescription && (
+              <Skeleton className="h-4 w-full mb-4" />
+            )}
             {showFooter && (
-              <div className="flex justify-between items-center">
-                <Skeleton className="h-2 w-1/3" />
-                <Skeleton className="h-6 w-20" />
+              <div className="flex items-center gap-1.5 mt-auto">
+                <Skeleton className="h-3 w-3 rounded" />
+                <Skeleton className="h-3 w-1/3" />
               </div>
             )}
           </CardContent>
