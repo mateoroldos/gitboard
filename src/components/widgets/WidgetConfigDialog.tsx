@@ -28,18 +28,13 @@ import {
   inferFieldType,
   getFieldMetadata,
 } from "./zod-helpers";
-import { WidgetDefinition } from "./types";
+import { WidgetDefinition, WidgetInstance } from "./types";
 import { Id } from "convex/_generated/dataModel";
 import { Loader } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 
 interface WidgetConfigDialogProps {
-  widget: {
-    _id: string;
-    widgetType: string;
-    config: Record<string, any>;
-    title?: string;
-  };
+  widget: WidgetInstance;
   repository: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;

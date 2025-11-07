@@ -7,7 +7,10 @@ import { convexAction, convexQuery } from "@convex-dev/react-query";
 import { WidgetSelector } from "@/components/widgets/WidgetSelector";
 import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
 import { WidgetConfigDialog } from "@/components/widgets/WidgetConfigDialog";
-import type { WidgetDefinition } from "@/components/widgets/types";
+import type {
+  WidgetDefinition,
+  WidgetInstance,
+} from "@/components/widgets/types";
 
 export const Route = createFileRoute("/$owner/$name")({
   loader: async (opts) => {
@@ -26,7 +29,9 @@ function RepoBoard() {
 
   // Configuration dialog state
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
-  const [selectedWidget, setSelectedWidget] = useState<any>(null);
+  const [selectedWidget, setSelectedWidget] = useState<WidgetInstance | null>(
+    null,
+  );
 
   const { data: hasAccess } = useSuspenseQuery(
     convexAction(api.auth.checkRepoWriteAccess, { repo: repoString }),
@@ -58,7 +63,7 @@ function RepoBoard() {
     });
   };
 
-  const handleEditWidget = (widget: any) => {
+  const handleEditWidget = (widget: WidgetInstance) => {
     setSelectedWidget(widget);
     setConfigDialogOpen(true);
   };

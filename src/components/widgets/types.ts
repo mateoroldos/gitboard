@@ -1,5 +1,6 @@
 import type React from "react";
 import type * as z from "zod";
+import { Doc } from "convex/_generated/dataModel";
 
 export interface WidgetProps<TConfig = Record<string, any>> {
   config: TConfig;
@@ -27,7 +28,7 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   component: React.ComponentType<WidgetProps<any>>;
   previewComponent?: React.ComponentType<WidgetProps<any>>;
 
-  configSchema: z.ZodObject<z.ZodType>;
+  configSchema: z.ZodObject<Record<string, z.ZodType>>;
   defaultConfig: TConfig;
 
   size: {
@@ -43,16 +44,4 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   };
 }
 
-export interface WidgetInstanceData {
-  _id: string;
-  widgetType: string;
-  config: Record<string, any>;
-  position: {
-    x: number;
-    y: number;
-  };
-  size: {
-    width: number;
-    height: number;
-  };
-}
+export type WidgetInstance = Doc<"widgets">;
