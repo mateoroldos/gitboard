@@ -58,7 +58,7 @@ export function WidgetSelector({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={disabled}>
+        <Button disabled={disabled} size="sm" className="cursor-pointer">
           <Plus className="w-4 h-4 mr-2" />
           Add Widget
         </Button>
@@ -169,4 +169,3 @@ function WidgetCard({ widget, onSelect }: WidgetCardProps) {
     </button>
   );
 }
-

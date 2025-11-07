@@ -11,13 +11,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Plus } from "lucide-react";
 
 export function Header() {
   const { data: session } = authClient.useSession();
 
   return (
-    <header className="container mx-auto flex flex-row justify-between py-4">
-      <Link to="/" className="text-lg font-mono font-semibold">
+    <header className="container mx-auto flex flex-row justify-between pt-4 pb-2">
+      <Link to="/" className="text-lg font-semibold">
         Gitboard
       </Link>
 
@@ -38,6 +39,7 @@ export function Header() {
             to="/create"
             className={buttonVariants({ size: "sm", variant: "outline" })}
           >
+            <Plus />
             New Board
           </Link>
           <DropdownMenu>

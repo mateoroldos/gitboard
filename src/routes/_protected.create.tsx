@@ -72,8 +72,8 @@ function RouteComponent() {
   });
 
   return (
-    <div className="container mx-auto flex items-center justify-center p-8">
-      <div className="max-w-sm w-full space-y-8 flex items-center flex-col">
+    <div className="container mx-auto flex items-center justify-center mt-24">
+      <div className="max-w-6xl w-full space-y-12 flex items-center flex-col">
         <div className="text-center">
           <h1 className="text-4xl font-bold">GitBoard</h1>
           <p className="text-muted-foreground">
@@ -87,7 +87,7 @@ function RouteComponent() {
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-4 w-full"
+          className="space-y-4 w-full max-w-sm"
         >
           <form.Field
             name="repo"

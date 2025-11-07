@@ -7,9 +7,9 @@ export const Route = createFileRoute("/")({ component: HomePage });
 
 function HomePage() {
   return (
-    <div className="min-h-screen p-8">
+    <div className="mt-24">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-semibold mb-2">GitBoard</h1>
           <p className="text-muted-foreground text-lg mb-8">
             The open source canvas for open source projects

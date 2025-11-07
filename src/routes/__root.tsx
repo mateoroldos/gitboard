@@ -94,7 +94,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="min-h-dvh">
         {children}
         <TanStackDevtools
           config={{

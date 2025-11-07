@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
@@ -11,6 +11,8 @@ import type {
   WidgetDefinition,
   WidgetInstance,
 } from "@/components/widgets/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { GitBranch, Github } from "lucide-react";
 
 export const Route = createFileRoute("/$owner/$name")({
   loader: async (opts) => {
@@ -82,47 +84,44 @@ function RepoBoard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{repoString}</h1>
-            <p className="text-gray-600 mt-1">GitHub Repository Board</p>
-          </div>
-          {hasAccess && (
-            <WidgetSelector
-              onSelectWidget={handleSelectWidget}
-              disabled={isPending}
-            />
-          )}
-        </div>
-      </header>
+    <>
+      <nav className="py-3 flex flex-row justify-between container mx-auto">
+        <a href={`https://github.com/${repoString}`} target="_blank">
+          <Card className="py-2 group hover:border-primary/40 transition-all">
+            <CardContent className="flex flex-row items-center gap-2 text-sm px-3">
+              <Github className="size-4 text-muted-foreground/70 group-hover:text-primary transition-all" />
+              <h1 className="font-semibold">{repoString}</h1>
+            </CardContent>
+          </Card>
+        </a>
+        {hasAccess && (
+          <WidgetSelector
+            onSelectWidget={handleSelectWidget}
+            disabled={isPending}
+          />
+        )}
+      </nav>
 
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4">Project Board</h2>
-            {widgets.length === 0 ? (
-              <p className="text-gray-600">
-                No widgets yet. Click "Add Widget" to get started!
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {widgets.map((widget) => (
-                  <div key={widget._id} className="group">
-                    <WidgetRenderer
-                      widgetType={widget.widgetType}
-                      config={widget.config}
-                      instanceId={widget._id}
-                      repository={repoString}
-                      onConfigChange={() => handleEditWidget(widget)}
-                    />
-                  </div>
-                ))}
+      <main className="container mx-auto">
+        {widgets.length === 0 ? (
+          <p className="text-gray-600">
+            No widgets yet. Click "Add Widget" to get started!
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {widgets.map((widget) => (
+              <div key={widget._id} className="group">
+                <WidgetRenderer
+                  widgetType={widget.widgetType}
+                  config={widget.config}
+                  instanceId={widget._id}
+                  repository={repoString}
+                  onConfigChange={() => handleEditWidget(widget)}
+                />
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
       </main>
 
       {/* Configuration Dialog */}
@@ -134,6 +133,6 @@ function RepoBoard() {
           onOpenChange={setConfigDialogOpen}
         />
       )}
-    </div>
+    </>
   );
 }
