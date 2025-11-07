@@ -37,6 +37,16 @@ export async function getBoardByRepo(
   return board;
 }
 
+export async function getRecentBoards(
+  ctx: QueryCtx,
+  { limit = 10 }: { limit?: number } = {},
+) {
+  return await ctx.db
+    .query("boards")
+    .order("desc")
+    .take(limit);
+}
+
 export async function createBoard(
   ctx: MutationCtx,
   {

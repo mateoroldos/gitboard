@@ -22,6 +22,15 @@ export const getBoardByRepo = query({
   },
 });
 
+export const getRecentBoards = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { limit }) => {
+    return await Boards.getRecentBoards(ctx, { limit });
+  },
+});
+
 const createBoardArgs = {
   name: v.string(),
   repo: v.string(),

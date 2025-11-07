@@ -9,22 +9,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 export function Header() {
-  const {
-    data: session,
-    isPending, //loading state
-    error, //error object
-    refetch, //refetch the session
-  } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
   return (
     <header className="container mx-auto flex flex-row justify-between py-4">
-      <Link to="/" className="text-lg font-serif font-semibold">
+      <Link to="/" className="text-lg font-mono font-semibold">
         Gitboard
       </Link>
 
