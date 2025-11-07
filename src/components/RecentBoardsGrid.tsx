@@ -57,7 +57,7 @@ export function RecentBoardsGrid({ limit = 6 }: RecentBoardsGridProps) {
                     {board.description}
                   </p>
                 )}
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-auto">
+                <div className="flex items-base gap-1.5 text-xs text-muted-foreground mt-auto">
                   <Calendar className="h-3 w-3" />
                   {new Date(board.createdAt).toLocaleDateString()}
                 </div>
