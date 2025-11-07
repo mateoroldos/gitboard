@@ -25,7 +25,7 @@ export function WidgetRoot({
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-medium text-sm">{title}</h3>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            {onEdit && (
+            {onEdit && !isEditing && (
               <button
                 type="button"
                 onClick={onEdit}
@@ -36,7 +36,7 @@ export function WidgetRoot({
                 ⚙️
               </button>
             )}
-            {onDelete && (
+            {onDelete && !isEditing && (
               <button
                 type="button"
                 onClick={onDelete}

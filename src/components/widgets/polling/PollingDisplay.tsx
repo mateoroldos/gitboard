@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { WidgetRoot } from "../WidgetRoot";
+import { Loader } from "lucide-react";
+import { Authenticated, Unauthenticated } from "convex/react";
 
 export interface PollOption {
   id: string;
@@ -38,17 +40,9 @@ export function PollingDisplay({
 }: PollingDisplayProps) {
   if (!pollData || !pollData.question || pollData.options.length === 0) {
     return (
-      <WidgetRoot
-        title="Poll"
-        onEdit={onEdit}
-        onDelete={onDelete}
-      >
+      <WidgetRoot title="Poll" onEdit={onEdit} onDelete={onDelete}>
         <div className="text-center text-muted-foreground space-y-2">
           <div>📊 No poll configured</div>
-          <div className="text-sm">
-            Click the edit button to create your poll with a question and
-            options
-          </div>
         </div>
       </WidgetRoot>
     );
@@ -61,11 +55,7 @@ export function PollingDisplay({
   const hasVoted = !!userVote;
 
   return (
-    <WidgetRoot
-      title="Poll"
-      onEdit={onEdit}
-      onDelete={onDelete}
-    >
+    <WidgetRoot title="Poll" onEdit={onEdit} onDelete={onDelete}>
       <div className="space-y-4">
         <h3 className="font-semibold">{pollData.question}</h3>
 
@@ -89,7 +79,9 @@ export function PollingDisplay({
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
                 }`}
-                onClick={() => !hasVoted && !isEditing && onOptionSelect?.(option.id)}
+                onClick={() =>
+                  !hasVoted && !isEditing && onOptionSelect?.(option.id)
+                }
                 disabled={hasVoted || isEditing}
               >
                 <div className="flex justify-between items-center">
@@ -123,26 +115,33 @@ export function PollingDisplay({
           })}
         </div>
 
-        {!hasVoted && !isEditing && (
-          <Button
-            onClick={onVote}
-            disabled={!selectedOption || isVoting}
-            className="w-full"
-          >
-            {isVoting ? "Voting..." : "Vote"}
-          </Button>
-        )}
+        <Authenticated>
+          {!hasVoted && !isEditing && (
+            <Button
+              onClick={onVote}
+              disabled={!selectedOption || isVoting}
+              className="w-full"
+            >
+              {isVoting && <Loader className="animate-spin" />}
+              {isVoting ? "Voting" : "Vote"}
+            </Button>
+          )}
+        </Authenticated>
 
         <div className="text-sm text-muted-foreground text-center">
           Total votes: {totalVotes}
           {hasVoted && (
             <div className="text-green-600">You have voted in this poll</div>
           )}
-          {isEditing && (
-            <div className="text-blue-600">Preview mode</div>
-          )}
         </div>
+
+        <Unauthenticated>
+          <p className="text-xs text-muted-foreground text-center">
+            Sign in to vote
+          </p>
+        </Unauthenticated>
       </div>
     </WidgetRoot>
   );
 }
+

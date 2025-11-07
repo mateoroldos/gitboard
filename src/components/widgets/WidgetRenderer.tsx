@@ -70,7 +70,7 @@ export function WidgetRenderer({
       instanceId={instanceId}
       repository={repository}
       onConfigChange={onConfigChange}
-      onDelete={handleDeleteWidget}
+      onDelete={isEditing ? undefined : handleDeleteWidget}
       isEditing={isEditing}
     />
   );
