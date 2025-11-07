@@ -3,7 +3,7 @@ import { ActionCtx, QueryCtx } from "convex/_generated/server";
 import { authComponent, createAuth } from "convex/auth";
 import { ConvexError } from "convex/values";
 
-export async function requireSession(ctx: ActionCtx) {
+export async function requireSession(ctx: ActionCtx | QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (identity === null) {
     throw new ConvexError({
@@ -11,6 +11,7 @@ export async function requireSession(ctx: ActionCtx) {
       code: 401,
     });
   }
+  return identity;
 }
 
 export async function getAccessToken(ctx: ActionCtx) {
@@ -73,17 +74,4 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
   }
 
   return { repo };
-}
-
-export async function getAccessTokenForQuery(ctx: QueryCtx) {
-  const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-
-  const { accessToken } = await auth.api.getAccessToken({
-    headers,
-    body: {
-      providerId: "github",
-    },
-  });
-
-  return accessToken;
 }

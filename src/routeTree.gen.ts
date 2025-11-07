@@ -9,14 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedCreateRouteImport } from './routes/_protected.create'
 import { Route as OwnerNameRouteImport } from './routes/$owner.$name'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedCreateRoute = ProtectedCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const OwnerNameRoute = OwnerNameRouteImport.update({
   id: '/$owner/$name',
@@ -32,41 +43,66 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$owner/$name': typeof OwnerNameRoute
+  '/create': typeof ProtectedCreateRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$owner/$name': typeof OwnerNameRoute
+  '/create': typeof ProtectedCreateRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteWithChildren
   '/$owner/$name': typeof OwnerNameRoute
+  '/_protected/create': typeof ProtectedCreateRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$owner/$name' | '/api/auth/$'
+  fullPaths: '/' | '/$owner/$name' | '/create' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$owner/$name' | '/api/auth/$'
-  id: '__root__' | '/' | '/$owner/$name' | '/api/auth/$'
+  to: '/' | '/$owner/$name' | '/create' | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/_protected'
+    | '/$owner/$name'
+    | '/_protected/create'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
   OwnerNameRoute: typeof OwnerNameRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ProtectedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/create': {
+      id: '/_protected/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof ProtectedCreateRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/$owner/$name': {
       id: '/$owner/$name'
@@ -85,8 +121,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProtectedRouteChildren {
+  ProtectedCreateRoute: typeof ProtectedCreateRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedCreateRoute: ProtectedCreateRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
   OwnerNameRoute: OwnerNameRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

@@ -80,20 +80,20 @@ export async function fetchGitHubStars(
     const headers: Record<string, string> = {
       Accept: "application/vnd.github.v3+json",
     };
-    
+
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
 
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${name}`,
-      { headers }
+      { headers },
     );
-    
+
     if (!response.ok) {
       return null;
     }
-    
+
     const repo = await response.json();
     return repo.stargazers_count;
   } catch {

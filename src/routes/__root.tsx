@@ -16,6 +16,7 @@ import { authClient } from "@/lib/auth-client";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
+import { Header } from "@/components/Header";
 
 // Get auth information for SSR using available cookies
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
@@ -80,6 +81,7 @@ function RootComponent() {
       authClient={authClient}
     >
       <RootDocument>
+        <Header />
         <Outlet />
       </RootDocument>
     </ConvexBetterAuthProvider>

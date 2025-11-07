@@ -7,11 +7,26 @@ import { components } from "./_generated/api";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
+const allReposCache = new ActionCache(components.actionCache, {
+  action: internal.github.fetchAllRepos,
+  name: "github-repos-v1",
+  ttl: 1000 * 60, // 1 min cache
+});
+
+export const fetchAllRepos = internalAction({
+  args: {
+    accessToken: v.string(),
+  },
+  handler: async (_, { accessToken }) => {
+    return await GitHub.getAllRepos({ accessToken });
+  },
+});
+
 export const getAllRepos = action({
-  handler: async (ctx) => {
+  handler: async (ctx): ReturnType<typeof GitHub.getAllRepos> => {
     const accessToken = await getAccessToken(ctx);
 
-    return await GitHub.getAllRepos({ accessToken });
+    return await allReposCache.fetch(ctx, { accessToken });
   },
 });
 
