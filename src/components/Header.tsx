@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus } from "lucide-react";
+import { Github, Plus } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Header() {
@@ -31,7 +31,10 @@ export function Header() {
         </AuthLoading>
 
         <Unauthenticated>
-          <Button onClick={signIn}>Sign In</Button>
+          <Button onClick={signIn} size="sm">
+            <Github />
+            Sign In
+          </Button>
         </Unauthenticated>
 
         <Authenticated>

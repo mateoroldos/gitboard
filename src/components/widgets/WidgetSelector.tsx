@@ -11,27 +11,55 @@ import {
 import { Plus } from "lucide-react";
 import type { WidgetDefinition, WidgetCategory } from "./types";
 import { getWidgetCategories, getWidgetsByCategory } from "./registry";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { api } from "convex/_generated/api";
+import { convexAction, convexQuery } from "@convex-dev/react-query";
+import { useAction } from "convex/react";
 
 interface WidgetSelectorProps {
-  onSelectWidget: (widget: WidgetDefinition) => void;
+  repoString: string;
   disabled?: boolean;
 }
 
-export function WidgetSelector({
-  onSelectWidget,
-  disabled,
-}: WidgetSelectorProps) {
+export function WidgetSelector({ repoString, disabled }: WidgetSelectorProps) {
   const [open, setOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] =
     useState<WidgetCategory>("github");
 
-  const categories = getWidgetCategories();
-  const widgets = getWidgetsByCategory(selectedCategory);
+  const { data: hasAccess } = useSuspenseQuery(
+    convexAction(api.auth.checkRepoWriteAccess, { repo: repoString }),
+  );
+
+  const { data: board } = useSuspenseQuery(
+    convexQuery(api.boards.getBoardByRepo, { repo: repoString }),
+  );
+
+  const { mutate: createWidget } = useMutation({
+    mutationFn: useAction(api.widgets.createWidgetAction),
+  });
+
+  if (!hasAccess) {
+    return null;
+  }
 
   const handleSelectWidget = (widget: WidgetDefinition) => {
-    onSelectWidget(widget);
+    if (!board) return;
+
+    // Use widget definition to create widget with proper defaults
+    createWidget({
+      boardId: board._id,
+      widgetType: widget.id,
+      config: { ...widget.defaultConfig, repository: repoString },
+      position: { x: 100, y: 100 },
+      size: widget.size.default,
+      title: widget.name,
+    });
+
     setOpen(false);
   };
+
+  const categories = getWidgetCategories();
+  const widgets = getWidgetsByCategory(selectedCategory);
 
   const getCategoryDisplayName = (category: WidgetCategory): string => {
     const names: Record<WidgetCategory, string> = {
