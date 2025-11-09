@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { WidgetRoot } from "../WidgetRoot";
 import { Loader } from "lucide-react";
 import { Authenticated, Unauthenticated } from "convex/react";
+import { WidgetInstance } from "../types";
 
 export interface PollOption {
   id: string;
@@ -16,6 +17,7 @@ export interface PollData {
 }
 
 interface PollingDisplayProps {
+  widget: WidgetInstance;
   pollData: PollData | null;
   userVote?: { optionId: string } | null;
   selectedOption?: string | null;
@@ -28,6 +30,7 @@ interface PollingDisplayProps {
 }
 
 export function PollingDisplay({
+  widget,
   pollData,
   userVote,
   selectedOption,
@@ -40,7 +43,7 @@ export function PollingDisplay({
 }: PollingDisplayProps) {
   if (!pollData || !pollData.question || pollData.options.length === 0) {
     return (
-      <WidgetRoot title="Poll" onEdit={onEdit} onDelete={onDelete}>
+      <WidgetRoot widget={widget} onEdit={onEdit} onDelete={onDelete}>
         <div className="text-center text-muted-foreground space-y-2">
           <div>📊 No poll configured</div>
         </div>
@@ -55,7 +58,7 @@ export function PollingDisplay({
   const hasVoted = !!userVote;
 
   return (
-    <WidgetRoot title="Poll" onEdit={onEdit} onDelete={onDelete}>
+    <WidgetRoot widget={widget} onEdit={onEdit} onDelete={onDelete}>
       <div className="space-y-4">
         <h3 className="font-semibold">{pollData.question}</h3>
 
@@ -144,4 +147,3 @@ export function PollingDisplay({
     </WidgetRoot>
   );
 }
-

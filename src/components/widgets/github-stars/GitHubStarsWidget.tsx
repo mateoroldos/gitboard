@@ -12,7 +12,7 @@ interface GitHubStarsConfig {
 }
 
 export function GitHubStarsWidget({
-  config,
+  widget,
   repository,
   onConfigChange,
   onDelete,
@@ -27,12 +27,12 @@ export function GitHubStarsWidget({
 
   return (
     <WidgetRoot
-      title="GitHub Stars"
-      onEdit={onConfigChange ? () => onConfigChange(config) : undefined}
+      widget={widget}
+      onEdit={onConfigChange ? () => onConfigChange(widget.config) : undefined}
       onDelete={onDelete}
     >
       <div className="flex items-center gap-3">
-        {config.showIcon && <div className="text-2xl">⭐</div>}
+        {widget.config.showIcon && <div className="text-2xl">⭐</div>}
         <div>
           <div className="text-2xl font-bold">{starCount.toLocaleString()}</div>
           <div className="text-sm text-muted-foreground">{repository}</div>

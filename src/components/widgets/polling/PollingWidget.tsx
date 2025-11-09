@@ -17,8 +17,7 @@ interface PollingConfig {
 }
 
 export function PollingWidget({
-  config,
-  instanceId,
+  widget,
   onConfigChange,
   onDelete,
 }: WidgetProps<PollingConfig>) {
@@ -26,11 +25,11 @@ export function PollingWidget({
   const queryClient = useQueryClient();
 
   const { data: pollData } = useSuspenseQuery(
-    convexQuery(api.polls.getPollData, { widgetId: instanceId as any })
+    convexQuery(api.polls.getPollData, { widgetId: widget._id }),
   );
 
   const { data: userVote } = useQuery({
-    ...convexQuery(api.polls.checkUserVote, { widgetId: instanceId as any }),
+    ...convexQuery(api.polls.checkUserVote, { widgetId: widget._id }),
     enabled: !!pollData,
   });
 
@@ -48,7 +47,7 @@ export function PollingWidget({
   const handleVote = () => {
     if (selectedOption && pollData) {
       voteMutation.mutate({
-        widgetId: instanceId,
+        widgetId: widget._id,
         optionId: selectedOption,
       });
     }
@@ -56,12 +55,13 @@ export function PollingWidget({
 
   return (
     <PollingDisplay
+      widget={widget}
       pollData={pollData}
       userVote={userVote}
       selectedOption={selectedOption}
       onOptionSelect={setSelectedOption}
       onVote={handleVote}
-      onEdit={onConfigChange ? () => onConfigChange(config) : undefined}
+      onEdit={onConfigChange ? () => onConfigChange(widget.config) : undefined}
       onDelete={onDelete}
       isVoting={voteMutation.isPending}
     />

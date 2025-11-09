@@ -3,8 +3,7 @@ import type * as z from "zod";
 import { Doc } from "convex/_generated/dataModel";
 
 export interface WidgetProps<TConfig = Record<string, any>> {
-  config: TConfig;
-  instanceId: string;
+  widget: WidgetInstance<TConfig>;
   repository: string; // owner/name format
   onConfigChange?: (config: TConfig) => void;
   onDelete?: () => void;
@@ -44,4 +43,7 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   };
 }
 
-export type WidgetInstance = Doc<"widgets">;
+export interface WidgetInstance<TConfig = Record<string, any>>
+  extends Doc<"widgets"> {
+  config: TConfig;
+}

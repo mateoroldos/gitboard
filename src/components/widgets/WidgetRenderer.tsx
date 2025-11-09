@@ -2,26 +2,22 @@ import { useMutation } from "@tanstack/react-query";
 import { getWidgetById } from "./registry";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
-import { Id } from "convex/_generated/dataModel";
+import { WidgetInstance } from "./types";
 
 interface WidgetRendererProps {
-  widgetType: string;
-  config: Record<string, any>;
-  instanceId: Id<"widgets">;
+  widget: WidgetInstance;
   repository: string;
   onConfigChange?: (config: Record<string, any>) => void;
   isEditing?: boolean;
 }
 
 export function WidgetRenderer({
-  widgetType,
-  config,
-  instanceId,
+  widget,
   repository,
   onConfigChange,
   isEditing,
 }: WidgetRendererProps) {
-  const widgetDef = getWidgetById(widgetType);
+  const widgetDef = getWidgetById(widget.widgetType);
 
   const { mutate: deleteWidget } = useMutation({
     mutationFn: useAction(api.widgets.deleteWidgetAction),
@@ -29,7 +25,7 @@ export function WidgetRenderer({
 
   const handleDeleteWidget = () => {
     if (confirm("Are you sure you want to delete this widget?")) {
-      deleteWidget({ id: instanceId });
+      deleteWidget({ id: widget._id });
     }
   };
 
@@ -49,7 +45,7 @@ export function WidgetRenderer({
           </button>
         </div>
         <p className="text-sm text-destructive/80">
-          Widget type "{widgetType}" not found in registry.
+          Widget type "{widget.widgetType}" not found in registry.
         </p>
         <p className="text-xs text-destructive/60 mt-2">
           This widget may have been removed or renamed. You can safely delete
@@ -66,8 +62,7 @@ export function WidgetRenderer({
 
   return (
     <WidgetComponent
-      config={config}
-      instanceId={instanceId}
+      widget={widget}
       repository={repository}
       onConfigChange={onConfigChange}
       onDelete={isEditing ? undefined : handleDeleteWidget}

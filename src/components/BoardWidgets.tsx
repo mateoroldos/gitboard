@@ -39,17 +39,14 @@ export function BoardWidgets({ boardId, repoString }: BoardWidgetsProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="relative min-h-screen" data-canvas>
         {widgets.map((widget) => (
-          <div key={widget._id} className="group">
-            <WidgetRenderer
-              widgetType={widget.widgetType}
-              config={widget.config}
-              instanceId={widget._id}
-              repository={repoString}
-              onConfigChange={() => handleEditWidget(widget)}
-            />
-          </div>
+          <WidgetRenderer
+            key={widget._id}
+            widget={widget}
+            repository={repoString}
+            onConfigChange={() => handleEditWidget(widget)}
+          />
         ))}
       </div>
 
@@ -64,4 +61,3 @@ export function BoardWidgets({ boardId, repoString }: BoardWidgetsProps) {
     </>
   );
 }
-

@@ -8,30 +8,34 @@ interface PollingConfig {
 }
 
 export function PollingPreview({
-  config,
+  widget,
   onConfigChange,
   onDelete,
 }: WidgetProps<PollingConfig>) {
-  const pollData: PollData | null = config.options ? {
-    question: config.question || "",
-    options: config.options
-      .split('\n')
-      .map((optionText: string) => optionText.trim())
-      .filter((optionText: string) => optionText.length > 0)
-      .map((optionText: string, index: number) => ({
-        id: `option_${index}`,
-        text: optionText,
-        votes: 0, // No votes in preview
-      })),
-    showPercentages: config.showPercentages || false,
-  } : null;
+  const pollData: PollData | null = widget.config.options
+    ? {
+        question: widget.config.question || "",
+        options: widget.config.options
+          .split("\n")
+          .map((optionText: string) => optionText.trim())
+          .filter((optionText: string) => optionText.length > 0)
+          .map((optionText: string, index: number) => ({
+            id: `option_${index}`,
+            text: optionText,
+            votes: 0, // No votes in preview
+          })),
+        showPercentages: widget.config.showPercentages || false,
+      }
+    : null;
 
   return (
     <PollingDisplay
+      widget={widget}
       pollData={pollData}
-      onEdit={onConfigChange ? () => onConfigChange(config) : undefined}
+      onEdit={onConfigChange ? () => onConfigChange(widget.config) : undefined}
       onDelete={onDelete}
       isEditing={true}
     />
   );
 }
+
