@@ -2,13 +2,14 @@ import type { WidgetDefinition, WidgetCategory } from "./types";
 import { githubStarsWidget } from "./github-stars";
 import { pollingWidget } from "./polling";
 import { taskWidget } from "./task";
+import { imageWidget } from "./image";
 
 export const widgetRegistry: Record<WidgetCategory, WidgetDefinition[]> = {
   github: [githubStarsWidget],
   analytics: [],
   notes: [],
   links: [],
-  custom: [pollingWidget, taskWidget],
+  custom: [pollingWidget, taskWidget, imageWidget],
 };
 
 // Helpers
