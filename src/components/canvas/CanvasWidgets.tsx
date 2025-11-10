@@ -6,9 +6,9 @@ import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
 import { WidgetConfigDialog } from "@/components/widgets/WidgetConfigDialog";
 import type { WidgetInstance } from "@/components/widgets/types";
 import { useCanvasContext } from "./CanvasContext";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "../ui/card";
 
-export function BoardWidgets() {
+export function CanvasWidgets() {
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<WidgetInstance | null>(
     null,

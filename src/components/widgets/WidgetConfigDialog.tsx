@@ -32,7 +32,7 @@ import { WidgetDefinition, WidgetInstance } from "./types";
 import { Id } from "convex/_generated/dataModel";
 import { Loader } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { useCanvasContext } from "../CanvasContext";
+import { useCanvasContext } from "../canvas/CanvasContext";
 
 interface WidgetConfigDialogProps {
   widget: WidgetInstance;

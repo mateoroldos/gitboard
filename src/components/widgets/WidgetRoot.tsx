@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { WidgetInstance } from "./types";
 import debounce from "debounce";
 import { motion } from "framer-motion";
-import { useCanvasContext } from "@/components/CanvasContext";
+import { useCanvasContext } from "@/components/canvas/CanvasContext";
 
 interface WidgetRootProps {
   children: React.ReactNode;

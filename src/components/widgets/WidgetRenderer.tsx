@@ -3,7 +3,7 @@ import { getWidgetById } from "./registry";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { WidgetInstance } from "./types";
-import { useCanvasContext } from "../CanvasContext";
+import { useCanvasContext } from "../canvas/CanvasContext";
 
 interface WidgetRendererProps {
   widget: WidgetInstance;

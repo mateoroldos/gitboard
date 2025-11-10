@@ -1,14 +1,17 @@
-import { Suspense, useRef } from "react";
+import { Suspense } from "react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { convexAction, convexQuery } from "@convex-dev/react-query";
 import { WidgetSelector } from "@/components/widgets/WidgetSelector";
 import { Card, CardContent } from "@/components/ui/card";
 import { Github } from "lucide-react";
-import { BoardWidgets } from "@/components/BoardWidgets";
 import { GridSkeleton } from "@/components/ui/grid-skeleton";
-import { CanvasProvider, useCanvasContext } from "@/components/CanvasContext";
-import { CanvasControls } from "@/components/CanvasControls";
+import {
+  CanvasProvider,
+  useCanvasContext,
+} from "@/components/canvas/CanvasContext";
+import { CanvasControls } from "@/components/canvas/CanvasControls";
+import { CanvasWidgets } from "@/components/canvas/CanvasWidgets";
 
 export const Route = createFileRoute("/$owner/$name")({
   beforeLoad: async ({ params, context }) => {
@@ -46,39 +49,6 @@ export const Route = createFileRoute("/$owner/$name")({
   component: RepoBoard,
 });
 
-function CanvasContainer() {
-  const { canvasRef, viewport } = useCanvasContext();
-
-  return (
-    <div
-      ref={canvasRef}
-      className="h-screen w-screen absolute top-0 left-0 overflow-hidden"
-      style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, oklch(from var(--muted-foreground) l c h / 0.25) 1px, transparent 0)`,
-        backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
-        backgroundPosition: `${viewport.x * viewport.zoom}px ${viewport.y * viewport.zoom}px`,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <Suspense
-          fallback={
-            <div className="container mx-auto min-h-screen flex flex-1 items-center">
-              <GridSkeleton count={6} />
-            </div>
-          }
-        >
-          <BoardWidgets />
-        </Suspense>
-      </div>
-    </div>
-  );
-}
-
 function RepoBoard() {
   const { board, hasWriteAccess } = Route.useLoaderData();
 
@@ -109,5 +79,38 @@ function RepoBoard() {
         <CanvasControls />
       </main>
     </CanvasProvider>
+  );
+}
+
+function CanvasContainer() {
+  const { canvasRef, viewport } = useCanvasContext();
+
+  return (
+    <div
+      ref={canvasRef}
+      className="h-screen w-screen absolute top-0 left-0 overflow-hidden"
+      style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, oklch(from var(--muted-foreground) l c h / 0.25) 1px, transparent 0)`,
+        backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
+        backgroundPosition: `${viewport.x * viewport.zoom}px ${viewport.y * viewport.zoom}px`,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <Suspense
+          fallback={
+            <div className="container mx-auto min-h-screen flex flex-1 items-center">
+              <GridSkeleton count={6} />
+            </div>
+          }
+        >
+          <CanvasWidgets />
+        </Suspense>
+      </div>
+    </div>
   );
 }

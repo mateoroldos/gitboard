@@ -14,7 +14,7 @@ import { getWidgetCategories, getWidgetsByCategory } from "./registry";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "convex/_generated/api";
 import { useAction } from "convex/react";
-import { useCanvasContext } from "../CanvasContext";
+import { useCanvasContext } from "../canvas/CanvasContext";
 
 export function WidgetSelector() {
   const [open, setOpen] = useState(false);
@@ -31,7 +31,7 @@ export function WidgetSelector() {
     // Place new widget in the center of the current viewport
     const centerScreen = { x: viewport.width / 2, y: viewport.height / 2 };
     const centerWorld = screenToWorld(centerScreen);
-    
+
     // Offset slightly to avoid overlapping widgets
     const randomOffset = () => Math.random() * 100 - 50;
     const position = {
