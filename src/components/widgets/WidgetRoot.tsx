@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { WidgetInstance } from "./types";
 import debounce from "debounce";
 import { motion } from "framer-motion";
+import { useCanvasContext } from "@/components/CanvasContext";
 
 interface WidgetRootProps {
   children: React.ReactNode;
@@ -26,6 +27,7 @@ export function WidgetRoot({
 }: WidgetRootProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [localPosition, setLocalPosition] = useState(widget.position);
+  const { hasWriteAccess } = useCanvasContext();
 
   const updatePosition = useMutation({
     mutationFn: useAction(api.widgets.updateWidgetAction),
@@ -51,10 +53,15 @@ export function WidgetRoot({
         y: Math.max(0, Math.round(localPosition.y + info.offset.y)),
       };
 
-      setLocalPosition(newPosition);
-      debouncedMutate(newPosition);
+      if (hasWriteAccess) {
+        setLocalPosition(newPosition);
+        debouncedMutate(newPosition);
+      } else {
+        // Revert to original position if no write access
+        setLocalPosition(widget.position);
+      }
     },
-    [localPosition, debouncedMutate],
+    [localPosition, debouncedMutate, hasWriteAccess, widget.position],
   );
 
   return (

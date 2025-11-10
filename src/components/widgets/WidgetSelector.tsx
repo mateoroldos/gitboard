@@ -11,43 +11,26 @@ import {
 import { Plus } from "lucide-react";
 import type { WidgetDefinition, WidgetCategory } from "./types";
 import { getWidgetCategories, getWidgetsByCategory } from "./registry";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { api } from "convex/_generated/api";
-import { convexAction, convexQuery } from "@convex-dev/react-query";
 import { useAction } from "convex/react";
+import { useCanvasContext } from "../CanvasContext";
 
-interface WidgetSelectorProps {
-  repoString: string;
-  disabled?: boolean;
-}
-
-export function WidgetSelector({ repoString, disabled }: WidgetSelectorProps) {
+export function WidgetSelector() {
   const [open, setOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] =
     useState<WidgetCategory>("github");
 
-  const { data: hasAccess } = useSuspenseQuery(
-    convexAction(api.auth.checkRepoWriteAccess, { repo: repoString }),
-  );
-
-  const { data: board } = useSuspenseQuery(
-    convexQuery(api.boards.getBoardByRepo, { repo: repoString }),
-  );
+  const { repoString, boardId } = useCanvasContext();
 
   const { mutate: createWidget } = useMutation({
     mutationFn: useAction(api.widgets.createWidgetAction),
   });
 
-  if (!hasAccess) {
-    return null;
-  }
-
   const handleSelectWidget = (widget: WidgetDefinition) => {
-    if (!board) return;
-
     // Use widget definition to create widget with proper defaults
     createWidget({
-      boardId: board._id,
+      boardId: boardId,
       widgetType: widget.id,
       config: { ...widget.defaultConfig, repository: repoString },
       position: { x: 100, y: 100 },
@@ -86,7 +69,7 @@ export function WidgetSelector({ repoString, disabled }: WidgetSelectorProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={disabled} size="sm" className="cursor-pointer">
+        <Button size="sm" className="cursor-pointer">
           <Plus className="w-4 h-4 mr-2" />
           Add Widget
         </Button>

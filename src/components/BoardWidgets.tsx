@@ -5,18 +5,15 @@ import { api } from "convex/_generated/api";
 import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
 import { WidgetConfigDialog } from "@/components/widgets/WidgetConfigDialog";
 import type { WidgetInstance } from "@/components/widgets/types";
-import type { Id } from "convex/_generated/dataModel";
+import { useCanvasContext } from "./CanvasContext";
 
-interface BoardWidgetsProps {
-  boardId: Id<"boards">;
-  repoString: string;
-}
-
-export function BoardWidgets({ boardId, repoString }: BoardWidgetsProps) {
+export function BoardWidgets() {
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<WidgetInstance | null>(
     null,
   );
+
+  const { boardId, repoString } = useCanvasContext();
 
   const { data: widgets } = useSuspenseQuery(
     convexQuery(api.widgets.getWidgetsByBoard, {

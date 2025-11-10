@@ -3,20 +3,21 @@ import { getWidgetById } from "./registry";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { WidgetInstance } from "./types";
+import { useCanvasContext } from "../CanvasContext";
 
 interface WidgetRendererProps {
   widget: WidgetInstance;
-  repository: string;
   onConfigChange?: (config: Record<string, any>) => void;
   isEditing?: boolean;
 }
 
 export function WidgetRenderer({
   widget,
-  repository,
   onConfigChange,
   isEditing,
 }: WidgetRendererProps) {
+  const { repoString } = useCanvasContext();
+
   const widgetDef = getWidgetById(widget.widgetType);
 
   const { mutate: deleteWidget } = useMutation({
@@ -63,7 +64,7 @@ export function WidgetRenderer({
   return (
     <WidgetComponent
       widget={widget}
-      repository={repository}
+      repository={repoString}
       onConfigChange={onConfigChange}
       onDelete={isEditing ? undefined : handleDeleteWidget}
       isEditing={isEditing}

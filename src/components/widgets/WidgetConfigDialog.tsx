@@ -32,21 +32,22 @@ import { WidgetDefinition, WidgetInstance } from "./types";
 import { Id } from "convex/_generated/dataModel";
 import { Loader } from "lucide-react";
 import { Textarea } from "../ui/textarea";
+import { useCanvasContext } from "../CanvasContext";
 
 interface WidgetConfigDialogProps {
   widget: WidgetInstance;
-  repository: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function WidgetConfigDialog({
   widget,
-  repository,
   open,
   onOpenChange,
 }: WidgetConfigDialogProps) {
   const widgetDefinition = getWidgetById(widget.widgetType) as WidgetDefinition;
+
+  const { repoString } = useCanvasContext();
 
   const { mutate: updateWidget, isPending } = useMutation({
     mutationFn: useAction(api.widgets.updateWidgetAction),
@@ -260,7 +261,7 @@ export function WidgetConfigDialog({
               {/*   widgetType={widget.widgetType} */}
               {/*   config={previewValues} */}
               {/*   instanceId={widget._id} */}
-              {/*   repository={repository} */}
+              {/*   repository={repoString} */}
               {/*   isEditing={true} */}
               {/* /> */}
             </div>

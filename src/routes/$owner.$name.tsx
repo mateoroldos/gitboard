@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Github } from "lucide-react";
 import { BoardWidgets } from "@/components/BoardWidgets";
 import { GridSkeleton } from "@/components/ui/grid-skeleton";
+import { CanvasProvider } from "@/components/CanvasContext";
 
 export const Route = createFileRoute("/$owner/$name")({
   beforeLoad: async ({ params, context }) => {
@@ -32,25 +33,30 @@ export const Route = createFileRoute("/$owner/$name")({
 
     const { owner, name } = params;
 
-    await context.queryClient.ensureQueryData(
+    const hasWriteAccess = await context.queryClient.ensureQueryData(
       convexAction(api.auth.checkRepoWriteAccess, { repo: `${owner}/${name}` }),
     );
 
     return {
       board: context.board,
+      hasWriteAccess,
     };
   },
   component: RepoBoard,
 });
 
 function RepoBoard() {
-  const { board } = Route.useLoaderData();
+  const { board, hasWriteAccess } = Route.useLoaderData();
 
   const { owner, name } = Route.useParams();
   const repoString = `${owner}/${name}`;
 
   return (
-    <>
+    <CanvasProvider
+      boardId={board._id}
+      repoString={repoString}
+      hasWriteAccess={hasWriteAccess}
+    >
       <nav className="py-3 flex flex-row justify-between container mx-auto">
         <a href={`https://github.com/${repoString}`} target="_blank">
           <Card className="py-2 group hover:border-primary/40 transition-all">
@@ -61,12 +67,10 @@ function RepoBoard() {
           </Card>
         </a>
 
-        <Suspense fallback={<div>loading</div>}>
-          <WidgetSelector repoString={repoString} />
-        </Suspense>
+        {hasWriteAccess && <WidgetSelector />}
       </nav>
 
-      <main className="h-screen w-screen fixed top-0">
+      <main className="h-screen w-screen absolute top-0 left-0">
         <Suspense
           fallback={
             <div className="container mx-auto min-h-screen flex flex-1 items-center">
@@ -74,9 +78,9 @@ function RepoBoard() {
             </div>
           }
         >
-          <BoardWidgets boardId={board._id} repoString={repoString} />
+          <BoardWidgets />
         </Suspense>
       </main>
-    </>
+    </CanvasProvider>
   );
 }
