@@ -3,7 +3,7 @@ import type { ImageData, ImageConfig } from "./types";
 export function createPreviewImageData(config: ImageConfig): ImageData {
   return {
     imageKey: config.imageKey || "",
-    imageUrl: config.imageKey ? `https://picsum.photos/400/300?random=${Date.now()}` : null,
+    imageUrl: config.imageKey ? `https://picsum.photos/400/300?random=${config.imageKey}` : null,
     title: config.title || "",
     altText: config.altText || "",
     fit: config.fit || "cover",

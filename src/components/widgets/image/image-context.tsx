@@ -24,15 +24,18 @@ export function ImageProvider({
   widget,
   isEditing = false,
 }: ImageProviderProps) {
+  // Always fetch real data if there's an imageKey, even in editing mode
+  const hasImageKey = widget.config.imageKey && widget.config.imageKey.length > 0;
+  
   const { data: imageData } = useSuspenseQuery({
     ...convexQuery(api.image.getImageData, { widgetId: widget._id }),
-    enabled: !isEditing,
+    enabled: !isEditing || hasImageKey,
   });
 
-  const previewData = isEditing ? createPreviewImageData(widget.config) : null;
+  const previewData = isEditing && !hasImageKey ? createPreviewImageData(widget.config) : null;
 
   const contextValue: ImageContextValue = {
-    imageData: isEditing ? previewData : imageData,
+    imageData: isEditing && !hasImageKey ? previewData : imageData,
     isEditing,
   };
 

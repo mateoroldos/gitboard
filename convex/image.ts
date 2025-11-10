@@ -5,13 +5,17 @@ import { components } from "./_generated/api";
 
 export const r2 = new R2(components.r2);
 
-// export const { generateUploadUrl, syncMetadata } = r2.clientApi({
-//   checkUpload: async (ctx, bucket) => {
-//     // TODO: Add user authentication check here
-//     // const user = await userFromAuth(ctx);
-//     // if (!user) throw new Error("Unauthorized");
-//   },
-// });
+export const { generateUploadUrl, syncMetadata } = r2.clientApi({
+  checkUpload: async (ctx, bucket) => {
+    // TODO: Add user authentication check here
+    // const user = await userFromAuth(ctx);
+    // if (!user) throw new Error("Unauthorized");
+  },
+  onUpload: async (ctx, bucket, key) => {
+    // Optional: Log upload or perform additional actions
+    console.log(`Image uploaded with key: ${key}`);
+  },
+});
 
 export const getImageData = query({
   args: { widgetId: v.id("widgets") },
