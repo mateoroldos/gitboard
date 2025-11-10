@@ -4,8 +4,11 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
+  RefObject,
 } from "react";
 import type { Id } from "convex/_generated/dataModel";
+import { useCanvasInteractions } from "./useCanvasInteractions";
 
 interface Viewport {
   x: number;
@@ -19,6 +22,7 @@ interface CanvasContextType {
   boardId: Id<"boards">;
   repoString: string;
   hasWriteAccess: boolean;
+  canvasRef: RefObject<HTMLDivElement>;
   viewport: Viewport;
   panTo: (x: number, y: number) => void;
   zoomTo: (zoom: number, centerX?: number, centerY?: number) => void;
@@ -60,6 +64,7 @@ export function CanvasProvider({
   repoString,
   hasWriteAccess,
 }: CanvasProviderProps) {
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [viewport, setViewport] = useState<Viewport>({
     x: 0,
     y: 0,
@@ -199,6 +204,7 @@ export function CanvasProvider({
       boardId,
       repoString,
       hasWriteAccess,
+      canvasRef,
       viewport,
       panTo,
       zoomTo,
@@ -213,6 +219,7 @@ export function CanvasProvider({
       boardId,
       repoString,
       hasWriteAccess,
+      canvasRef,
       viewport,
       panTo,
       zoomTo,
@@ -224,6 +231,13 @@ export function CanvasProvider({
       setViewportSize,
     ],
   );
+
+  useCanvasInteractions({
+    containerRef: canvasRef,
+    panBy,
+    zoomBy,
+    setViewportSize,
+  });
 
   return (
     <CanvasContext.Provider value={contextValue}>

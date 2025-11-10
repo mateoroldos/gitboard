@@ -8,7 +8,6 @@ import { Github } from "lucide-react";
 import { BoardWidgets } from "@/components/BoardWidgets";
 import { GridSkeleton } from "@/components/ui/grid-skeleton";
 import { CanvasProvider, useCanvasContext } from "@/components/CanvasContext";
-import { useCanvasInteractions } from "@/components/useCanvasInteractions";
 import { CanvasControls } from "@/components/CanvasControls";
 
 export const Route = createFileRoute("/$owner/$name")({
@@ -48,10 +47,7 @@ export const Route = createFileRoute("/$owner/$name")({
 });
 
 function CanvasContainer() {
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const { viewport } = useCanvasContext();
-
-  useCanvasInteractions({ containerRef: canvasRef });
+  const { canvasRef, viewport } = useCanvasContext();
 
   return (
     <div
