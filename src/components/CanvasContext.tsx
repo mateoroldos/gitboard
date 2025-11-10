@@ -22,7 +22,7 @@ interface CanvasContextType {
   boardId: Id<"boards">;
   repoString: string;
   hasWriteAccess: boolean;
-  canvasRef: RefObject<HTMLDivElement>;
+  canvasRef: RefObject<HTMLDivElement | null>;
   viewport: Viewport;
   panTo: (x: number, y: number) => void;
   zoomTo: (zoom: number, centerX?: number, centerY?: number) => void;
@@ -91,10 +91,8 @@ export function CanvasProvider({
 
       setViewport((prev) => {
         if (centerX !== undefined && centerY !== undefined) {
-          // Zoom towards a specific point
-          const zoomRatio = clampedZoom / prev.zoom;
-          const newX = centerX - (centerX - prev.x) * zoomRatio;
-          const newY = centerY - (centerY - prev.y) * zoomRatio;
+          const newX = centerX * (1 / clampedZoom - 1 / prev.zoom) + prev.x;
+          const newY = centerY * (1 / clampedZoom - 1 / prev.zoom) + prev.y;
 
           return {
             ...prev,
@@ -119,9 +117,8 @@ export function CanvasProvider({
         );
 
         if (centerX !== undefined && centerY !== undefined) {
-          const zoomRatio = newZoom / prev.zoom;
-          const newX = centerX - (centerX - prev.x) * zoomRatio;
-          const newY = centerY - (centerY - prev.y) * zoomRatio;
+          const newX = centerX * (1 / newZoom - 1 / prev.zoom) + prev.x;
+          const newY = centerY * (1 / newZoom - 1 / prev.zoom) + prev.y;
 
           return {
             ...prev,

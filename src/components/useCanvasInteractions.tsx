@@ -49,7 +49,7 @@ export function useCanvasInteractions({
       const delta = -e.deltaY / 1000;
       zoomBy(delta, centerX, centerY);
     },
-    [disabled, containerRef, zoomBy],
+    [disabled, panBy, zoomBy, containerRef],
   );
 
   // Handle mouse pan
@@ -68,7 +68,7 @@ export function useCanvasInteractions({
         containerRef.current.style.cursor = "grabbing";
       }
     },
-    [disabled, containerRef],
+    [disabled, panBy, zoomBy, containerRef],
   );
 
   const handleMouseMove = useCallback(
@@ -284,4 +284,3 @@ export function useCanvasInteractions({
     isPanning: isPanningRef.current,
   };
 }
-
