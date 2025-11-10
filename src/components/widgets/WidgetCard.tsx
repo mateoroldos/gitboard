@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWidget } from "./WidgetProvider";
+import { Settings, Trash2 } from "lucide-react";
 
 interface WidgetCardProps {
   children: React.ReactNode;
@@ -26,18 +27,18 @@ export function WidgetCard({ children, className }: WidgetCardProps) {
                     aria-label="Edit widget"
                     title="Configure widget"
                   >
-                    ⚙️
+                    <Settings className="w-3 h-3" />
                   </button>
                 )}
                 {!state.isEditing && (
                   <button
                     type="button"
                     onClick={actions.deleteWidget}
-                    className="p-1 hover:bg-destructive hover:text-destructive-foreground rounded text-xs transition-colors"
+                    className="p-1 hover:bg-destructive/10 rounded text-xs transition-colors"
                     aria-label="Delete widget"
                     title="Delete widget"
                   >
-                    🗑️
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 )}
               </div>
