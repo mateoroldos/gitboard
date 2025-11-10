@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAction } from "convex/react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm, useStore } from "@tanstack/react-form";
 import * as z from "zod";
+import { format } from "date-fns";
+import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { api } from "convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,19 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { WidgetRenderer } from "./WidgetRenderer";
 import { getWidgetById } from "./registry";
 import {
@@ -33,11 +48,60 @@ import { Id } from "convex/_generated/dataModel";
 import { Loader } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { useCanvasContext } from "../canvas/CanvasContext";
+import { cn } from "@/lib/utils";
 
 interface WidgetConfigDialogProps {
   widget: WidgetInstance;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+interface DatePickerProps {
+  value?: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  "aria-invalid"?: boolean;
+}
+
+function DatePicker({ value, onChange, placeholder, ...props }: DatePickerProps) {
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(
+    value ? new Date(value) : undefined
+  );
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground"
+          )}
+          {...props}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : <span>{placeholder || "Pick a date"}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(selectedDate) => {
+            setDate(selectedDate);
+            if (selectedDate) {
+              onChange(selectedDate.toISOString().split('T')[0]);
+            } else {
+              onChange("");
+            }
+            setOpen(false);
+          }}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 export function WidgetConfigDialog({
@@ -202,27 +266,36 @@ export function WidgetConfigDialog({
                                   </FieldLabel>
                                 </div>
                               ) : fieldType === "select" && enumOptions ? (
-                                <select
-                                  id={fieldKey}
-                                  name={field.name}
+                                <Select
                                   value={field.state.value || ""}
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
+                                  onValueChange={(value) =>
+                                    field.handleChange(value)
                                   }
-                                  onBlur={field.handleBlur}
-                                  aria-invalid={isInvalid}
-                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                  <option value="">Select an option...</option>
-                                  {enumOptions.map((option) => (
-                                    <option
-                                      key={option.value}
-                                      value={option.value}
-                                    >
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </select>
+                                  <SelectTrigger
+                                    id={fieldKey}
+                                    aria-invalid={isInvalid}
+                                  >
+                                    <SelectValue placeholder="Select an option..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {enumOptions.map((option) => (
+                                      <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                      >
+                                        {option.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : fieldType === "date" ? (
+                                <DatePicker
+                                  value={field.state.value}
+                                  onChange={(value) => field.handleChange(value)}
+                                  placeholder={fieldMetadata?.placeholder}
+                                  aria-invalid={isInvalid}
+                                />
                               ) : (
                                 <div className="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
                                   <p className="text-sm text-yellow-800">

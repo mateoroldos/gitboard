@@ -4,7 +4,7 @@ export interface FieldMetadata {
   label?: string;
   placeholder?: string;
   description?: string;
-  inputType?: 'input' | 'textarea' | 'select' | 'checkbox' | 'number';
+  inputType?: 'input' | 'textarea' | 'select' | 'checkbox' | 'number' | 'date';
   rows?: number; // for textarea
   validation?: {
     errorMessage?: string;
@@ -61,6 +61,11 @@ export function enumField<T extends readonly [string, ...string[]]>(
 ) {
   const schema = z.enum(values);
   return Object.assign(schema, { _fieldMeta: { ...metadata, inputType: 'select' as const } });
+}
+
+export function dateField(metadata?: FieldMetadata) {
+  const schema = z.string();
+  return Object.assign(schema, { _fieldMeta: { ...metadata, inputType: 'date' as const } });
 }
 
 // Enhanced helper functions

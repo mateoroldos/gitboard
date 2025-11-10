@@ -18,6 +18,7 @@ import type * as model_github from "../model/github.js";
 import type * as model_widget_lifecycle from "../model/widget_lifecycle.js";
 import type * as model_widgets from "../model/widgets.js";
 import type * as polls from "../polls.js";
+import type * as task from "../task.js";
 import type * as widgets from "../widgets.js";
 
 import type {
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   "model/widget_lifecycle": typeof model_widget_lifecycle;
   "model/widgets": typeof model_widgets;
   polls: typeof polls;
+  task: typeof task;
   widgets: typeof widgets;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

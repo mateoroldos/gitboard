@@ -19,18 +19,29 @@ export function WidgetRenderer({
 
   if (!widgetDef) {
     return (
-      <div className="p-4 border border-destructive/20 rounded-lg bg-destructive/5 group">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-medium text-destructive">Unknown Widget</h3>
-        </div>
-        <p className="text-sm text-destructive/80">
-          Widget type "{widget.widgetType}" not found in registry.
-        </p>
-        <p className="text-xs text-destructive/60 mt-2">
-          This widget may have been removed or renamed. You can safely delete
-          it.
-        </p>
-      </div>
+      <WidgetProvider
+        widget={widget}
+        isEditing={isEditing}
+        isPreview={isEditing}
+        onConfigChange={onConfigChange}
+      >
+        <WidgetCanvas>
+          <WidgetCard>
+            <div className="p-4 border border-destructive/40 rounded-lg bg-destructive/10 group">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-medium text-destructive">Unknown Widget</h3>
+              </div>
+              <p className="text-sm text-destructive/80">
+                Widget type "{widget.widgetType}" not found in registry.
+              </p>
+              <p className="text-xs text-destructive/60 mt-2">
+                This widget may have been removed or renamed. You can safely
+                delete it.
+              </p>
+            </div>
+          </WidgetCard>
+        </WidgetCanvas>
+      </WidgetProvider>
     );
   }
 
