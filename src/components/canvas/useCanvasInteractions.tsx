@@ -123,18 +123,22 @@ export function useCanvasInteractions({
           }
           break;
         case "ArrowUp":
+        case "k":
           e.preventDefault();
           panBy(0, panSpeed);
           break;
         case "ArrowDown":
+        case "j":
           e.preventDefault();
           panBy(0, -panSpeed);
           break;
         case "ArrowLeft":
+        case "h":
           e.preventDefault();
           panBy(panSpeed, 0);
           break;
         case "ArrowRight":
+        case "l":
           e.preventDefault();
           panBy(-panSpeed, 0);
           break;

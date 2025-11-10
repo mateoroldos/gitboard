@@ -1,13 +1,25 @@
-import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
+import {
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  Keyboard,
+  Mouse,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "./CanvasContext";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "convex/_generated/api";
+import { useState } from "react";
 
 export function CanvasControls() {
   const { viewport, zoomBy, zoomTo, fitToContent, boardId } =
     useCanvasContext();
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const { data: widgets } = useSuspenseQuery(
     convexQuery(api.widgets.getWidgetsByBoard, {
@@ -37,63 +49,93 @@ export function CanvasControls() {
 
   return (
     <div className="fixed bottom-4 right-4 z-20 flex flex-col gap-2">
-      <div className="bg-background/80 backdrop-blur-sm border rounded-lg p-2 shadow-lg text-xs text-muted-foreground">
-        <div className="space-y-1">
-          <div>🖱️ Space + drag to pan</div>
-          <div>⚙️ Scroll to pan</div>
-          <div>⚙️ Ctrl + scroll to zoom</div>
-          <div>⌨️ Arrow keys to pan</div>
-          <div>⌨️ Ctrl +/- to zoom</div>
+      {showShortcuts && (
+        <div className="bg-background/80 backdrop-blur-sm border rounded-lg p-2 shadow-lg text-xs text-muted-foreground">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1">
+              <Mouse className="h-3 w-3" />
+              Space + drag to pan
+            </div>
+            <div className="flex items-center gap-1">
+              <Mouse className="h-3 w-3" />
+              Scroll to pan
+            </div>
+            <div className="flex items-center gap-1">
+              <Mouse className="h-3 w-3" />
+              Ctrl + scroll to zoom
+            </div>
+            <div className="flex items-center gap-1">
+              <ArrowUp className="h-3 w-3" />
+              Arrow keys / hjkl to pan
+            </div>
+            <div className="flex items-center gap-1">
+              <Keyboard className="h-3 w-3" />
+              Ctrl +/- to zoom
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="bg-background/80 flex flex-row divide-x backdrop-blur-sm border rounded-lg shadow-lg">
-        <div className="flex flex-row gap-1 flex-1 justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleZoomOut}
-            disabled={viewport.zoom <= 0.1}
-            className="h-8 w-8 p-0"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleResetZoom}
-            className="h-8 px-2 text-xs font-mono"
-          >
-            {zoomPercentage}%
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleZoomIn}
-            disabled={viewport.zoom >= 3}
-            className="h-8 w-8 p-0"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {widgets.length > 0 && (
-          <div className="flex items-center justify-center">
+      <div className="flex flex-row gap-1 justify-end">
+        <div className="bg-background/80 flex flex-row divide-x backdrop-blur-sm border rounded-lg shadow-lg">
+          <div className="flex flex-row gap-1 flex-1 justify-between">
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleFitToContent}
-              className="p-0"
-              title="Fit to content"
+              onClick={handleZoomOut}
+              disabled={viewport.zoom <= 0.1}
+              className="h-8 w-8 p-0"
             >
-              <Maximize className="h-4 w-4" />
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleResetZoom}
+              className="h-8 px-2 text-xs font-mono"
+            >
+              {zoomPercentage}%
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleZoomIn}
+              disabled={viewport.zoom >= 3}
+              className="h-8 w-8 p-0"
+            >
+              <ZoomIn className="h-4 w-4" />
             </Button>
           </div>
-        )}
+
+          {widgets.length > 0 && (
+            <div className="flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleFitToContent}
+                className="h-8 w-8 p-0"
+                title="Fit to content"
+              >
+                <Maximize className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowShortcuts(!showShortcuts)}
+            className="h-8 w-8 p-0"
+            title="Toggle keyboard shortcuts"
+          >
+            <Keyboard className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
 }
-
