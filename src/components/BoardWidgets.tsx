@@ -39,7 +39,7 @@ export function BoardWidgets({ boardId, repoString }: BoardWidgetsProps) {
 
   return (
     <>
-      <div className="relative min-h-screen" data-canvas>
+      <div className="min-h-screen">
         {widgets.map((widget) => (
           <WidgetRenderer
             key={widget._id}

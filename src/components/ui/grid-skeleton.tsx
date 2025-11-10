@@ -20,7 +20,7 @@ export function GridSkeleton({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+        "w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
         className,
       )}
     >
@@ -34,9 +34,7 @@ export function GridSkeleton({
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            {showDescription && (
-              <Skeleton className="h-4 w-full mb-4" />
-            )}
+            {showDescription && <Skeleton className="h-4 w-full mb-4" />}
             {showFooter && (
               <div className="flex items-center gap-1.5 mt-auto">
                 <Skeleton className="h-3 w-3 rounded" />
@@ -49,4 +47,3 @@ export function GridSkeleton({
     </div>
   );
 }
-

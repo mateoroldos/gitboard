@@ -66,8 +66,14 @@ function RepoBoard() {
         </Suspense>
       </nav>
 
-      <main className="container mx-auto">
-        <Suspense fallback={<GridSkeleton count={6} />}>
+      <main className="h-screen w-screen fixed top-0">
+        <Suspense
+          fallback={
+            <div className="container mx-auto min-h-screen flex flex-1 items-center">
+              <GridSkeleton count={6} />
+            </div>
+          }
+        >
           <BoardWidgets boardId={board._id} repoString={repoString} />
         </Suspense>
       </main>

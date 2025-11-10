@@ -1,11 +1,11 @@
-import type React from "react";
-import { useState, useCallback, useEffect } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { WidgetInstance } from "./types";
-import { debounce } from "@/lib/utils";
+import debounce from "debounce";
+import { motion } from "framer-motion";
 
 interface WidgetRootProps {
   children: React.ReactNode;
@@ -24,160 +24,112 @@ export function WidgetRoot({
   isEditing = false,
   isDraggable = true,
 }: WidgetRootProps) {
-  const [currentPosition, setCurrentPosition] = useState(widget.position);
-  const [dragState, setDragState] = useState<{
-    isDragging: boolean;
-    startPos: { x: number; y: number };
-  }>({
-    isDragging: false,
-    startPos: { x: 0, y: 0 },
-  });
+  const [isDragging, setIsDragging] = useState(false);
+  const [localPosition, setLocalPosition] = useState(widget.position);
 
   const updatePosition = useMutation({
     mutationFn: useAction(api.widgets.updateWidgetAction),
   });
 
-  const debounceUpdatePosition = debounce(
-    (newPosition: { x: number; y: number }) => {
-      updatePosition.mutate({
-        id: widget._id,
-        position: newPosition,
-      });
-    },
-    500,
+  const debouncedMutate = useMemo(
+    () =>
+      debounce((newPosition: { x: number; y: number }) => {
+        updatePosition.mutate({
+          id: widget._id,
+          position: newPosition,
+        });
+      }, 2000),
+    [updatePosition.mutate, widget._id],
   );
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!isDraggable) return;
+  const handleDragEnd = useCallback(
+    (_event: any, info: any) => {
+      setIsDragging(false);
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const startPos = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-
-    setDragState({
-      isDragging: true,
-      startPos,
-    });
-
-    // Prevent text selection during drag
-    e.preventDefault();
-  };
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!dragState.isDragging) return;
-
-      // Get parent container (canvas)
-      const canvas = document.querySelector("[data-canvas]") as HTMLElement;
-      if (!canvas) return;
-
-      const parentRect = canvas.getBoundingClientRect();
-      const newX = Math.max(
-        0,
-        e.clientX - parentRect.left - dragState.startPos.x,
-      );
-      const newY = Math.max(
-        0,
-        e.clientY - parentRect.top - dragState.startPos.y,
-      );
-
-      // Update position immediately (optimistic)
-      setCurrentPosition({
-        x: newX,
-        y: newY,
-      });
-    },
-    [dragState.isDragging, dragState.startPos],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    if (!dragState.isDragging) return;
-
-    setDragState({
-      isDragging: false,
-      startPos: { x: 0, y: 0 },
-    });
-
-    // Persist current position to database
-    debounceUpdatePosition(currentPosition);
-  }, [dragState.isDragging, currentPosition, debounceUpdatePosition]);
-
-  // Attach/detach global listeners during drag
-  useEffect(() => {
-    if (dragState.isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "grabbing";
-      document.body.style.userSelect = "none";
-
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-        document.body.style.cursor = "";
-        document.body.style.userSelect = "";
+      const newPosition = {
+        x: Math.max(0, Math.round(localPosition.x + info.offset.x)),
+        y: Math.max(0, Math.round(localPosition.y + info.offset.y)),
       };
-    }
-  }, [dragState.isDragging, handleMouseMove, handleMouseUp]);
 
-  // Sync currentPosition with widget.position when widget updates
-  // useEffect(() => {
-  //   if (!dragState.isDragging) {
-  //     setCurrentPosition(widget.position);
-  //   }
-  // }, [widget.position, dragState.isDragging]);
+      setLocalPosition(newPosition);
+      debouncedMutate(newPosition);
+    },
+    [localPosition, debouncedMutate],
+  );
 
   return (
-    <Card
+    <motion.div
+      data-widget
+      drag={isDraggable}
+      dragMomentum={false}
+      dragElastic={0}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={handleDragEnd}
+      initial={{
+        x: localPosition.x,
+        y: localPosition.y,
+      }}
+      animate={{
+        x: localPosition.x,
+        y: localPosition.y,
+      }}
       style={{
         position: "absolute",
-        left: currentPosition.x,
-        top: currentPosition.y,
-        cursor: isDraggable
-          ? dragState.isDragging
-            ? "grabbing"
-            : "grab"
-          : "default",
-        zIndex: dragState.isDragging ? 1000 : 1,
+        left: 0,
+        top: 0,
+        cursor: isDraggable ? "grab" : "default",
+        zIndex: isDragging ? 1000 : 0,
       }}
-      className={`group transition-all ${
-        isEditing ? "ring-2 ring-primary ring-opacity-50" : ""
-      } ${dragState.isDragging ? "opacity-80 shadow-lg" : ""}`}
-      onMouseDown={handleMouseDown}
+      whileDrag={{
+        scale: 1.02,
+        opacity: 0.9,
+        boxShadow: "0 8px 14px rgba(0,0,0,0.1)",
+        cursor: "grabbing",
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      }}
     >
-      <CardContent>
-        {widget.title && (
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-sm">{widget.title}</h3>
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              {onEdit && !isEditing && (
-                <button
-                  type="button"
-                  onClick={onEdit}
-                  className="p-1 hover:bg-accent rounded text-xs transition-colors"
-                  aria-label="Edit widget"
-                  title="Configure widget"
-                >
-                  ⚙️
-                </button>
-              )}
-              {onDelete && !isEditing && (
-                <button
-                  type="button"
-                  onClick={onDelete}
-                  className="p-1 hover:bg-destructive hover:text-destructive-foreground rounded text-xs transition-colors"
-                  aria-label="Delete widget"
-                  title="Delete widget"
-                >
-                  🗑️
-                </button>
-              )}
+      <Card
+        className={`group transition-all ${
+          isEditing ? "ring-2 ring-primary ring-opacity-50" : ""
+        }`}
+      >
+        <CardContent>
+          {widget.title && (
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-sm">{widget.title}</h3>
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {onEdit && !isEditing && (
+                  <button
+                    type="button"
+                    onClick={onEdit}
+                    className="p-1 hover:bg-accent rounded text-xs transition-colors"
+                    aria-label="Edit widget"
+                    title="Configure widget"
+                  >
+                    ⚙️
+                  </button>
+                )}
+                {onDelete && !isEditing && (
+                  <button
+                    type="button"
+                    onClick={onDelete}
+                    className="p-1 hover:bg-destructive hover:text-destructive-foreground rounded text-xs transition-colors"
+                    aria-label="Delete widget"
+                    title="Delete widget"
+                  >
+                    🗑️
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-        <div className="widget-content">{children}</div>
-      </CardContent>
-    </Card>
+          )}
+          <div className="widget-content">{children}</div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
