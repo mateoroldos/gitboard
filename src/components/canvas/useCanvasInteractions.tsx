@@ -109,6 +109,17 @@ export function useCanvasInteractions({
     (e: KeyboardEvent) => {
       if (disabled) return;
 
+      // Don't handle shortcuts when typing in inputs, textareas, or when modals are open
+      const target = e.target as HTMLElement;
+      const isInputElement = target.tagName === 'INPUT' || 
+                            target.tagName === 'TEXTAREA' || 
+                            target.contentEditable === 'true' ||
+                            target.closest('[role="dialog"]') ||
+                            target.closest('[data-dialog]') ||
+                            target.closest('.dialog-content');
+      
+      if (isInputElement) return;
+
       const panSpeed = 50;
       const zoomSpeed = 0.1;
 
@@ -178,6 +189,17 @@ export function useCanvasInteractions({
   const handleKeyUp = useCallback(
     (e: KeyboardEvent) => {
       if (disabled) return;
+
+      // Don't handle shortcuts when typing in inputs, textareas, or when modals are open
+      const target = e.target as HTMLElement;
+      const isInputElement = target.tagName === 'INPUT' || 
+                            target.tagName === 'TEXTAREA' || 
+                            target.contentEditable === 'true' ||
+                            target.closest('[role="dialog"]') ||
+                            target.closest('[data-dialog]') ||
+                            target.closest('.dialog-content');
+      
+      if (isInputElement) return;
 
       if (e.key === " ") {
         isSpaceKeyDownRef.current = false;
