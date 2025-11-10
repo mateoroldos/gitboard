@@ -17,6 +17,7 @@ export function useCanvasInteractions({
 }: UseCanvasInteractionsProps) {
   const isPanningRef = useRef(false);
   const lastPanPointRef = useRef({ x: 0, y: 0 });
+  const isSpaceKeyDownRef = useRef(false);
 
   // Handle viewport resize
   useEffect(() => {
@@ -32,30 +33,39 @@ export function useCanvasInteractions({
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [containerRef, setViewportSize]);
 
-  // Handle mouse wheel zoom
+  // Handle mouse wheel - pan by default, zoom with Ctrl
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       if (disabled) return;
 
       e.preventDefault();
 
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl+scroll for zoom
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
 
-      const centerX = e.clientX - rect.left;
-      const centerY = e.clientY - rect.top;
+        const centerX = e.clientX - rect.left;
+        const centerY = e.clientY - rect.top;
 
-      // Normalize wheel delta across browsers
-      const delta = -e.deltaY / 1000;
-      zoomBy(delta, centerX, centerY);
+        // Normalize wheel delta across browsers
+        const delta = -e.deltaY / 1000;
+        zoomBy(delta, centerX, centerY);
+      } else {
+        // Regular scroll for pan
+        const panSpeed = 50;
+        const deltaX = e.deltaX * panSpeed / 100;
+        const deltaY = e.deltaY * panSpeed / 100;
+        panBy(-deltaX, -deltaY);
+      }
     },
     [disabled, panBy, zoomBy, containerRef],
   );
 
-  // Handle mouse pan
+  // Handle mouse pan (only when space key is pressed)
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
-      if (disabled || e.button !== 0) return; // Only left mouse button
+      if (disabled || e.button !== 0 || !isSpaceKeyDownRef.current) return; // Only left mouse button and space key
 
       // Don't pan if clicking on a widget
       const target = e.target as HTMLElement;
@@ -89,7 +99,7 @@ export function useCanvasInteractions({
     if (isPanningRef.current) {
       isPanningRef.current = false;
       if (containerRef.current) {
-        containerRef.current.style.cursor = "grab";
+        containerRef.current.style.cursor = isSpaceKeyDownRef.current ? "grab" : "default";
       }
     }
   }, [containerRef]);
@@ -103,6 +113,15 @@ export function useCanvasInteractions({
       const zoomSpeed = 0.1;
 
       switch (e.key) {
+        case " ":
+          if (!isSpaceKeyDownRef.current) {
+            e.preventDefault();
+            isSpaceKeyDownRef.current = true;
+            if (containerRef.current) {
+              containerRef.current.style.cursor = "grab";
+            }
+          }
+          break;
         case "ArrowUp":
           e.preventDefault();
           panBy(0, panSpeed);
@@ -150,6 +169,20 @@ export function useCanvasInteractions({
       }
     },
     [disabled, panBy, zoomBy, containerRef],
+  );
+
+  const handleKeyUp = useCallback(
+    (e: KeyboardEvent) => {
+      if (disabled) return;
+
+      if (e.key === " ") {
+        isSpaceKeyDownRef.current = false;
+        if (containerRef.current && !isPanningRef.current) {
+          containerRef.current.style.cursor = "default";
+        }
+      }
+    },
+    [disabled, containerRef],
   );
 
   // Touch handling for mobile
@@ -252,9 +285,10 @@ export function useCanvasInteractions({
 
     // Keyboard events
     document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
 
     // Set initial cursor
-    container.style.cursor = "grab";
+    container.style.cursor = "default";
 
     return () => {
       container.removeEventListener("wheel", handleWheel);
@@ -267,6 +301,7 @@ export function useCanvasInteractions({
       container.removeEventListener("touchend", handleTouchEnd);
 
       document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
     };
   }, [
     containerRef,
@@ -278,6 +313,7 @@ export function useCanvasInteractions({
     handleTouchMove,
     handleTouchEnd,
     handleKeyDown,
+    handleKeyUp,
   ]);
 
   return {
