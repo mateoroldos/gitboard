@@ -21,19 +21,29 @@ export function WidgetSelector() {
   const [selectedCategory, setSelectedCategory] =
     useState<WidgetCategory>("github");
 
-  const { repoString, boardId } = useCanvasContext();
+  const { repoString, boardId, viewport, screenToWorld } = useCanvasContext();
 
   const { mutate: createWidget } = useMutation({
     mutationFn: useAction(api.widgets.createWidgetAction),
   });
 
   const handleSelectWidget = (widget: WidgetDefinition) => {
-    // Use widget definition to create widget with proper defaults
+    // Place new widget in the center of the current viewport
+    const centerScreen = { x: viewport.width / 2, y: viewport.height / 2 };
+    const centerWorld = screenToWorld(centerScreen);
+    
+    // Offset slightly to avoid overlapping widgets
+    const randomOffset = () => Math.random() * 100 - 50;
+    const position = {
+      x: Math.round(centerWorld.x + randomOffset()),
+      y: Math.round(centerWorld.y + randomOffset()),
+    };
+
     createWidget({
       boardId: boardId,
       widgetType: widget.id,
       config: { ...widget.defaultConfig, repository: repoString },
-      position: { x: 100, y: 100 },
+      position,
       size: widget.size.default,
       title: widget.name,
     });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "convex/_generated/api";
@@ -6,6 +6,7 @@ import { WidgetRenderer } from "@/components/widgets/WidgetRenderer";
 import { WidgetConfigDialog } from "@/components/widgets/WidgetConfigDialog";
 import type { WidgetInstance } from "@/components/widgets/types";
 import { useCanvasContext } from "./CanvasContext";
+import { Card, CardContent } from "./ui/card";
 
 export function BoardWidgets() {
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
@@ -13,7 +14,7 @@ export function BoardWidgets() {
     null,
   );
 
-  const { boardId, repoString } = useCanvasContext();
+  const { boardId, viewport, fitToContent } = useCanvasContext();
 
   const { data: widgets } = useSuspenseQuery(
     convexQuery(api.widgets.getWidgetsByBoard, {
@@ -26,22 +27,53 @@ export function BoardWidgets() {
     setConfigDialogOpen(true);
   };
 
+  // Auto-fit to content when widgets first load
+  useMemo(() => {
+    if (
+      widgets.length > 0 &&
+      viewport.zoom === 1 &&
+      viewport.x === 0 &&
+      viewport.y === 0
+    ) {
+      // Only auto-fit if we're at the default viewport position
+      fitToContent(widgets);
+    }
+  }, [
+    widgets.length,
+    fitToContent,
+    viewport.zoom,
+    viewport.x,
+    viewport.y,
+    widgets,
+  ]);
+
   if (widgets.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center text-muted-foreground max-w-lg text-center mx-auto">
-        <p>Upss... this board doesn't have any widget yet.</p>
+      <div
+        className="flex h-80 items-center justify-center text-muted-foreground max-w-lg text-center mx-auto"
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <Card>
+          <CardContent>
+            <p>Upss... this board doesn't have any widget yet.</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <>
-      <div className="min-h-screen">
+      <div className="relative w-full h-full">
         {widgets.map((widget) => (
           <WidgetRenderer
             key={widget._id}
             widget={widget}
-            repository={repoString}
             onConfigChange={() => handleEditWidget(widget)}
           />
         ))}
@@ -50,7 +82,6 @@ export function BoardWidgets() {
       {selectedWidget && (
         <WidgetConfigDialog
           widget={selectedWidget}
-          repository={repoString}
           open={configDialogOpen}
           onOpenChange={setConfigDialogOpen}
         />

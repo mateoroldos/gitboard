@@ -134,11 +134,5 @@ code {
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      oklch(from var(--muted-foreground) l c h / 0.1) 1px,
-      transparent 0
-    );
-    background-size: 20px 20px;
   }
 }

@@ -27,7 +27,7 @@ export function WidgetRoot({
 }: WidgetRootProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [localPosition, setLocalPosition] = useState(widget.position);
-  const { hasWriteAccess } = useCanvasContext();
+  const { hasWriteAccess, viewport } = useCanvasContext();
 
   const updatePosition = useMutation({
     mutationFn: useAction(api.widgets.updateWidgetAction),
@@ -40,7 +40,7 @@ export function WidgetRoot({
           id: widget._id,
           position: newPosition,
         });
-      }, 2000),
+      }, 500),
     [updatePosition.mutate, widget._id],
   );
 
@@ -48,20 +48,29 @@ export function WidgetRoot({
     (_event: any, info: any) => {
       setIsDragging(false);
 
+      // Convert screen drag offset to world coordinates
+      const worldOffsetX = info.offset.x / viewport.zoom;
+      const worldOffsetY = info.offset.y / viewport.zoom;
+
       const newPosition = {
-        x: Math.max(0, Math.round(localPosition.x + info.offset.x)),
-        y: Math.max(0, Math.round(localPosition.y + info.offset.y)),
+        x: Math.round(localPosition.x + worldOffsetX),
+        y: Math.round(localPosition.y + worldOffsetY),
       };
 
       if (hasWriteAccess) {
         setLocalPosition(newPosition);
         debouncedMutate(newPosition);
       } else {
-        // Revert to original position if no write access
         setLocalPosition(widget.position);
       }
     },
-    [localPosition, debouncedMutate, hasWriteAccess, widget.position],
+    [
+      localPosition,
+      debouncedMutate,
+      hasWriteAccess,
+      widget.position,
+      viewport.zoom,
+    ],
   );
 
   return (
@@ -73,12 +82,14 @@ export function WidgetRoot({
       onDragStart={() => setIsDragging(true)}
       onDragEnd={handleDragEnd}
       initial={{
-        x: localPosition.x,
-        y: localPosition.y,
+        x: (localPosition.x + viewport.x) * viewport.zoom,
+        y: (localPosition.y + viewport.y) * viewport.zoom,
+        scale: viewport.zoom,
       }}
       animate={{
-        x: localPosition.x,
-        y: localPosition.y,
+        x: (localPosition.x + viewport.x) * viewport.zoom,
+        y: (localPosition.y + viewport.y) * viewport.zoom,
+        scale: viewport.zoom,
       }}
       style={{
         position: "absolute",
@@ -86,12 +97,16 @@ export function WidgetRoot({
         top: 0,
         cursor: isDraggable ? "grab" : "default",
         zIndex: isDragging ? 1000 : 0,
+        width: widget.size.width,
+        height: widget.size.height,
+        transformOrigin: "0 0",
       }}
       whileDrag={{
-        scale: 1.02,
+        scale: 1.02 * viewport.zoom,
         opacity: 0.9,
         boxShadow: "0 8px 14px rgba(0,0,0,0.1)",
         cursor: "grabbing",
+        zIndex: 1000,
       }}
       transition={{
         type: "spring",
