@@ -257,13 +257,13 @@ export function WidgetConfigDialog({
           <div className="flex-1 border-l pl-6">
             <h3 className="font-medium text-sm mb-3">Preview</h3>
             <div className="border rounded-lg p-4 bg-gray-50">
-              {/* <WidgetRenderer */}
-              {/*   widgetType={widget.widgetType} */}
-              {/*   config={previewValues} */}
-              {/*   instanceId={widget._id} */}
-              {/*   repository={repoString} */}
-              {/*   isEditing={true} */}
-              {/* /> */}
+              <WidgetRenderer
+                widget={{
+                  ...widget,
+                  config: previewValues,
+                }}
+                isEditing={true}
+              />
             </div>
           </div>
         </div>

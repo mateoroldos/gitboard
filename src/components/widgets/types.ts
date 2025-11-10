@@ -2,14 +2,6 @@ import type React from "react";
 import type * as z from "zod";
 import { Doc } from "convex/_generated/dataModel";
 
-export interface WidgetProps<TConfig = Record<string, any>> {
-  widget: WidgetInstance<TConfig>;
-  repository: string; // owner/name format
-  onConfigChange?: (config: TConfig) => void;
-  onDelete?: () => void;
-  isEditing?: boolean;
-}
-
 export type WidgetCategory =
   | "github"
   | "analytics"
@@ -24,8 +16,8 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   category: WidgetCategory;
   icon: string;
 
-  component: React.ComponentType<WidgetProps<any>>;
-  previewComponent?: React.ComponentType<WidgetProps<any>>;
+  component: React.ComponentType;
+  previewComponent?: React.ComponentType;
 
   configSchema: z.ZodObject<Record<string, z.ZodType>>;
   defaultConfig: TConfig;

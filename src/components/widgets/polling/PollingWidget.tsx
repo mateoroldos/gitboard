@@ -1,69 +1,35 @@
-import type { WidgetProps } from "../types";
-import {
-  useSuspenseQuery,
-  useMutation,
-  useQueryClient,
-  useQuery,
-} from "@tanstack/react-query";
-import { convexQuery, convexAction } from "@convex-dev/react-query";
-import { api } from "convex/_generated/api";
-import { useState } from "react";
-import { PollingDisplay } from "./PollingDisplay";
+import { PollRoot } from "./poll-root";
+import { PollQuestion } from "./poll-question";
+import { PollOptions } from "./poll-options";
+import { PollAuthGate } from "./poll-auth-gate";
+import { PollVoteButton } from "./poll-vote-button";
+import { PollResults } from "./poll-results";
+import { PollEmptyState } from "./poll-empty-state";
+import { usePoll } from "./poll-context";
 
-interface PollingConfig {
-  question: string;
-  options: string;
-  showPercentages: boolean;
-}
+function PollContent() {
+  const { pollData } = usePoll();
 
-export function PollingWidget({
-  widget,
-  onConfigChange,
-  onDelete,
-}: WidgetProps<PollingConfig>) {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  const { data: pollData } = useSuspenseQuery(
-    convexQuery(api.polls.getPollData, { widgetId: widget._id }),
-  );
-
-  const { data: userVote } = useQuery({
-    ...convexQuery(api.polls.checkUserVote, { widgetId: widget._id }),
-    enabled: !!pollData,
-  });
-
-  const voteMutation = useMutation({
-    mutationFn: async (variables: { widgetId: any; optionId: string }) => {
-      const action = convexAction(api.polls.vote, variables);
-      return await queryClient.fetchQuery(action);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries();
-      setSelectedOption(null);
-    },
-  });
-
-  const handleVote = () => {
-    if (selectedOption && pollData) {
-      voteMutation.mutate({
-        widgetId: widget._id,
-        optionId: selectedOption,
-      });
-    }
-  };
+  if (!pollData || !pollData.question || pollData.options.length === 0) {
+    return <PollEmptyState />;
+  }
 
   return (
-    <PollingDisplay
-      widget={widget}
-      pollData={pollData}
-      userVote={userVote}
-      selectedOption={selectedOption}
-      onOptionSelect={setSelectedOption}
-      onVote={handleVote}
-      onEdit={onConfigChange ? () => onConfigChange(widget.config) : undefined}
-      onDelete={onDelete}
-      isVoting={voteMutation.isPending}
-    />
+    <div className="space-y-4">
+      <PollQuestion />
+      <PollOptions />
+      <PollAuthGate>
+        <PollVoteButton />
+      </PollAuthGate>
+      <PollResults />
+    </div>
+  );
+}
+
+export function PollingWidget() {
+  return (
+    <PollRoot>
+      <PollContent />
+    </PollRoot>
   );
 }

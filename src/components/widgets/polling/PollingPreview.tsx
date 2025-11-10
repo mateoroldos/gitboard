@@ -1,41 +1,45 @@
-import type { WidgetProps } from "../types";
-import { PollingDisplay, type PollData } from "./PollingDisplay";
+import { PollContext } from "./poll-context";
+import { PollQuestion } from "./poll-question";
+import { PollOptions } from "./poll-options";
+import { PollResults } from "./poll-results";
+import { PollEmptyState } from "./poll-empty-state";
+import type { PollingConfig } from "./types";
+import { createPreviewPollData } from "./utils";
+import { useWidget } from "../WidgetProvider";
 
-interface PollingConfig {
-  question: string;
-  options: string;
-  showPercentages: boolean;
-}
+export function PollingPreview() {
+  const { widget } = useWidget();
+  const config = widget.config as PollingConfig;
+  const pollData = createPreviewPollData(config);
 
-export function PollingPreview({
-  widget,
-  onConfigChange,
-  onDelete,
-}: WidgetProps<PollingConfig>) {
-  const pollData: PollData | null = widget.config.options
-    ? {
-        question: widget.config.question || "",
-        options: widget.config.options
-          .split("\n")
-          .map((optionText: string) => optionText.trim())
-          .filter((optionText: string) => optionText.length > 0)
-          .map((optionText: string, index: number) => ({
-            id: `option_${index}`,
-            text: optionText,
-            votes: 0, // No votes in preview
-          })),
-        showPercentages: widget.config.showPercentages || false,
-      }
-    : null;
+  const contextValue = {
+    pollData,
+    userVote: null,
+    selectedOption: null,
+    isVoting: false,
+    hasVoted: false,
+    totalVotes: 0,
+    isEditing: true,
+    actions: {
+      selectOption: () => {},
+      vote: () => {},
+      clearSelection: () => {},
+    },
+  };
 
   return (
-    <PollingDisplay
-      widget={widget}
-      pollData={pollData}
-      onEdit={onConfigChange ? () => onConfigChange(widget.config) : undefined}
-      onDelete={onDelete}
-      isEditing={true}
-    />
+    <>
+      {!pollData || !pollData.question || pollData.options.length === 0 ? (
+        <PollEmptyState />
+      ) : (
+        <PollContext.Provider value={contextValue}>
+          <div className="space-y-4">
+            <PollQuestion />
+            <PollOptions />
+            <PollResults showVotedMessage={false} />
+          </div>
+        </PollContext.Provider>
+      )}
+    </>
   );
 }
-
