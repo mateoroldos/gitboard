@@ -31,11 +31,7 @@ export function ImageEditingOverlay() {
   const uploadFile = useUploadFile(api.image);
 
   const updateConfig = (updates: Partial<typeof config>) => {
-    actions.updateConfigOptimistic({ ...config, ...updates });
-  };
-
-  const updateConfigDebounced = (updates: Partial<typeof config>) => {
-    actions.updateConfigOptimisticDebounced({ ...config, ...updates });
+    actions.updateConfigDebounced({ ...config, ...updates });
   };
 
   const fitOptions = [
@@ -119,9 +115,7 @@ export function ImageEditingOverlay() {
                 <Input
                   placeholder="Describe the image..."
                   value={config.altText || ""}
-                  onChange={(e) =>
-                    updateConfigDebounced({ altText: e.target.value })
-                  }
+                  onChange={(e) => updateConfig({ altText: e.target.value })}
                 />
               </div>
             </PopoverContent>
@@ -148,9 +142,7 @@ export function ImageEditingOverlay() {
                 <Input
                   placeholder="Enter caption..."
                   value={config.title || ""}
-                  onChange={(e) =>
-                    updateConfigDebounced({ title: e.target.value })
-                  }
+                  onChange={(e) => updateConfig({ title: e.target.value })}
                 />
               </div>
             </PopoverContent>
@@ -188,7 +180,7 @@ export function ImageEditingOverlay() {
               max="50"
               value={config.borderRadius || 0}
               onChange={(e) =>
-                updateConfigDebounced({
+                updateConfig({
                   borderRadius: parseInt(e.target.value) || 0,
                 })
               }
@@ -236,4 +228,3 @@ export function ImageEditingOverlay() {
     </>
   );
 }
-

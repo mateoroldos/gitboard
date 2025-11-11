@@ -14,11 +14,7 @@ export function TextEditingOverlay() {
   const config = widget.config;
 
   const updateConfig = (updates: Partial<typeof config>) => {
-    actions.updateConfigOptimistic({ ...config, ...updates });
-  };
-
-  const updateConfigDebounced = (updates: Partial<typeof config>) => {
-    actions.updateConfigOptimisticDebounced({ ...config, ...updates });
+    actions.updateConfigDebounced({ ...config, ...updates });
   };
 
   const fontFamilyOptions = [
@@ -106,7 +102,7 @@ export function TextEditingOverlay() {
             variant="ghost"
             size="sm"
             onClick={() =>
-              updateConfigDebounced({
+              updateConfig({
                 fontScale: Math.max(0.5, (config.fontScale || 1) - 0.1),
               })
             }
@@ -121,7 +117,7 @@ export function TextEditingOverlay() {
             variant="ghost"
             size="sm"
             onClick={() =>
-              updateConfigDebounced({
+              updateConfig({
                 fontScale: Math.min(3, (config.fontScale || 1) + 0.1),
               })
             }
@@ -147,4 +143,3 @@ export function TextEditingOverlay() {
     </div>
   );
 }
-

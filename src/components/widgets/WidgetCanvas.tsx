@@ -1,8 +1,7 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { useWidget } from "./WidgetProvider";
 import { useCanvasContext } from "@/components/canvas/CanvasContext";
-import debounce from "debounce";
 import { getWidgetDefinitionByType } from "./registry";
 import { EditingOverlay } from "./EditingOverlay";
 
@@ -28,22 +27,8 @@ export function WidgetCanvas({
 
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [localPosition, setLocalPosition] = useState(widget.position);
-  const [localSize, setLocalSize] = useState(widget.size);
 
   const isSelected = selectedWidgetId === widget._id;
-
-  const debouncedUpdatePosition = useMemo(() => {
-    return debounce((newPosition: { x: number; y: number }) => {
-      actions.updatePosition(newPosition);
-    }, 500);
-  }, [actions.updatePosition]);
-
-  const debouncedUpdateSize = useMemo(() => {
-    return debounce((newSize: { width: number; height: number }) => {
-      actions.updateSize(newSize);
-    }, 500);
-  }, [actions.updateSize]);
 
   const handleDragEnd = useCallback(
     (_event: any, info: any) => {
@@ -55,23 +40,19 @@ export function WidgetCanvas({
       const worldOffsetY = info.offset.y / viewport.zoom;
 
       const newPosition = {
-        x: Math.round(localPosition.x + worldOffsetX),
-        y: Math.round(localPosition.y + worldOffsetY),
+        x: Math.round(widget.position.x + worldOffsetX),
+        y: Math.round(widget.position.y + worldOffsetY),
       };
 
       if (state.hasWriteAccess) {
-        setLocalPosition(newPosition);
-        debouncedUpdatePosition(newPosition);
-      } else {
-        setLocalPosition(widget.position);
+        actions.updatePosition(newPosition);
       }
     },
     [
       isResizing,
-      localPosition,
-      debouncedUpdatePosition,
-      state.hasWriteAccess,
       widget.position,
+      actions.updatePosition,
+      state.hasWriteAccess,
       viewport.zoom,
     ],
   );
@@ -90,60 +71,90 @@ export function WidgetCanvas({
       const worldDeltaX = deltaX / viewport.zoom;
       const worldDeltaY = deltaY / viewport.zoom;
 
-      let newSize = { ...localSize };
-      let newPosition = { ...localPosition };
+      let newSize = { ...widget.size };
+      let newPosition = { ...widget.position };
 
       switch (handle) {
         case "top-left":
-          newSize.width = Math.max(MIN_WIDTH, localSize.width - worldDeltaX);
-          newSize.height = Math.max(MIN_HEIGHT, localSize.height - worldDeltaY);
-          newPosition.x = localPosition.x + (localSize.width - newSize.width);
-          newPosition.y = localPosition.y + (localSize.height - newSize.height);
+          newSize.width = Math.max(MIN_WIDTH, widget.size.width - worldDeltaX);
+          newSize.height = Math.max(
+            MIN_HEIGHT,
+            widget.size.height - worldDeltaY,
+          );
+          newPosition.x =
+            widget.position.x + (widget.size.width - newSize.width);
+          newPosition.y =
+            widget.position.y + (widget.size.height - newSize.height);
           break;
         case "top-right":
-          newSize.width = Math.max(MIN_WIDTH, localSize.width + worldDeltaX);
-          newSize.height = Math.max(MIN_HEIGHT, localSize.height - worldDeltaY);
-          newPosition.y = localPosition.y + (localSize.height - newSize.height);
+          newSize.width = Math.max(MIN_WIDTH, widget.size.width + worldDeltaX);
+          newSize.height = Math.max(
+            MIN_HEIGHT,
+            widget.size.height - worldDeltaY,
+          );
+          newPosition.y =
+            widget.position.y + (widget.size.height - newSize.height);
           break;
         case "bottom-left":
-          newSize.width = Math.max(MIN_WIDTH, localSize.width - worldDeltaX);
-          newSize.height = Math.max(MIN_HEIGHT, localSize.height + worldDeltaY);
-          newPosition.x = localPosition.x + (localSize.width - newSize.width);
+          newSize.width = Math.max(MIN_WIDTH, widget.size.width - worldDeltaX);
+          newSize.height = Math.max(
+            MIN_HEIGHT,
+            widget.size.height + worldDeltaY,
+          );
+          newPosition.x =
+            widget.position.x + (widget.size.width - newSize.width);
           break;
         case "bottom-right":
-          newSize.width = Math.max(MIN_WIDTH, localSize.width + worldDeltaX);
-          newSize.height = Math.max(MIN_HEIGHT, localSize.height + worldDeltaY);
+          newSize.width = Math.max(MIN_WIDTH, widget.size.width + worldDeltaX);
+          newSize.height = Math.max(
+            MIN_HEIGHT,
+            widget.size.height + worldDeltaY,
+          );
           break;
         case "top":
-          newSize.height = Math.max(MIN_HEIGHT, localSize.height - worldDeltaY);
-          newPosition.y = localPosition.y + (localSize.height - newSize.height);
+          newSize.height = Math.max(
+            MIN_HEIGHT,
+            widget.size.height - worldDeltaY,
+          );
+          newPosition.y =
+            widget.position.y + (widget.size.height - newSize.height);
           break;
         case "bottom":
-          newSize.height = Math.max(MIN_HEIGHT, localSize.height + worldDeltaY);
+          newSize.height = Math.max(
+            MIN_HEIGHT,
+            widget.size.height + worldDeltaY,
+          );
           break;
         case "left":
-          newSize.width = Math.max(MIN_WIDTH, localSize.width - worldDeltaX);
-          newPosition.x = localPosition.x + (localSize.width - newSize.width);
+          newSize.width = Math.max(MIN_WIDTH, widget.size.width - worldDeltaX);
+          newPosition.x =
+            widget.position.x + (widget.size.width - newSize.width);
           break;
         case "right":
-          newSize.width = Math.max(MIN_WIDTH, localSize.width + worldDeltaX);
+          newSize.width = Math.max(MIN_WIDTH, widget.size.width + worldDeltaX);
           break;
       }
 
-      setLocalSize(newSize);
-      setLocalPosition(newPosition);
+      actions.updateSize(newSize);
+      if (
+        newPosition.x !== widget.position.x ||
+        newPosition.y !== widget.position.y
+      ) {
+        actions.updatePosition(newPosition);
+      }
     },
-    [localSize, localPosition, viewport.zoom, state.hasWriteAccess],
+    [
+      widget.size,
+      widget.position,
+      viewport.zoom,
+      state.hasWriteAccess,
+      actions,
+    ],
   );
 
   const handleResizeEnd = useCallback(() => {
     setIsResizing(false);
-    if (state.hasWriteAccess) {
-      debouncedUpdateSize(localSize);
-    } else {
-      setLocalSize(widget.size);
-    }
-  }, [localSize, debouncedUpdateSize, state.hasWriteAccess, widget.size]);
+  }, []);
 
   return (
     <motion.div
@@ -162,18 +173,18 @@ export function WidgetCanvas({
         setSelectedWidgetId(widget._id);
       }}
       initial={{
-        x: (localPosition.x + viewport.x) * viewport.zoom,
-        y: (localPosition.y + viewport.y) * viewport.zoom,
+        x: (widget.position.x + viewport.x) * viewport.zoom,
+        y: (widget.position.y + viewport.y) * viewport.zoom,
         scale: viewport.zoom,
-        width: localSize.width,
-        height: localSize.height,
+        width: widget.size.width,
+        height: widget.size.height,
       }}
       animate={{
-        x: (localPosition.x + viewport.x) * viewport.zoom,
-        y: (localPosition.y + viewport.y) * viewport.zoom,
+        x: (widget.position.x + viewport.x) * viewport.zoom,
+        y: (widget.position.y + viewport.y) * viewport.zoom,
         scale: viewport.zoom,
-        width: localSize.width,
-        height: localSize.height,
+        width: widget.size.width,
+        height: widget.size.height,
       }}
       style={{
         position: "absolute",

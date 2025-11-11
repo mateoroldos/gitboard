@@ -1,20 +1,26 @@
-import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import { WidgetInstance } from "./types";
 import { useCanvasContext } from "../canvas/CanvasContext";
-import { toast } from "sonner";
 import debounce from "debounce";
 
-interface WidgetActions {
-  updateWidget: (updates: Partial<WidgetInstance>) => void;
+interface WidgetActions<TConfig> {
   deleteWidget: () => void;
   updatePosition: (position: { x: number; y: number }) => void;
   updateSize: (size: { width: number; height: number }) => void;
-  updateConfig: (config: Record<string, any>) => void;
-  updateConfigOptimistic: (config: Record<string, any>) => void;
-  updateConfigOptimisticDebounced: (config: Record<string, any>) => void;
+  updateConfig: (config: TConfig) => void;
+  updateConfigDebounced: (config: TConfig) => void;
   openConfig: () => void;
 }
 
@@ -28,7 +34,7 @@ interface WidgetState {
 interface WidgetContextValue<TConfig = Record<string, any>> {
   widget: WidgetInstance<TConfig>;
   repository: string;
-  actions: WidgetActions;
+  actions: WidgetActions<TConfig>;
   state: WidgetState;
 }
 
@@ -42,6 +48,7 @@ interface WidgetProviderProps<TConfig = Record<string, any>> {
   isDragging?: boolean;
   onConfigChange?: () => void;
   onDelete?: () => void;
+  debounceMs?: number;
 }
 
 export function WidgetProvider<TConfig = Record<string, any>>({
@@ -52,137 +59,93 @@ export function WidgetProvider<TConfig = Record<string, any>>({
   isDragging = false,
   onConfigChange,
   onDelete,
+  debounceMs = 500,
 }: WidgetProviderProps<TConfig>) {
   const { hasWriteAccess, repoString: repository } = useCanvasContext();
 
-  // Local state for optimistic updates
-  const [optimisticWidget, setOptimisticWidget] = useState<WidgetInstance<TConfig>>(widget);
-  const pendingConfigRef = useRef<Record<string, any> | null>(null);
+  const [optimisticWidget, setOptimisticWidget] = useState<Partial<
+    Pick<WidgetInstance<TConfig>, "position" | "size" | "config">
+  > | null>(null);
 
-  // Smart sync optimistic state when widget prop changes (from server updates)
-  useEffect(() => {
-    // Only sync if no pending optimistic updates or if server data matches pending state
-    if (!pendingConfigRef.current) {
-      setOptimisticWidget(widget);
-    } else {
-      // Check if server data matches our pending optimistic state
-      const serverConfig = widget.config;
-      const pendingConfig = pendingConfigRef.current;
-      
-      // Deep compare configs to see if they match
-      const configsMatch = JSON.stringify(serverConfig) === JSON.stringify(pendingConfig);
-      
-      if (configsMatch) {
-        // Server confirmed our optimistic update
-        setOptimisticWidget(widget);
-        pendingConfigRef.current = null;
-      } else {
-        // Server has different data, but we have pending changes
-        // Keep optimistic state but update other properties
-        setOptimisticWidget(prev => ({
-          ...widget,
-          config: prev.config // Keep optimistic config
-        }));
-      }
-    }
-  }, [widget]);
-
-  const { mutate: updateWidgetMutation } = useMutation({
+  const updateWidgetMutation = useMutation({
     mutationFn: useAction(api.widgets.updateWidgetAction),
-    onError: (error) => {
-      // Revert optimistic update on error
-      setOptimisticWidget(widget);
-      
-      // Show error toast
-      toast.error("Failed to update widget", {
-        description: "Your changes couldn't be saved. Please try again.",
-      });
-      
-      console.error("Widget update failed:", error);
+    onError: () => {
+      setOptimisticWidget(null);
     },
   });
 
-  const { mutate: deleteWidgetMutation } = useMutation({
+  const deleteWidgetMutation = useMutation({
     mutationFn: useAction(api.widgets.deleteWidgetAction),
   });
 
-  // Debounced server update for rapid changes
-  const debouncedServerUpdate = useCallback(
-    debounce((config: Record<string, any>) => {
-      updateWidgetMutation({
-        id: widget._id,
-        config,
+  const debouncedUpdateWidget = useRef(
+    debounce(() => {
+      setOptimisticWidget((current) => {
+        if (current) {
+          updateWidgetMutation.mutate({
+            id: widget._id,
+            ...current,
+          });
+        }
+        return current;
       });
-      pendingConfigRef.current = null;
-    }, 300),
-    [updateWidgetMutation, widget._id]
-  );
+    }, debounceMs),
+  ).current;
 
-  // Cleanup debounced function on unmount
   useEffect(() => {
     return () => {
-      debouncedServerUpdate.clear?.();
+      debouncedUpdateWidget.flush();
     };
-  }, [debouncedServerUpdate]);
+  }, [debouncedUpdateWidget]);
 
-  const actions: WidgetActions = {
-    updateWidget: (updates) => {
-      updateWidgetMutation({
-        id: widget._id,
-        ...updates,
-      });
+  const deleteWidget = useCallback(() => {
+    if (onDelete) {
+      onDelete();
+    } else if (confirm("Are you sure you want to delete this widget?")) {
+      debouncedUpdateWidget.flush();
+      deleteWidgetMutation.mutate({ id: widget._id });
+    }
+  }, [onDelete, debouncedUpdateWidget, deleteWidgetMutation, widget._id]);
+
+  const updatePosition = useCallback(
+    (position: { x: number; y: number }) => {
+      setOptimisticWidget((prev) => ({ ...(prev || {}), position }));
+      debouncedUpdateWidget();
     },
-    deleteWidget: () => {
-      if (onDelete) {
-        onDelete();
-      } else if (confirm("Are you sure you want to delete this widget?")) {
-        deleteWidgetMutation({ id: widget._id });
-      }
+    [debouncedUpdateWidget],
+  );
+
+  const updateSize = useCallback(
+    (size: { width: number; height: number }) => {
+      setOptimisticWidget((prev) => ({ ...(prev || {}), size }));
+      debouncedUpdateWidget();
     },
-    updatePosition: (position) => {
-      updateWidgetMutation({
-        id: widget._id,
-        position,
-      });
-    },
-    updateSize: (size) => {
-      updateWidgetMutation({
-        id: widget._id,
-        size,
-      });
-    },
-    updateConfig: (config) => {
-      updateWidgetMutation({
-        id: widget._id,
-        config,
-      });
-    },
-    updateConfigOptimistic: (config) => {
-      // Immediate optimistic update
-      setOptimisticWidget(prev => ({ ...prev, config }));
-      
-      // Background server update
-      updateWidgetMutation({
+    [debouncedUpdateWidget],
+  );
+
+  const updateConfig = useCallback(
+    (config: TConfig) => {
+      updateWidgetMutation.mutate({
         id: widget._id,
         config,
       });
     },
-    updateConfigOptimisticDebounced: (config) => {
-      // Immediate optimistic update
-      setOptimisticWidget(prev => ({ ...prev, config }));
-      
-      // Store pending config for potential revert
-      pendingConfigRef.current = config;
-      
-      // Debounced server update
-      debouncedServerUpdate(config);
+    [updateWidgetMutation, widget._id],
+  );
+
+  const updateConfigDebounced = useCallback(
+    (config: TConfig) => {
+      setOptimisticWidget((prev) => ({ ...(prev || {}), config }));
+      debouncedUpdateWidget();
     },
-    openConfig: () => {
-      if (onConfigChange) {
-        onConfigChange();
-      }
-    },
-  };
+    [debouncedUpdateWidget],
+  );
+
+  const openConfig = useCallback(() => {
+    if (onConfigChange) {
+      onConfigChange();
+    }
+  }, [onConfigChange]);
 
   const state: WidgetState = {
     isEditing,
@@ -191,10 +154,23 @@ export function WidgetProvider<TConfig = Record<string, any>>({
     hasWriteAccess,
   };
 
+  const displayWidget = {
+    ...widget,
+    ...(updateWidgetMutation.variables || {}),
+    ...(optimisticWidget || {}),
+  };
+
   const contextValue: WidgetContextValue<TConfig> = {
-    widget: optimisticWidget,
+    widget: displayWidget,
     repository,
-    actions,
+    actions: {
+      deleteWidget,
+      updatePosition,
+      updateSize,
+      updateConfig,
+      updateConfigDebounced,
+      openConfig,
+    },
     state,
   };
 
