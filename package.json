@@ -13,7 +13,6 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "^1.13.8",
     "@convex-dev/action-cache": "^0.2.11",
     "@convex-dev/better-auth": "^0.9.7",
     "@convex-dev/r2": "^0.7.3",
@@ -60,6 +59,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
+    "@netlify/vite-plugin-tanstack-start": "^1.1.12",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
