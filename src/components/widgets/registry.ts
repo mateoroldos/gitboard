@@ -3,13 +3,14 @@ import { githubStarsWidget } from "./github-stars";
 import { pollingWidget } from "./polling";
 import { taskWidget } from "./task";
 import { imageWidget } from "./image";
+import { textWidget } from "./text";
 
 export const widgetRegistry: Record<WidgetCategory, WidgetDefinition[]> = {
   github: [githubStarsWidget],
   analytics: [],
   notes: [],
   links: [],
-  custom: [pollingWidget, taskWidget, imageWidget],
+  custom: [pollingWidget, taskWidget, imageWidget, textWidget],
 };
 
 // Helpers
