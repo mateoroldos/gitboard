@@ -8,6 +8,7 @@ import {
 import { WidgetDefinition } from "../types";
 import { TextWidget } from "./TextWidget";
 import { TextPreview } from "./TextPreview";
+import { TextEditingOverlay } from "./TextEditingOverlay";
 
 const textConfigSchema = createWidgetSchema({
   content: stringField({
@@ -50,6 +51,7 @@ export const textWidget: WidgetDefinition<TextConfig> = {
 
   component: TextWidget,
   previewComponent: TextPreview,
+  customEditingComponent: TextEditingOverlay,
   configSchema: textConfigSchema,
 
   defaultConfig: {
@@ -69,4 +71,3 @@ export const textWidget: WidgetDefinition<TextConfig> = {
 
   renderStyle: "raw",
 };
-

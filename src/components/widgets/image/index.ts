@@ -8,6 +8,7 @@ import {
 import { WidgetDefinition } from "../types";
 import { ImageWidget } from "./ImageWidget";
 import { ImagePreview } from "./ImagePreview";
+import { ImageEditingOverlay } from "./ImageEditingOverlay";
 
 const imageConfigSchema = createWidgetSchema({
   title: stringField({
@@ -42,6 +43,7 @@ export const imageWidget: WidgetDefinition<ImageConfig> = {
 
   component: ImageWidget,
   previewComponent: ImagePreview,
+  customEditingComponent: ImageEditingOverlay,
   configSchema: imageConfigSchema,
 
   defaultConfig: {

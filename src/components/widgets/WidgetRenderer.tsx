@@ -52,23 +52,6 @@ export function WidgetRenderer({
 
   const shouldUseCard = widgetDef.renderStyle !== "raw";
 
-  const widgetContent = (
-    <WidgetProvider
-      widget={widget}
-      isEditing={isEditing}
-      isPreview={isEditing}
-      onConfigChange={onConfigChange}
-    >
-      {shouldUseCard ? (
-        <WidgetCard>
-          <WidgetComponent />
-        </WidgetCard>
-      ) : (
-        <WidgetComponent />
-      )}
-    </WidgetProvider>
-  );
-
   // For canvas widgets (not editing/preview), wrap with WidgetCanvas for positioning
   if (!isEditing) {
     return (
@@ -92,5 +75,20 @@ export function WidgetRenderer({
   }
 
   // For preview/editing, return the widget directly without canvas positioning
-  return widgetContent;
+  return (
+    <WidgetProvider
+      widget={widget}
+      isEditing={isEditing}
+      isPreview={isEditing}
+      onConfigChange={onConfigChange}
+    >
+      {shouldUseCard ? (
+        <WidgetCard>
+          <WidgetComponent />
+        </WidgetCard>
+      ) : (
+        <WidgetComponent />
+      )}
+    </WidgetProvider>
+  );
 }

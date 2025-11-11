@@ -18,6 +18,7 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
 
   component: React.ComponentType;
   previewComponent?: React.ComponentType;
+  customEditingComponent?: React.ComponentType;
 
   configSchema: z.ZodObject<Record<string, z.ZodType>>;
   defaultConfig: TConfig;
