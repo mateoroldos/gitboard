@@ -9,6 +9,7 @@ interface WidgetActions {
   updateWidget: (updates: Partial<WidgetInstance>) => void;
   deleteWidget: () => void;
   updatePosition: (position: { x: number; y: number }) => void;
+  updateSize: (size: { width: number; height: number }) => void;
   updateConfig: (config: Record<string, any>) => void;
   openConfig: () => void;
 }
@@ -76,6 +77,12 @@ export function WidgetProvider<TConfig = Record<string, any>>({
       updateWidgetMutation({
         id: widget._id,
         position,
+      });
+    },
+    updateSize: (size) => {
+      updateWidgetMutation({
+        id: widget._id,
+        size,
       });
     },
     updateConfig: (config) => {
