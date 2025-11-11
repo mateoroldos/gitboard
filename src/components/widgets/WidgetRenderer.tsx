@@ -50,6 +50,8 @@ export function WidgetRenderer({
       ? widgetDef.previewComponent
       : widgetDef.component;
 
+  const shouldUseCard = widgetDef.renderStyle !== "raw";
+
   const widgetContent = (
     <WidgetProvider
       widget={widget}
@@ -57,9 +59,13 @@ export function WidgetRenderer({
       isPreview={isEditing}
       onConfigChange={onConfigChange}
     >
-      <WidgetCard>
+      {shouldUseCard ? (
+        <WidgetCard>
+          <WidgetComponent />
+        </WidgetCard>
+      ) : (
         <WidgetComponent />
-      </WidgetCard>
+      )}
     </WidgetProvider>
   );
 
@@ -73,9 +79,13 @@ export function WidgetRenderer({
         onConfigChange={onConfigChange}
       >
         <WidgetCanvas>
-          <WidgetCard>
+          {shouldUseCard ? (
+            <WidgetCard>
+              <WidgetComponent />
+            </WidgetCard>
+          ) : (
             <WidgetComponent />
-          </WidgetCard>
+          )}
         </WidgetCanvas>
       </WidgetProvider>
     );

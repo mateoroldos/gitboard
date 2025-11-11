@@ -69,5 +69,7 @@ export const taskWidget: WidgetDefinition<TaskConfig> = {
     min: { width: 280, height: 180 },
     max: { width: 500, height: 350 },
   },
+
+  renderStyle: "card",
 };
 

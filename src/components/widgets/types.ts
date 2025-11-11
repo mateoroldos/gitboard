@@ -33,6 +33,8 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
     thumbnail?: string;
     description?: string;
   };
+
+  renderStyle: "card" | "raw";
 }
 
 export interface WidgetInstance<TConfig = Record<string, any>>

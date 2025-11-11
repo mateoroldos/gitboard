@@ -186,7 +186,10 @@ export function WidgetCanvas({
       whileDrag={{
         scale: 1.02 * viewport.zoom,
         opacity: 0.9,
-        boxShadow: "0 8px 14px rgba(0,0,0,0.1)",
+        boxShadow:
+          widgetDefinition.renderStyle === "card"
+            ? "0 8px 14px rgba(0,0,0,0.1)"
+            : "",
         cursor: "grabbing",
         zIndex: 1000,
       }}

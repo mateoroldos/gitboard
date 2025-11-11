@@ -30,4 +30,6 @@ export const githubStarsWidget: WidgetDefinition<GitHubStarsConfig> = {
     min: { width: 200, height: 80 },
     max: { width: 400, height: 200 },
   },
+
+  renderStyle: "card",
 };

@@ -53,8 +53,9 @@ export const imageWidget: WidgetDefinition<ImageConfig> = {
 
   size: {
     default: { width: 320, height: 240 },
-    min: { width: 200, height: 150 },
+    min: { width: 20, height: 20 },
     max: { width: 600, height: 450 },
   },
-};
 
+  renderStyle: "raw",
+};
