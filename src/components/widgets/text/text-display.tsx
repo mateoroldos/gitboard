@@ -22,9 +22,8 @@ export function TextDisplay() {
   const updateFontSize = useCallback(() => {
     if (!containerRef.current || !textData) return;
 
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
+    const containerWidth = widget.size.width;
+    const containerHeight = widget.size.height;
 
     if (containerWidth <= 0 || containerHeight <= 0) return;
 
@@ -42,7 +41,7 @@ export function TextDisplay() {
     );
 
     setFontSize(newFontSize);
-  }, [textData]);
+  }, [textData, widget.size.width, widget.size.height]);
 
   useEffect(() => {
     if (!containerRef.current || !textData) return;
