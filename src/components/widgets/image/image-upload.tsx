@@ -4,62 +4,71 @@ import { useUploadFile } from "@convex-dev/r2/react";
 import { api } from "convex/_generated/api";
 import { Button } from "../../ui/button";
 import { Progress } from "../../ui/progress";
-import { isValidImageFile, formatFileSize } from "./utils";
+import { isValidImageFile } from "./utils";
 
 interface ImageUploadProps {
   onUploadComplete: (imageKey: string) => void;
   onUploadError: (error: string) => void;
 }
 
-export function ImageUpload({ onUploadComplete, onUploadError }: ImageUploadProps) {
+export function ImageUpload({
+  onUploadComplete,
+  onUploadError,
+}: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const uploadFile = useUploadFile(api.image);
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-    if (!isValidImageFile(file)) {
-      onUploadError("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
-      return;
-    }
+      if (!isValidImageFile(file)) {
+        onUploadError(
+          "Please select a valid image file (JPEG, PNG, GIF, SVG, or WebP)",
+        );
+        return;
+      }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      onUploadError("File size must be less than 10MB");
-      return;
-    }
+      if (file.size > 10 * 1024 * 1024) {
+        // 10MB limit
+        onUploadError("File size must be less than 10MB");
+        return;
+      }
 
-    setIsUploading(true);
-    setUploadProgress(0);
+      setIsUploading(true);
+      setUploadProgress(0);
 
-    try {
-      // Simulate progress for better UX
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => Math.min(prev + 10, 90));
-      }, 100);
+      try {
+        // Simulate progress for better UX
+        const progressInterval = setInterval(() => {
+          setUploadProgress((prev) => Math.min(prev + 10, 90));
+        }, 100);
 
-      const imageKey = await uploadFile(file);
-      
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      
-      setTimeout(() => {
-        onUploadComplete(imageKey);
+        const imageKey = await uploadFile(file);
+
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+
+        setTimeout(() => {
+          onUploadComplete(imageKey);
+          setIsUploading(false);
+          setUploadProgress(0);
+        }, 500);
+      } catch (error) {
         setIsUploading(false);
         setUploadProgress(0);
-      }, 500);
-    } catch (error) {
-      setIsUploading(false);
-      setUploadProgress(0);
-      onUploadError(error instanceof Error ? error.message : "Upload failed");
-    }
-  }, [uploadFile, onUploadComplete, onUploadError]);
+        onUploadError(error instanceof Error ? error.message : "Upload failed");
+      }
+    },
+    [uploadFile, onUploadComplete, onUploadError],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
     },
     multiple: false,
     disabled: isUploading,
@@ -81,17 +90,18 @@ export function ImageUpload({ onUploadComplete, onUploadError }: ImageUploadProp
       className={`
         flex flex-col items-center justify-center w-full h-full p-6 
         border-2 border-dashed rounded-lg cursor-pointer transition-colors
-        ${isDragActive 
-          ? 'border-blue-400 bg-blue-50' 
-          : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+        ${
+          isDragActive
+            ? "border-blue-400 bg-blue-50"
+            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
         }
       `}
     >
       <input {...getInputProps()} />
-      
+
       <div className="text-center space-y-4">
         <div className="text-4xl">📷</div>
-        
+
         {isDragActive ? (
           <div className="text-blue-600">
             <div className="font-medium">Drop your image here</div>
@@ -109,11 +119,12 @@ export function ImageUpload({ onUploadComplete, onUploadError }: ImageUploadProp
             </Button>
           </div>
         )}
-        
+
         <div className="text-xs text-gray-400">
-          Supports JPEG, PNG, GIF, WebP (max 10MB)
+          Supports JPEG, PNG, GIF, SVG, WebP (max 10MB)
         </div>
       </div>
     </div>
   );
 }
+

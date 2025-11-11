@@ -3,7 +3,9 @@ import type { ImageData, ImageConfig } from "./types";
 export function createPreviewImageData(config: ImageConfig): ImageData {
   return {
     imageKey: config.imageKey || "",
-    imageUrl: config.imageKey ? `https://picsum.photos/400/300?random=${config.imageKey}` : null,
+    imageUrl: config.imageKey
+      ? `https://picsum.photos/400/300?random=${config.imageKey}`
+      : null,
     title: config.title || "",
     altText: config.altText || "",
     fit: config.fit || "cover",
@@ -33,6 +35,14 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function isValidImageFile(file: File): boolean {
-  const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+  const validTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/svg",
+  ];
   return validTypes.includes(file.type);
 }
+

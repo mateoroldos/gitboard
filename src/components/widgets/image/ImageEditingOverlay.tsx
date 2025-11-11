@@ -53,7 +53,7 @@ export function ImageEditingOverlay() {
     if (!isValidImageFile(file)) {
       toast.error("Invalid file type", {
         description:
-          "Please select a valid image file (JPEG, PNG, GIF, or WebP)",
+          "Please select a valid image file (JPEG, PNG, GIF, SVG, or WebP)",
       });
       return;
     }
