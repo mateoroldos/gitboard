@@ -9,6 +9,7 @@ import { convexQuery, convexAction } from "@convex-dev/react-query";
 import { api } from "convex/_generated/api";
 import type { WidgetInstance } from "../types";
 import type { PollData, UserVote, PollingConfig } from "./types";
+import { useAction } from "convex/react";
 
 export interface PollContextValue {
   pollData: PollData | null;
@@ -39,7 +40,6 @@ export function PollProvider({
   isEditing = false,
 }: PollProviderProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const queryClient = useQueryClient();
 
   const { data: pollData } = useSuspenseQuery(
     convexQuery(api.polls.getPollData, { widgetId: widget._id }),
@@ -51,12 +51,8 @@ export function PollProvider({
   });
 
   const voteMutation = useMutation({
-    mutationFn: async (variables: { widgetId: any; optionId: string }) => {
-      const action = convexAction(api.polls.vote, variables);
-      return await queryClient.fetchQuery(action);
-    },
+    mutationFn: useAction(api.polls.vote),
     onSuccess: () => {
-      queryClient.invalidateQueries();
       setSelectedOption(null);
     },
   });
