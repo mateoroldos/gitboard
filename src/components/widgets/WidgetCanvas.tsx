@@ -43,7 +43,11 @@ export function WidgetCanvas({
 
   const handleDragEnd = useCallback(
     (_event: any, info: any) => {
+      if (isResizing) return;
+
       setIsDragging(false);
+
+      console.log("end");
 
       const worldOffsetX = info.offset.x / viewport.zoom;
       const worldOffsetY = info.offset.y / viewport.zoom;
@@ -61,6 +65,7 @@ export function WidgetCanvas({
       }
     },
     [
+      isResizing,
       localPosition,
       debouncedUpdatePosition,
       state.hasWriteAccess,
@@ -71,6 +76,7 @@ export function WidgetCanvas({
 
   const handleResizeStart = useCallback((e: any) => {
     e.stopPropagation();
+    e.preventDefault();
     setIsResizing(true);
   }, []);
 
@@ -135,15 +141,7 @@ export function WidgetCanvas({
     } else {
       setLocalSize(widget.size);
     }
-  }, [
-    localSize,
-    localPosition,
-    debouncedUpdateSize,
-    debouncedUpdatePosition,
-    state.hasWriteAccess,
-    widget.size,
-    widget.position,
-  ]);
+  }, [localSize, debouncedUpdateSize, state.hasWriteAccess, widget.size]);
 
   return (
     <motion.div
@@ -151,7 +149,11 @@ export function WidgetCanvas({
       drag={isDraggable && !isResizing}
       dragMomentum={false}
       dragElastic={0}
-      onDragStart={() => setIsDragging(true)}
+      onDragStart={() => {
+        if (!isResizing) {
+          setIsDragging(true);
+        }
+      }}
       onDragEnd={handleDragEnd}
       onClick={(e) => {
         e.stopPropagation();
@@ -202,7 +204,7 @@ export function WidgetCanvas({
         <>
           {/* Corner handles */}
           <motion.div
-            className="absolute size-3.5 bg-background border-blue-500 border-2 rounded shadow-sm cursor-nw-resize"
+            className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
             style={{ top: -6, left: -6 }}
             onPanStart={handleResizeStart}
             onPan={(_, info) =>
@@ -211,7 +213,7 @@ export function WidgetCanvas({
             onPanEnd={handleResizeEnd}
           />
           <motion.div
-            className="absolute size-3.5 bg-background border-blue-500 border-2 rounded shadow-sm cursor-nw-resize"
+            className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
             style={{ top: -6, right: -6 }}
             onPanStart={handleResizeStart}
             onPan={(_, info) =>
@@ -220,7 +222,7 @@ export function WidgetCanvas({
             onPanEnd={handleResizeEnd}
           />
           <motion.div
-            className="absolute size-3.5 bg-background border-blue-500 border-2 rounded shadow-sm cursor-nw-resize"
+            className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
             style={{ bottom: -6, left: -6 }}
             onPanStart={handleResizeStart}
             onPan={(_, info) =>
@@ -229,7 +231,7 @@ export function WidgetCanvas({
             onPanEnd={handleResizeEnd}
           />
           <motion.div
-            className="absolute size-3.5 bg-background border-blue-500 border-2 rounded shadow-sm cursor-nw-resize"
+            className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
             style={{ bottom: -6, right: -6 }}
             onPanStart={handleResizeStart}
             onPan={(_, info) =>
@@ -280,4 +282,3 @@ export function WidgetCanvas({
     </motion.div>
   );
 }
-
