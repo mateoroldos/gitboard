@@ -3,15 +3,13 @@ import { motion } from "framer-motion";
 import { useWidget } from "./WidgetProvider";
 import { useCanvasContext } from "@/components/canvas/CanvasContext";
 import debounce from "debounce";
+import { getWidgetDefinitionByType } from "./registry";
 
 interface WidgetCanvasProps {
   children: React.ReactNode;
   isDraggable?: boolean;
   isResizable?: boolean;
 }
-
-const MIN_WIDTH = 200;
-const MIN_HEIGHT = 150;
 
 export function WidgetCanvas({
   children,
@@ -21,6 +19,11 @@ export function WidgetCanvas({
   const { widget, actions, state } = useWidget();
   const { viewport, selectedWidgetId, setSelectedWidgetId } =
     useCanvasContext();
+
+  const widgetDefinition = getWidgetDefinitionByType(widget.widgetType);
+
+  const MIN_WIDTH = widgetDefinition?.size.min.width ?? 200;
+  const MIN_HEIGHT = widgetDefinition?.size.min.height ?? 150;
 
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -46,8 +49,6 @@ export function WidgetCanvas({
       if (isResizing) return;
 
       setIsDragging(false);
-
-      console.log("end");
 
       const worldOffsetX = info.offset.x / viewport.zoom;
       const worldOffsetY = info.offset.y / viewport.zoom;
@@ -180,10 +181,7 @@ export function WidgetCanvas({
         cursor: isDraggable && !isResizing ? "grab" : "default",
         zIndex: isDragging || isResizing ? 1000 : 0,
         transformOrigin: "0 0",
-        border:
-          isSelected && state.hasWriteAccess
-            ? "3px solid #3b82f6"
-            : "3px solid transparent",
+        outline: isSelected && state.hasWriteAccess ? "3px solid #3b82f6" : "",
       }}
       whileDrag={{
         scale: 1.02 * viewport.zoom,

@@ -13,7 +13,9 @@ export const widgetRegistry: Record<WidgetCategory, WidgetDefinition[]> = {
 };
 
 // Helpers
-export function getWidgetById(id: string): WidgetDefinition | undefined {
+export function getWidgetDefinitionByType(
+  id: string,
+): WidgetDefinition | undefined {
   return getAllWidgets().find((widget) => widget.id === id);
 }
 

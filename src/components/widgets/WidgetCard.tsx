@@ -12,7 +12,9 @@ export function WidgetCard({ children, className }: WidgetCardProps) {
   const { widget, actions, state } = useWidget();
 
   return (
-    <Card className={`group transition-all h-full w-full ${className || ""}`}>
+    <Card
+      className={`group transition-all h-full w-full overflow-hidden ${className || ""}`}
+    >
       <CardContent className="h-full w-full">
         {widget.title && (
           <div className="flex items-center justify-between mb-3">

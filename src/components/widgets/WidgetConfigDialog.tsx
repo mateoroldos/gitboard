@@ -37,7 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { WidgetRenderer } from "./WidgetRenderer";
-import { getWidgetById } from "./registry";
+import { getWidgetDefinitionByType } from "./registry";
 import {
   getEnumOptions,
   inferFieldType,
@@ -63,10 +63,15 @@ interface DatePickerProps {
   "aria-invalid"?: boolean;
 }
 
-function DatePicker({ value, onChange, placeholder, ...props }: DatePickerProps) {
+function DatePicker({
+  value,
+  onChange,
+  placeholder,
+  ...props
+}: DatePickerProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(
-    value ? new Date(value) : undefined
+    value ? new Date(value) : undefined,
   );
 
   return (
@@ -76,12 +81,16 @@ function DatePicker({ value, onChange, placeholder, ...props }: DatePickerProps)
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
           )}
           {...props}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>{placeholder || "Pick a date"}</span>}
+          {date ? (
+            format(date, "PPP")
+          ) : (
+            <span>{placeholder || "Pick a date"}</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -91,7 +100,7 @@ function DatePicker({ value, onChange, placeholder, ...props }: DatePickerProps)
           onSelect={(selectedDate) => {
             setDate(selectedDate);
             if (selectedDate) {
-              onChange(selectedDate.toISOString().split('T')[0]);
+              onChange(selectedDate.toISOString().split("T")[0]);
             } else {
               onChange("");
             }
@@ -109,7 +118,9 @@ export function WidgetConfigDialog({
   open,
   onOpenChange,
 }: WidgetConfigDialogProps) {
-  const widgetDefinition = getWidgetById(widget.widgetType) as WidgetDefinition;
+  const widgetDefinition = getWidgetDefinitionByType(
+    widget.widgetType,
+  ) as WidgetDefinition;
 
   const { repoString } = useCanvasContext();
 
@@ -292,7 +303,9 @@ export function WidgetConfigDialog({
                               ) : fieldType === "date" ? (
                                 <DatePicker
                                   value={field.state.value}
-                                  onChange={(value) => field.handleChange(value)}
+                                  onChange={(value) =>
+                                    field.handleChange(value)
+                                  }
                                   placeholder={fieldMetadata?.placeholder}
                                   aria-invalid={isInvalid}
                                 />

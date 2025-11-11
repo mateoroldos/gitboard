@@ -1,4 +1,4 @@
-import { getWidgetById } from "./registry";
+import { getWidgetDefinitionByType } from "./registry";
 import { WidgetInstance } from "./types";
 import { WidgetProvider } from "./WidgetProvider";
 import { WidgetCanvas } from "./WidgetCanvas";
@@ -15,7 +15,7 @@ export function WidgetRenderer({
   onConfigChange,
   isEditing = false,
 }: WidgetRendererProps) {
-  const widgetDef = getWidgetById(widget.widgetType);
+  const widgetDef = getWidgetDefinitionByType(widget.widgetType);
 
   if (!widgetDef) {
     return (
