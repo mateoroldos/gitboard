@@ -1,36 +1,21 @@
 import { useState } from "react";
 import { useWidget } from "../WidgetProvider";
-import { useText } from "./text-context";
 import { TextEditor } from "./text-editor";
-import { Button } from "../../ui/button";
 import type { TextConfig } from "./types";
 
 export function TextEmptyState() {
   const { widget, actions } = useWidget<TextConfig>();
-  const { updateOptimisticContent, resetOptimisticContent } = useText();
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleSave = async (content: string) => {
-    // Optimistically update the content immediately
-    updateOptimisticContent(content);
+  const handleSave = (content: string) => {
     setIsEditing(false);
-
-    try {
-      // Update the actual config
-      await actions.updateConfig({
-        ...widget.config,
-        content,
-      });
-      // The optimistic state will be reset automatically when the config updates
-    } catch (error) {
-      // If the update fails, reset the optimistic state
-      resetOptimisticContent();
-      console.error("Failed to update text content:", error);
-    }
+    actions.updateConfig({
+      ...widget.config,
+      content,
+    });
   };
 
   const handleCancel = () => {
-    resetOptimisticContent();
     setIsEditing(false);
   };
 

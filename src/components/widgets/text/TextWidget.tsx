@@ -1,10 +1,13 @@
 import { TextRoot } from "./text-root";
 import { TextDisplay } from "./text-display";
 import { TextEmptyState } from "./text-empty-state";
-import { useText } from "./text-context";
+import { useWidget } from "../WidgetProvider";
+import { createTextDataFromConfig } from "./utils";
+import type { TextConfig } from "./types";
 
 function TextContent() {
-  const { textData } = useText();
+  const { widget } = useWidget<TextConfig>();
+  const textData = createTextDataFromConfig(widget.config);
 
   if (!textData || !textData.content) {
     return <TextEmptyState />;

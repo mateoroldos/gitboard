@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { useText } from "./text-context";
 import { useWidget } from "../WidgetProvider";
 import { TextEditor } from "./text-editor";
 import {
@@ -9,19 +8,16 @@ import {
   calculateOptimalFontSize,
   getLineHeight,
 } from "./utils";
+import { createTextDataFromConfig } from "./utils";
 import type { TextConfig } from "./types";
 
 export function TextDisplay() {
-  const {
-    textData,
-    isEditing: isPreviewMode,
-    updateOptimisticContent,
-    resetOptimisticContent,
-  } = useText();
-  const { widget, actions } = useWidget<TextConfig>();
+  const { widget, actions, state } = useWidget<TextConfig>();
   const containerRef = useRef<HTMLDivElement>(null);
   const [fontSize, setFontSize] = useState(16);
   const [isEditing, setIsEditing] = useState(false);
+
+  const textData = createTextDataFromConfig(widget.config);
 
   const updateFontSize = useCallback(() => {
     if (!containerRef.current || !textData) return;
@@ -42,9 +38,9 @@ export function TextDisplay() {
       textData.fontScale,
       textData.fontFamily,
       textData.fontWeight,
-      textData.padding
+      textData.padding,
     );
-    
+
     setFontSize(newFontSize);
   }, [textData]);
 
@@ -59,7 +55,7 @@ export function TextDisplay() {
       // Debounce resize calculations
       setTimeout(updateFontSize, 10);
     });
-    
+
     resizeObserver.observe(containerRef.current);
 
     return () => {
@@ -77,7 +73,7 @@ export function TextDisplay() {
   const fontWeightClass = getFontWeightClass(textData.fontWeight);
 
   const lineHeight = getLineHeight(fontSize);
-  
+
   const style = {
     color: textData.textColor,
     backgroundColor:
@@ -90,32 +86,20 @@ export function TextDisplay() {
   };
 
   const handleDoubleClick = () => {
-    if (!isPreviewMode) {
+    if (!state.isPreview) {
       setIsEditing(true);
     }
   };
 
-  const handleSave = async (content: string) => {
-    // Optimistically update the content immediately
-    updateOptimisticContent(content);
+  const handleSave = (content: string) => {
     setIsEditing(false);
-
-    try {
-      // Update the actual config
-      actions.updateConfig({
-        ...widget.config,
-        content,
-      });
-      // The optimistic state will be reset automatically when the config updates
-    } catch (error) {
-      // If the update fails, reset the optimistic state
-      resetOptimisticContent();
-      console.error("Failed to update text content:", error);
-    }
+    actions.updateConfig({
+      ...widget.config,
+      content,
+    });
   };
 
   const handleCancel = () => {
-    resetOptimisticContent();
     setIsEditing(false);
   };
 
@@ -141,18 +125,18 @@ export function TextDisplay() {
   }
 
   // Determine if we should center vertically based on content
-  const shouldCenterVertically = !textData.content || textData.content.split('\n').length === 1;
+  const shouldCenterVertically =
+    !textData.content || textData.content.split("\n").length === 1;
 
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full ${fontFamilyClass} ${textAlignClass} ${fontWeightClass} whitespace-pre-wrap break-words cursor-pointer hover:bg-black/5 transition-colors ${shouldCenterVertically ? 'flex items-center' : 'flex flex-col justify-center'}`}
+      className={`w-full h-full ${fontFamilyClass} ${textAlignClass} ${fontWeightClass} whitespace-pre-wrap break-words cursor-pointer hover:bg-black/5 transition-colors ${shouldCenterVertically ? "flex items-center" : "flex flex-col justify-center"}`}
       style={style}
       onDoubleClick={handleDoubleClick}
-      title={isPreviewMode ? undefined : "Double-click to edit"}
+      title={state.isPreview ? undefined : "Double-click to edit"}
     >
       {textData.content || "Double-click to add text..."}
     </div>
   );
 }
-
