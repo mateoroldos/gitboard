@@ -181,8 +181,8 @@ export function WidgetCanvas({
         cursor: isDraggable && !isResizing ? "grab" : "default",
         zIndex: isDragging || isResizing ? 1000 : 0,
         transformOrigin: "0 0",
-        outline: isSelected && state.hasWriteAccess ? "3px solid #3b82f6" : "",
       }}
+      className={`${isSelected && state.hasWriteAccess ? "outline-3 outline-blue-500" : ""}`}
       whileDrag={{
         scale: 1.02 * viewport.zoom,
         opacity: 0.9,

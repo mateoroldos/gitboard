@@ -10,11 +10,6 @@ import { ImageWidget } from "./ImageWidget";
 import { ImagePreview } from "./ImagePreview";
 
 const imageConfigSchema = createWidgetSchema({
-  imageKey: stringField({
-    label: "Image",
-    placeholder: "Upload an image",
-    description: "The image to display in this widget",
-  }),
   title: stringField({
     label: "Caption",
     placeholder: "Enter image caption (optional)",
@@ -50,10 +45,9 @@ export const imageWidget: WidgetDefinition<ImageConfig> = {
   configSchema: imageConfigSchema,
 
   defaultConfig: {
-    imageKey: "",
     title: "",
     altText: "",
-    fit: "cover",
+    fit: "contain",
     borderRadius: 0,
   },
 
@@ -63,3 +57,4 @@ export const imageWidget: WidgetDefinition<ImageConfig> = {
     max: { width: 600, height: 450 },
   },
 };
+

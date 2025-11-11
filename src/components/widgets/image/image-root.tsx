@@ -12,10 +12,11 @@ export function ImageRoot({ children, className }: ImageRootProps) {
   const { widget, state } = useWidget<ImageConfig>();
 
   return (
-    <div className={className}>
+    <div className={`overflow-hidden w-full h-full ${className}`}>
       <ImageProvider widget={widget} isEditing={state.isEditing}>
         {children}
       </ImageProvider>
     </div>
   );
 }
+
