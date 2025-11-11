@@ -7,7 +7,6 @@ import {
 } from "../zod-helpers";
 import { WidgetDefinition } from "../types";
 import { ImageWidget } from "./ImageWidget";
-import { ImagePreview } from "./ImagePreview";
 import { ImageEditingOverlay } from "./ImageEditingOverlay";
 
 const imageConfigSchema = createWidgetSchema({
@@ -42,7 +41,6 @@ export const imageWidget: WidgetDefinition<ImageConfig> = {
   icon: "Image",
 
   component: ImageWidget,
-  previewComponent: ImagePreview,
   customEditingComponent: ImageEditingOverlay,
   configSchema: imageConfigSchema,
 

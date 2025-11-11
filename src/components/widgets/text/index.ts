@@ -7,7 +7,6 @@ import {
 } from "../zod-helpers";
 import { WidgetDefinition } from "../types";
 import { TextWidget } from "./TextWidget";
-import { TextPreview } from "./TextPreview";
 import { TextEditingOverlay } from "./TextEditingOverlay";
 
 const textConfigSchema = createWidgetSchema({
@@ -50,7 +49,6 @@ export const textWidget: WidgetDefinition<TextConfig> = {
   icon: "Type",
 
   component: TextWidget,
-  previewComponent: TextPreview,
   customEditingComponent: TextEditingOverlay,
   configSchema: textConfigSchema,
 
