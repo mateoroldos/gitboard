@@ -11,17 +11,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Github, Plus } from "lucide-react";
+import { Github, LayoutDashboard, Plus, Star } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useGitHubStars } from "@/hooks/useGitHubStars";
 
 export function Header() {
   const { data: session } = authClient.useSession();
+  const { stars } = useGitHubStars("mateoroldos", "gitboard");
 
   return (
     <header className="fixed flex flex-row justify-between pt-4 pb-2 z-20 px-5 w-full">
-      <Link to="/" className="text-lg font-semibold">
-        Gitboard
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link
+          to="/"
+          className={`${buttonVariants({ variant: "outline" })} !rounded`}
+        >
+          <LayoutDashboard />
+          GitBoard
+        </Link>
+        {stars !== null && (
+          <a
+            href="https://github.com/mateoroldos/gitboard"
+            className={`${buttonVariants({ variant: "outline" })} !rounded group`}
+          >
+            <Star className="transition group-hover:fill-amber-200 group-hover:stroke-amber-300" />
+            {stars.toLocaleString()}
+          </a>
+        )}
+      </div>
 
       <div className="flex flex-row gap-3">
         <ThemeToggle />
