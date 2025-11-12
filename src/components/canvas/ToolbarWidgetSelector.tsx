@@ -6,9 +6,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Search } from "lucide-react";
-import type { WidgetDefinition } from "../widgets/types";
-import { getAllWidgets } from "../widgets/registry";
+import type { WidgetDefinition, WidgetCategory } from "../widgets/types";
+import { getAllWidgets, getWidgetCategories } from "../widgets/registry";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "convex/_generated/api";
 import { useAction } from "convex/react";
@@ -18,6 +19,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 export function ToolbarWidgetSelector() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<WidgetCategory | null>(null);
 
   const { repoString, boardId, viewport, screenToWorld } = useCanvasContext();
 
@@ -48,21 +50,32 @@ export function ToolbarWidgetSelector() {
 
     setOpen(false);
     setSearch("");
+    setSelectedCategory(null);
   };
 
   const allWidgets = getAllWidgets();
 
   const filteredWidgets = useMemo(() => {
-    if (!search.trim()) return allWidgets;
+    let widgets = allWidgets;
 
-    const searchLower = search.toLowerCase();
-    return allWidgets.filter(
-      (widget) =>
-        widget.name.toLowerCase().includes(searchLower) ||
-        widget.description.toLowerCase().includes(searchLower) ||
-        widget.category.toLowerCase().includes(searchLower),
-    );
-  }, [allWidgets, search]);
+    // Filter by category if selected
+    if (selectedCategory) {
+      widgets = widgets.filter((widget) => widget.category === selectedCategory);
+    }
+
+    // Filter by search term
+    if (search.trim()) {
+      const searchLower = search.toLowerCase();
+      widgets = widgets.filter(
+        (widget) =>
+          widget.name.toLowerCase().includes(searchLower) ||
+          widget.description.toLowerCase().includes(searchLower) ||
+          widget.category.toLowerCase().includes(searchLower),
+      );
+    }
+
+    return widgets;
+  }, [allWidgets, search, selectedCategory]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -81,9 +94,9 @@ export function ToolbarWidgetSelector() {
         side="bottom"
         sideOffset={8}
       >
-        <div className="p-4 border-b">
+        <div className="py-4 px-6 border-b">
           <h3 className="font-medium text-xs mb-2">Add Widget</h3>
-          <div className="relative">
+          <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 size-3 text-muted-foreground" />
             <Input
               placeholder="Search widgets..."
@@ -92,16 +105,35 @@ export function ToolbarWidgetSelector() {
               className="pl-9 !text-xs placeholder:text-xs"
             />
           </div>
+          <div className="flex flex-wrap gap-1">
+            <Badge
+              variant={selectedCategory === null ? "default" : "secondary"}
+              className="cursor-pointer text-xs px-2 py-1"
+              onClick={() => setSelectedCategory(null)}
+            >
+              All
+            </Badge>
+            {getWidgetCategories().map((category) => (
+              <Badge
+                key={category}
+                variant={selectedCategory === category ? "default" : "secondary"}
+                className="cursor-pointer text-xs px-2 py-1 capitalize"
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         <ScrollArea className="h-100 overflow-y-auto">
           {filteredWidgets.length === 0 ? (
-            <div className="flex items-center justify-center h-32 text-center p-4">
+            <div className="flex items-center justify-center h-32 text-xs text-center p-4">
               <div>
-                <div className="text-2xl mb-2">
+                <div className="text-lg mb-2">
                   {search.trim() ? "🔍" : "📦"}
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground">
                   {search.trim()
                     ? "No widgets found matching your search"
                     : "No widgets available yet"}
@@ -109,7 +141,7 @@ export function ToolbarWidgetSelector() {
               </div>
             </div>
           ) : (
-            <div className="p-2 space-y-2">
+            <div className="py-2 px-6 space-y-3">
               {filteredWidgets.map((widget) => (
                 <WidgetCard
                   key={widget.id}
@@ -134,10 +166,10 @@ function WidgetCard({ widget, onSelect }: WidgetCardProps) {
   return (
     <button
       onClick={onSelect}
-      className="p-3 rounded hover:bg-accent hover:text-accent-foreground transition-colors text-left group w-full"
+      className="p-4 rounded bg-accent/50 hover:bg-accent border hover:text-accent-foreground transition-colors text-left group w-full"
     >
       <div className="flex items-start gap-3">
-        <div className="bg-primary text-primary-foreground rounded p-1.5 flex-shrink-0">
+        <div className="border text-secondary-foreground rounded p-1.5 flex-shrink-0">
           {typeof widget.icon === "string" ? (
             <span className="text-sm">{widget.icon}</span>
           ) : (

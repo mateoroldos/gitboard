@@ -7,16 +7,20 @@ import {
   ArrowUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useCanvasContext } from "./CanvasContext";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "convex/_generated/api";
-import { useState } from "react";
 
 export function CanvasControls() {
   const { viewport, zoomBy, zoomTo, fitToContent, boardId } =
     useCanvasContext();
-  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const { data: widgets } = useSuspenseQuery(
     convexQuery(api.widgets.getWidgetsByBoard, {
@@ -46,33 +50,6 @@ export function CanvasControls() {
 
   return (
     <div className="fixed bottom-5 right-5 z-20 flex flex-col gap-2">
-      {showShortcuts && (
-        <div className="bg-background/80 rounded backdrop-blur-sm border p-2 shadow-lg text-xs text-muted-foreground">
-          <div className="space-y-1">
-            <div className="flex items-center gap-1">
-              <Mouse className="h-3 w-3" />
-              Space + drag to pan
-            </div>
-            <div className="flex items-center gap-1">
-              <Mouse className="h-3 w-3" />
-              Scroll to pan
-            </div>
-            <div className="flex items-center gap-1">
-              <Mouse className="h-3 w-3" />
-              Ctrl + scroll to zoom
-            </div>
-            <div className="flex items-center gap-1">
-              <ArrowUp className="h-3 w-3" />
-              Arrow keys / hjkl to pan
-            </div>
-            <div className="flex items-center gap-1">
-              <Keyboard className="h-3 w-3" />
-              Ctrl +/- to zoom
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-row gap-1 justify-end">
         <div className="bg-background/80 rounded flex flex-row divide-x backdrop-blur-sm border shadow-lg">
           <div className="flex flex-row gap-1 flex-1 justify-between">
@@ -122,15 +99,87 @@ export function CanvasControls() {
         </div>
 
         <div className="bg-background/80 rounded backdrop-blur-sm border shadow-lg">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowShortcuts(!showShortcuts)}
-            className="h-8 w-8 p-0"
-            title="Toggle keyboard shortcuts"
-          >
-            <Keyboard className="h-4 w-4" />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                title="Keyboard shortcuts"
+              >
+                <Keyboard className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-80 p-3 rounded"
+              align="end"
+              side="top"
+              sideOffset={8}
+            >
+              <div className="space-y-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mouse className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs">Space + drag</span>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Pan</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mouse className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs">Scroll</span>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Pan</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <KbdGroup>
+                        <Kbd>Ctrl</Kbd>
+                        <span className="text-xs">+</span>
+                        <span className="text-xs">scroll</span>
+                      </KbdGroup>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Zoom</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ArrowUp className="h-3 w-3 text-muted-foreground" />
+                      <KbdGroup>
+                        <Kbd>↑</Kbd>
+                        <Kbd>↓</Kbd>
+                        <Kbd>←</Kbd>
+                        <Kbd>→</Kbd>
+                      </KbdGroup>
+                      <span className="text-xs">or</span>
+                      <KbdGroup>
+                        <Kbd>h</Kbd>
+                        <Kbd>j</Kbd>
+                        <Kbd>k</Kbd>
+                        <Kbd>l</Kbd>
+                      </KbdGroup>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Pan</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Keyboard className="h-3 w-3 text-muted-foreground" />
+                      <KbdGroup>
+                        <Kbd>Ctrl</Kbd>
+                        <Kbd>+</Kbd>
+                      </KbdGroup>
+                      <span className="text-xs">/</span>
+                      <KbdGroup>
+                        <Kbd>Ctrl</Kbd>
+                        <Kbd>-</Kbd>
+                      </KbdGroup>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Zoom</span>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>
