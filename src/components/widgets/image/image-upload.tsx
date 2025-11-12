@@ -5,6 +5,8 @@ import { api } from "convex/_generated/api";
 import { Button } from "../../ui/button";
 import { Progress } from "../../ui/progress";
 import { isValidImageFile } from "./utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Image } from "lucide-react";
 
 interface ImageUploadProps {
   onUploadComplete: (imageKey: string) => void;
@@ -65,66 +67,58 @@ export function ImageUpload({
     [uploadFile, onUploadComplete, onUploadError],
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: {
       "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
     },
     multiple: false,
     disabled: isUploading,
+    noClick: true, // Prevent click from opening file dialog
   });
 
   if (isUploading) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full p-6 space-y-4">
-        <div className="text-sm text-gray-600">Uploading image...</div>
+        <div className="text-sm text-muted-foreground">Uploading image...</div>
         <Progress value={uploadProgress} className="w-full max-w-xs" />
-        <div className="text-xs text-gray-500">{uploadProgress}%</div>
+        <div className="text-xs text-muted-foreground">{uploadProgress}%</div>
       </div>
     );
   }
 
   return (
-    <div
-      {...getRootProps()}
-      className={`
-        flex flex-col items-center justify-center w-full h-full p-6 
-        border-2 border-dashed rounded-lg cursor-pointer transition-colors
-        ${
-          isDragActive
-            ? "border-blue-400 bg-blue-50"
-            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-        }
-      `}
-    >
-      <input {...getInputProps()} />
+    <Card className="overflow-hidden w-full h-full flex">
+      <CardContent className="flex flex-1 items-center justify-center">
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
 
-      <div className="text-center space-y-4">
-        <div className="text-4xl">📷</div>
+          <div className="text-center space-y-4 flex flex-col items-center">
+            <Image />
+            {isDragActive ? (
+              <div className="text-primary">
+                <div className="font-medium">Drop your image here</div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="font-medium text-foreground">
+                  Drag & drop an image here
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  or click to select a file
+                </div>
+                <Button size="sm" className="mt-2" onClick={open}>
+                  Choose Image
+                </Button>
+              </div>
+            )}
 
-        {isDragActive ? (
-          <div className="text-blue-600">
-            <div className="font-medium">Drop your image here</div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="font-medium text-gray-700">
-              Drag & drop an image here
+            <div className="text-xs text-muted-foreground">
+              Supports JPEG, PNG, GIF, SVG, WebP (max 10MB)
             </div>
-            <div className="text-sm text-gray-500">
-              or click to select a file
-            </div>
-            <Button variant="outline" size="sm" className="mt-2">
-              Choose Image
-            </Button>
           </div>
-        )}
-
-        <div className="text-xs text-gray-400">
-          Supports JPEG, PNG, GIF, SVG, WebP (max 10MB)
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
-

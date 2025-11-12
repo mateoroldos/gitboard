@@ -4,7 +4,6 @@ import {
   AlignRight,
   AlignJustify,
   Type,
-  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWidget } from "../WidgetProvider";
@@ -39,9 +38,9 @@ export function TextEditingOverlay() {
 
   return (
     <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
-      <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex items-center gap-1 pointer-events-auto">
+      <div className="bg-background border border-border rounded-lg shadow-lg p-2 flex items-center gap-1 pointer-events-auto">
         {/* Font Family */}
-        <div className="flex border-r border-gray-200 pr-2 mr-2">
+        <div className="flex border-r border-border pr-2 mr-2">
           {fontFamilyOptions.map((option) => (
             <Button
               key={option.value}
@@ -60,7 +59,7 @@ export function TextEditingOverlay() {
         </div>
 
         {/* Font Weight */}
-        <div className="flex border-r border-gray-200 pr-2 mr-2">
+        <div className="flex border-r border-border pr-2 mr-2">
           {fontWeightOptions.map((option) => (
             <Button
               key={option.value}
@@ -77,7 +76,7 @@ export function TextEditingOverlay() {
         </div>
 
         {/* Text Alignment */}
-        <div className="flex border-r border-gray-200 pr-2 mr-2">
+        <div className="flex border-r border-border pr-2 mr-2">
           {alignmentOptions.map((option) => {
             const IconComponent = option.icon;
             return (
@@ -110,7 +109,7 @@ export function TextEditingOverlay() {
           >
             <Type className="h-3 w-3" />
           </Button>
-          <span className="text-xs text-gray-600 min-w-[2rem] text-center">
+          <span className="text-xs text-muted-foreground min-w-[2rem] text-center">
             {Math.round((config.fontScale || 1) * 100)}%
           </span>
           <Button
@@ -126,19 +125,6 @@ export function TextEditingOverlay() {
             <Type className="h-4 w-4" />
           </Button>
         </div>
-      </div>
-
-      {/* Delete Button - Top Right */}
-      <div className="absolute -top-12 right-2 pointer-events-none">
-        <Button
-          variant="destructive"
-          size="sm"
-          className="h-8 w-8 p-0 pointer-events-auto shadow-lg"
-          onClick={() => actions.deleteWidget()}
-          title="Delete widget"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );

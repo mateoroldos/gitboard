@@ -74,7 +74,6 @@ export function TextDisplay() {
   const lineHeight = getLineHeight(fontSize);
 
   const style = {
-    color: textData.textColor,
     backgroundColor:
       textData.backgroundColor !== "transparent"
         ? textData.backgroundColor
@@ -114,7 +113,6 @@ export function TextDisplay() {
           onSave={handleSave}
           onCancel={handleCancel}
           style={{
-            color: textData.textColor,
             fontSize: `${fontSize}px`,
           }}
           className={`${fontFamilyClass} ${textAlignClass} ${fontWeightClass}`}
@@ -130,7 +128,7 @@ export function TextDisplay() {
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full ${fontFamilyClass} ${textAlignClass} ${fontWeightClass} whitespace-pre-wrap break-words cursor-pointer hover:bg-black/5 transition-colors ${shouldCenterVertically ? "flex items-center" : "flex flex-col justify-center"}`}
+      className={`w-full h-full text-foreground ${fontFamilyClass} ${textAlignClass} ${fontWeightClass} whitespace-pre-wrap break-words cursor-pointer hover:bg-accent/20 transition-colors ${shouldCenterVertically ? "flex items-center" : "flex flex-col justify-center"}`}
       style={style}
       onDoubleClick={handleDoubleClick}
       title={state.isPreview ? undefined : "Double-click to edit"}

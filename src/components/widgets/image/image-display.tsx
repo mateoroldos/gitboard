@@ -56,7 +56,7 @@ export function ImageDisplay() {
       )}
 
       {imageData.title && (
-        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm">
+        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-sm">
           {imageData.title}
         </div>
       )}

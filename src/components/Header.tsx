@@ -18,7 +18,7 @@ export function Header() {
   const { data: session } = authClient.useSession();
 
   return (
-    <header className="container mx-auto flex flex-row justify-between pt-4 pb-2">
+    <header className="fixed flex flex-row justify-between pt-4 pb-2 z-20 px-5 w-full">
       <Link to="/" className="text-lg font-semibold">
         Gitboard
       </Link>
@@ -31,7 +31,7 @@ export function Header() {
         </AuthLoading>
 
         <Unauthenticated>
-          <Button onClick={signIn} size="sm">
+          <Button onClick={signIn} size="sm" className="rounded">
             <Github />
             Sign In
           </Button>
@@ -40,7 +40,7 @@ export function Header() {
         <Authenticated>
           <Link
             to="/create"
-            className={buttonVariants({ size: "sm", variant: "outline" })}
+            className={`!rounded ${buttonVariants({ size: "sm", variant: "outline" })}`}
           >
             <Plus />
             New Board

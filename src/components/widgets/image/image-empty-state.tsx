@@ -24,8 +24,8 @@ export function ImageEmptyState() {
     <div className="w-full h-full">
       <ImageAuthGate>
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <div className="text-sm text-red-600">{error}</div>
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <div className="text-sm text-destructive">{error}</div>
           </div>
         )}
         

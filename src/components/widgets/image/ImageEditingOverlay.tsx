@@ -6,7 +6,6 @@ import {
   Maximize,
   Minimize,
   Square,
-  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,11 +88,16 @@ export function ImageEditingOverlay() {
     }
   };
 
+  // Don't show overlay if no image exists
+  if (!config.imageKey) {
+    return null;
+  }
+
   return (
     <>
       {/* Top toolbar */}
       <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex items-center gap-1 pointer-events-auto">
+        <div className="bg-background border border-border rounded-lg shadow-lg p-2 flex items-center gap-1 pointer-events-auto">
           {/* Alt Text */}
           <Popover open={altTextOpen} onOpenChange={setAltTextOpen}>
             <PopoverTrigger asChild>
@@ -109,7 +113,7 @@ export function ImageEditingOverlay() {
             <PopoverContent className="w-80">
               <div className="space-y-2">
                 <h4 className="font-medium text-sm">Alt Text</h4>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   Describe the image for accessibility and screen readers
                 </p>
                 <Input
@@ -136,7 +140,7 @@ export function ImageEditingOverlay() {
             <PopoverContent className="w-80">
               <div className="space-y-2">
                 <h4 className="font-medium text-sm">Image Caption</h4>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   Optional caption displayed over the image
                 </p>
                 <Input
@@ -148,7 +152,7 @@ export function ImageEditingOverlay() {
             </PopoverContent>
           </Popover>
 
-          <div className="w-px h-6 bg-gray-200 mx-1" />
+          <div className="w-px h-6 bg-border mx-1" />
 
           {/* Image Fit */}
           <div className="flex">
@@ -169,11 +173,11 @@ export function ImageEditingOverlay() {
             })}
           </div>
 
-          <div className="w-px h-6 bg-gray-200 mx-1" />
+          <div className="w-px h-6 bg-border mx-1" />
 
           {/* Border Radius */}
           <div className="flex items-center gap-1">
-            <span className="text-xs text-gray-600">Radius:</span>
+            <span className="text-xs text-muted-foreground">Radius:</span>
             <Input
               type="number"
               min="0"
@@ -211,19 +215,6 @@ export function ImageEditingOverlay() {
           onChange={handleFileChange}
           className="hidden"
         />
-      </div>
-
-      {/* Delete Button - Top Right */}
-      <div className="absolute -bottom-12 right-2 pointer-events-none">
-        <Button
-          variant="destructive"
-          size="sm"
-          className="h-8 w-8 p-0 pointer-events-auto shadow-lg"
-          onClick={() => actions.deleteWidget()}
-          title="Delete widget"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
       </div>
     </>
   );
