@@ -1,17 +1,7 @@
-import { Suspense } from "react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { convexAction, convexQuery } from "@convex-dev/react-query";
-import { WidgetSelector } from "@/components/widgets/WidgetSelector";
-import { Card, CardContent } from "@/components/ui/card";
-import { Github } from "lucide-react";
-import { GridSkeleton } from "@/components/ui/grid-skeleton";
-import {
-  CanvasProvider,
-  useCanvasContext,
-} from "@/components/canvas/CanvasContext";
-import { CanvasControls } from "@/components/canvas/CanvasControls";
-import { CanvasWidgets } from "@/components/canvas/CanvasWidgets";
+import { CanvasPage } from "@/components/canvas/CanvasPage";
 
 export const Route = createFileRoute("/$owner/$name")({
   beforeLoad: async ({ params, context }) => {
@@ -52,66 +42,19 @@ export const Route = createFileRoute("/$owner/$name")({
       hasWriteAccess,
     };
   },
-  component: RepoBoard,
+  component: Canvas,
 });
 
-function RepoBoard() {
+function Canvas() {
   const { board, hasWriteAccess } = Route.useLoaderData();
-
   const { owner, name } = Route.useParams();
-  const repoString = `${owner}/${name}`;
 
   return (
-    <CanvasProvider
-      boardId={board._id}
-      repoString={repoString}
+    <CanvasPage
+      owner={owner}
+      name={name}
+      board={board}
       hasWriteAccess={hasWriteAccess}
-    >
-      <nav className="py-3 flex flex-row justify-between container mx-auto relative z-10">
-        <a href={`https://github.com/${repoString}`} target="_blank">
-          <Card className="py-2 group hover:border-primary/40 transition-all">
-            <CardContent className="flex flex-row items-center gap-2 text-sm px-3">
-              <Github className="size-4 text-muted-foreground/70 group-hover:text-primary transition-all" />
-              <h1 className="font-semibold">{repoString}</h1>
-            </CardContent>
-          </Card>
-        </a>
-
-        {hasWriteAccess && <WidgetSelector />}
-      </nav>
-
-      <main>
-        <CanvasContainer />
-        <CanvasControls />
-      </main>
-    </CanvasProvider>
-  );
-}
-
-function CanvasContainer() {
-  const { canvasRef, viewport, setSelectedWidgetId } = useCanvasContext();
-
-  return (
-    <div
-      ref={canvasRef}
-      className="h-screen w-screen absolute top-0 left-0 overflow-hidden"
-      onClick={() => setSelectedWidgetId(null)}
-      style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, oklch(from var(--muted-foreground) l c h / 0.25) 1px, transparent 0)`,
-        backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
-        backgroundPosition: `${viewport.x * viewport.zoom}px ${viewport.y * viewport.zoom}px`,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <Suspense>
-          <CanvasWidgets />
-        </Suspense>
-      </div>
-    </div>
+    />
   );
 }

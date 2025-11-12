@@ -5,9 +5,6 @@ import {
   Keyboard,
   Mouse,
   ArrowUp,
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCanvasContext } from "./CanvasContext";

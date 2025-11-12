@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { validateRepoString } from "@/lib/github";
-import { convexQuery } from "@convex-dev/react-query";
+import { convexAction, convexQuery } from "@convex-dev/react-query";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
@@ -19,6 +19,10 @@ export const Route = createFileRoute("/_protected/create")({
   beforeLoad: async (opts) => {
     const user = await opts.context.queryClient.ensureQueryData(
       convexQuery(api.auth.getUser, {}),
+    );
+
+    opts.context.queryClient.prefetchQuery(
+      convexAction(api.github.getAllRepos, {}),
     );
 
     return { user };
