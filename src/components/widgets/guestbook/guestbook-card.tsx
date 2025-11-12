@@ -57,9 +57,9 @@ export function GuestbookCard() {
                       style={{ zIndex: 3 - index }}
                     />
                   ))}
-                {commentCount > 3 && (
+                {uniqueUsers > 3 && (
                   <div className="size-10 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs text-muted-foreground font-medium">
-                    +{commentCount - 3}
+                    +{uniqueUsers - Math.min(3, stats?.recentAvatars?.length || 0)}
                   </div>
                 )}
               </div>

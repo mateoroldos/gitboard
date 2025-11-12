@@ -36,7 +36,7 @@ export function GuestbookModal() {
             <div className="flex flex-col flex-1 min-h-0">
               <div className="min-h-[400px] flex-1 overflow-y-auto">
                 <ScrollArea>
-                  {comments.map((comment: any) => (
+                  {comments.map((comment) => (
                     <GuestbookCommentComponent
                       key={comment._id}
                       comment={comment}

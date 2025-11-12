@@ -81,7 +81,6 @@ export const checkUserVote = query({
     }
 
     const userId = identity.subject;
-    return await Polls.checkUserVote(ctx, { userId, widgetId });
+    return await Polls.getUserVote(ctx, { userId, widgetId });
   },
 });
-

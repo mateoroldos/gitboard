@@ -1,9 +1,9 @@
-import { QueryCtx, MutationCtx } from '../_generated/server';
-import { Id } from '../_generated/dataModel';
+import { QueryCtx, MutationCtx } from "../_generated/server";
+import { Id } from "../_generated/dataModel";
 
 export async function getPollData(
   ctx: QueryCtx,
-  { widgetId }: { widgetId: Id<"widgets"> }
+  { widgetId }: { widgetId: Id<"widgets"> },
 ) {
   const widget = await ctx.db.get(widgetId);
   if (!widget || widget.widgetType !== "polling") {
@@ -22,7 +22,7 @@ export async function getPollData(
 
   const options = widget.config.options
     ? widget.config.options
-        .split('\n')
+        .split("\n")
         .map((optionText: string) => optionText.trim())
         .filter((optionText: string) => optionText.length > 0)
         .map((optionText: string, index: number) => ({
@@ -41,7 +41,7 @@ export async function getPollData(
 
 export async function getUserVote(
   ctx: QueryCtx,
-  { userId, widgetId }: { userId: string; widgetId: Id<"widgets"> }
+  { userId, widgetId }: { userId: string; widgetId: Id<"widgets"> },
 ) {
   return await ctx.db
     .query("pollVotes")
@@ -53,11 +53,15 @@ export async function getUserVote(
 
 export async function recordVote(
   ctx: MutationCtx,
-  { widgetId, userId, optionId }: { 
-    widgetId: Id<"widgets">; 
-    userId: string; 
-    optionId: string; 
-  }
+  {
+    widgetId,
+    userId,
+    optionId,
+  }: {
+    widgetId: Id<"widgets">;
+    userId: string;
+    optionId: string;
+  },
 ) {
   await ctx.db.insert("pollVotes", {
     widgetId,
@@ -67,14 +71,3 @@ export async function recordVote(
   });
 }
 
-export async function checkUserVote(
-  ctx: QueryCtx,
-  { userId, widgetId }: { userId: string; widgetId: Id<"widgets"> }
-) {
-  return await ctx.db
-    .query("pollVotes")
-    .withIndex("by_user_widget", (q) =>
-      q.eq("userId", userId).eq("widgetId", widgetId),
-    )
-    .first();
-}

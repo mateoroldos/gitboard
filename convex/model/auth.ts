@@ -75,10 +75,3 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
 
   return { repo };
 }
-
-export const getUserById = query({
-  args: { id: v.id("user") },
-  handler: async (ctx, args) => {
-    return authComponent.getAnyUserById(ctx, args.id);
-  },
-});
