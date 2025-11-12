@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Users } from "lucide-react";
 import { useGuestbook } from "./guestbook-context";
+import { GuestbookSkeleton } from "./guestbook-skeleton";
 
 export function GuestbookCard() {
-  const { comments, actions, isEditing } = useGuestbook();
+  const { comments, actions, isEditing, isLoading } = useGuestbook();
+
+  if (isLoading) {
+    return <GuestbookSkeleton />;
+  }
 
   const commentCount = comments?.length || 0;
   const uniqueUsers = new Set(comments?.map((comment: any) => comment.userId))
