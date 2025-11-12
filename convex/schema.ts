@@ -35,4 +35,14 @@ export default defineSchema({
   })
     .index("by_widget", ["widgetId"])
     .index("by_user_widget", ["userId", "widgetId"]),
+
+  guestbookComments: defineTable({
+    widgetId: v.id("widgets"),
+    userId: v.string(),
+    comment: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_widget", ["widgetId"])
+    .index("by_user", ["userId"])
+    .index("by_widget_created", ["widgetId", "createdAt"]),
 });

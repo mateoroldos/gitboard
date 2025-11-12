@@ -65,3 +65,12 @@ export const getUser = query({
     }
   },
 });
+
+export const getUserById = query({
+  args: {
+    id: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return authComponent.getAnyUserById(ctx, args.id);
+  },
+});
