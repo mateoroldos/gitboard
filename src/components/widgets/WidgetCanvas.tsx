@@ -221,7 +221,7 @@ export function WidgetCanvas({
                 {/* Corner handles */}
                 <motion.div
                   className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
-                  style={{ top: -6, left: -6 }}
+                  style={{ top: -9, left: -9 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("top-left", info.delta.x, info.delta.y, _)
@@ -229,8 +229,18 @@ export function WidgetCanvas({
                   onPanEnd={handleResizeEnd}
                 />
                 <motion.div
-                  className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
-                  style={{ top: -6, right: -6 }}
+                  className="absolute cursor-nw-resize"
+                  style={{ top: -20, left: -20, width: 32, height: 32 }}
+                  onPanStart={handleResizeStart}
+                  onPan={(_, info) =>
+                    handleResize("top-left", info.delta.x, info.delta.y, _)
+                  }
+                  onPanEnd={handleResizeEnd}
+                />
+                
+                <motion.div
+                  className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-ne-resize"
+                  style={{ top: -9, right: -9 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("top-right", info.delta.x, info.delta.y, _)
@@ -238,8 +248,18 @@ export function WidgetCanvas({
                   onPanEnd={handleResizeEnd}
                 />
                 <motion.div
-                  className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
-                  style={{ bottom: -6, left: -6 }}
+                  className="absolute cursor-ne-resize"
+                  style={{ top: -20, right: -20, width: 32, height: 32 }}
+                  onPanStart={handleResizeStart}
+                  onPan={(_, info) =>
+                    handleResize("top-right", info.delta.x, info.delta.y, _)
+                  }
+                  onPanEnd={handleResizeEnd}
+                />
+                
+                <motion.div
+                  className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-sw-resize"
+                  style={{ bottom: -9, left: -9 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("bottom-left", info.delta.x, info.delta.y, _)
@@ -247,8 +267,27 @@ export function WidgetCanvas({
                   onPanEnd={handleResizeEnd}
                 />
                 <motion.div
-                  className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-nw-resize"
-                  style={{ bottom: -6, right: -6 }}
+                  className="absolute cursor-sw-resize"
+                  style={{ bottom: -20, left: -20, width: 32, height: 32 }}
+                  onPanStart={handleResizeStart}
+                  onPan={(_, info) =>
+                    handleResize("bottom-left", info.delta.x, info.delta.y, _)
+                  }
+                  onPanEnd={handleResizeEnd}
+                />
+                
+                <motion.div
+                  className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-se-resize"
+                  style={{ bottom: -9, right: -9 }}
+                  onPanStart={handleResizeStart}
+                  onPan={(_, info) =>
+                    handleResize("bottom-right", info.delta.x, info.delta.y, _)
+                  }
+                  onPanEnd={handleResizeEnd}
+                />
+                <motion.div
+                  className="absolute cursor-se-resize"
+                  style={{ bottom: -20, right: -20, width: 32, height: 32 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("bottom-right", info.delta.x, info.delta.y, _)
@@ -259,7 +298,7 @@ export function WidgetCanvas({
                 {/* Edge resize zones */}
                 <motion.div
                   className="absolute cursor-n-resize"
-                  style={{ top: 0, left: 0, right: 0, height: 4 }}
+                  style={{ top: -8, left: 24, right: 24, height: 16 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("top", info.delta.x, info.delta.y, _)
@@ -268,7 +307,7 @@ export function WidgetCanvas({
                 />
                 <motion.div
                   className="absolute cursor-s-resize"
-                  style={{ bottom: 0, left: 0, right: 0, height: 4 }}
+                  style={{ bottom: -8, left: 24, right: 24, height: 16 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("bottom", info.delta.x, info.delta.y, _)
@@ -277,7 +316,7 @@ export function WidgetCanvas({
                 />
                 <motion.div
                   className="absolute cursor-w-resize"
-                  style={{ left: 0, top: 0, bottom: 0, width: 4 }}
+                  style={{ left: -8, top: 24, bottom: 24, width: 16 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("left", info.delta.x, info.delta.y, _)
@@ -286,7 +325,7 @@ export function WidgetCanvas({
                 />
                 <motion.div
                   className="absolute cursor-e-resize"
-                  style={{ right: 0, top: 0, bottom: 0, width: 4 }}
+                  style={{ right: -8, top: 24, bottom: 24, width: 16 }}
                   onPanStart={handleResizeStart}
                   onPan={(_, info) =>
                     handleResize("right", info.delta.x, info.delta.y, _)
