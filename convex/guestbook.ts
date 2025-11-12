@@ -8,73 +8,17 @@ import {
 import { v } from "convex/values";
 import { requireSession, requireRepoAccess } from "./model/auth";
 import { ConvexError } from "convex/values";
-import { api, internal } from "./_generated/api";
+import { internal } from "./_generated/api";
 import { paginationOptsValidator } from "convex/server";
+import * as Guestbook from "./model/guestbook";
 
 export const getComments = query({
   args: {
     widgetId: v.id("widgets"),
     paginationOpts: paginationOptsValidator,
   },
-  handler: async (
-    ctx,
-    { widgetId, paginationOpts },
-  ): Promise<{
-    page: Array<{
-      _id: string;
-      comment: string;
-      createdAt: number;
-      userId: string;
-      username: string;
-      avatarUrl: string | null;
-    }>;
-    isDone: boolean;
-    continueCursor: string;
-  }> => {
-    const widget = await ctx.db.get(widgetId);
-    if (!widget || widget.widgetType !== "guestbook") {
-      return { page: [], isDone: true, continueCursor: "" };
-    }
-
-    const results = await ctx.db
-      .query("guestbookComments")
-      .withIndex("by_widget_created", (q) => q.eq("widgetId", widgetId))
-      .order("desc")
-      .paginate(paginationOpts);
-
-    const commentsWithUserData = await Promise.all(
-      results.page.map(async (comment) => {
-        const user = await ctx.runQuery(api.auth.getUserById, {
-          id: comment.userId,
-        });
-
-        if (!user) {
-          return {
-            _id: comment._id,
-            comment: comment.comment,
-            createdAt: comment.createdAt,
-            userId: comment.userId,
-            username: "Anon",
-            avatarUrl: null,
-          };
-        }
-
-        return {
-          _id: comment._id,
-          comment: comment.comment,
-          createdAt: comment.createdAt,
-          userId: comment.userId,
-          username: user.name || "Anon",
-          avatarUrl: (user.image as string) || null,
-        };
-      }),
-    );
-
-    return {
-      page: commentsWithUserData,
-      isDone: results.isDone,
-      continueCursor: results.continueCursor || "",
-    };
+  handler: async (ctx, { widgetId, paginationOpts }) => {
+    return await Guestbook.getComments(ctx, { widgetId, paginationOpts });
   },
 });
 
@@ -84,13 +28,7 @@ export const getUserCommentCount = internalQuery({
     widgetId: v.id("widgets"),
   },
   handler: async (ctx, { userId, widgetId }) => {
-    const comments = await ctx.db
-      .query("guestbookComments")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .filter((q) => q.eq(q.field("widgetId"), widgetId))
-      .collect();
-
-    return comments.length;
+    return await Guestbook.getUserCommentCount(ctx, { userId, widgetId });
   },
 });
 
@@ -101,12 +39,7 @@ export const addCommentInternal = internalMutation({
     comment: v.string(),
   },
   handler: async (ctx, { widgetId, userId, comment }) => {
-    await ctx.db.insert("guestbookComments", {
-      widgetId,
-      userId,
-      comment,
-      createdAt: Date.now(),
-    });
+    await Guestbook.addComment(ctx, { widgetId, userId, comment });
   },
 });
 
@@ -162,7 +95,7 @@ export const deleteCommentInternal = internalMutation({
     commentId: v.id("guestbookComments"),
   },
   handler: async (ctx, { commentId }) => {
-    await ctx.db.delete(commentId);
+    await Guestbook.deleteComment(ctx, { commentId });
   },
 });
 
@@ -200,7 +133,7 @@ export const getCommentById = internalQuery({
     commentId: v.id("guestbookComments"),
   },
   handler: async (ctx, { commentId }) => {
-    return await ctx.db.get(commentId);
+    return await Guestbook.getCommentById(ctx, { commentId });
   },
 });
 
@@ -208,23 +141,8 @@ export const getCommentRepo = internalQuery({
   args: {
     commentId: v.id("guestbookComments"),
   },
-  handler: async (ctx, { commentId }): Promise<string | null> => {
-    const comment = await ctx.db.get(commentId);
-    if (!comment) {
-      return null;
-    }
-
-    const widget = await ctx.db.get(comment.widgetId);
-    if (!widget) {
-      return null;
-    }
-
-    const board = await ctx.db.get(widget.boardId);
-    if (!board) {
-      return null;
-    }
-
-    return board.repo;
+  handler: async (ctx, { commentId }) => {
+    return await Guestbook.getCommentRepo(ctx, { commentId });
   },
 });
 
@@ -232,77 +150,8 @@ export const getGuestbookStats = query({
   args: {
     widgetId: v.id("widgets"),
   },
-  handler: async (
-    ctx,
-    { widgetId },
-  ): Promise<{
-    totalComments: number;
-    uniqueUsers: number;
-    recentAvatars: Array<{
-      _id: string;
-      userId: string;
-      username: string;
-      avatarUrl: string | null;
-    }>;
-  }> => {
-    const widget = await ctx.db.get(widgetId);
-    if (!widget || widget.widgetType !== "guestbook") {
-      return {
-        totalComments: 0,
-        uniqueUsers: 0,
-        recentAvatars: [],
-      };
-    }
-
-    // Get all comments for accurate totals
-    const allComments = await ctx.db
-      .query("guestbookComments")
-      .withIndex("by_widget_created", (q) => q.eq("widgetId", widgetId))
-      .collect();
-
-    const uniqueUserIds = [...new Set(allComments.map((c) => c.userId))];
-
-    // Get recent comments for avatar display
-    const recentComments = await ctx.db
-      .query("guestbookComments")
-      .withIndex("by_widget_created", (q) => q.eq("widgetId", widgetId))
-      .order("desc")
-      .take(3);
-
-    const recentAvatars: Array<{
-      _id: string;
-      userId: string;
-      username: string;
-      avatarUrl: string | null;
-    }> = await Promise.all(
-      recentComments.map(
-        async (
-          comment,
-        ): Promise<{
-          _id: string;
-          userId: string;
-          username: string;
-          avatarUrl: string | null;
-        }> => {
-          const user: any = await ctx.runQuery(api.auth.getUserById, {
-            id: comment.userId,
-          });
-
-          return {
-            _id: comment._id,
-            userId: comment.userId,
-            username: user?.name || "Anon",
-            avatarUrl: (user?.image as string) || null,
-          };
-        },
-      ),
-    );
-
-    return {
-      totalComments: allComments.length,
-      uniqueUsers: uniqueUserIds.length,
-      recentAvatars,
-    };
+  handler: async (ctx, { widgetId }) => {
+    return await Guestbook.getGuestbookStats(ctx, { widgetId });
   },
 });
 
@@ -317,33 +166,6 @@ export const checkUserCanComment = query({
     }
 
     const userId = identity.subject;
-    const comments = await ctx.db
-      .query("guestbookComments")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .filter((q) => q.eq(q.field("widgetId"), widgetId))
-      .collect();
-
-    // Check if user has delete permissions (repo write access)
-    let canDelete = false;
-    try {
-      const widget = await ctx.db.get(widgetId);
-      if (widget) {
-        const board = await ctx.db.get(widget.boardId);
-        if (board) {
-          // This is a simplified check - in a real implementation you'd want to
-          // check GitHub permissions here, but that requires an action context
-          // For now, we'll add a separate query for this
-          canDelete = false; // Will be determined by a separate action
-        }
-      }
-    } catch {
-      canDelete = false;
-    }
-
-    return {
-      canComment: comments.length < 5,
-      commentCount: comments.length,
-      canDelete,
-    };
+    return await Guestbook.checkUserCanComment(ctx, { userId, widgetId });
   },
 });

@@ -17,6 +17,8 @@ import type * as image from "../image.js";
 import type * as model_auth from "../model/auth.js";
 import type * as model_boards from "../model/boards.js";
 import type * as model_github from "../model/github.js";
+import type * as model_guestbook from "../model/guestbook.js";
+import type * as model_polls from "../model/polls.js";
 import type * as model_widget_lifecycle from "../model/widget_lifecycle.js";
 import type * as model_widgets from "../model/widgets.js";
 import type * as polls from "../polls.js";
@@ -47,6 +49,8 @@ declare const fullApi: ApiFromModules<{
   "model/auth": typeof model_auth;
   "model/boards": typeof model_boards;
   "model/github": typeof model_github;
+  "model/guestbook": typeof model_guestbook;
+  "model/polls": typeof model_polls;
   "model/widget_lifecycle": typeof model_widget_lifecycle;
   "model/widgets": typeof model_widgets;
   polls: typeof polls;

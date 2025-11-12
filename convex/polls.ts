@@ -8,45 +8,12 @@ import { v } from "convex/values";
 import { requireSession } from "./model/auth";
 import { ConvexError } from "convex/values";
 import { internal } from "./_generated/api";
+import * as Polls from "./model/polls";
 
 export const getPollData = query({
   args: { widgetId: v.id("widgets") },
   handler: async (ctx, { widgetId }) => {
-    // Get widget config
-    const widget = await ctx.db.get(widgetId);
-    if (!widget || widget.widgetType !== "polling") {
-      return null;
-    }
-
-    // Get all votes for this widget
-    const votes = await ctx.db
-      .query("pollVotes")
-      .withIndex("by_widget", (q) => q.eq("widgetId", widgetId))
-      .collect();
-
-    // Calculate vote counts per option
-    const voteCounts: Record<string, number> = {};
-    for (const vote of votes) {
-      voteCounts[vote.optionId] = (voteCounts[vote.optionId] || 0) + 1;
-    }
-
-    const options = widget.config.options
-      ? widget.config.options
-          .split('\n')
-          .map((optionText: string) => optionText.trim())
-          .filter((optionText: string) => optionText.length > 0)
-          .map((optionText: string, index: number) => ({
-            id: `option_${index}`,
-            text: optionText,
-            votes: voteCounts[`option_${index}`] || 0,
-          }))
-      : [];
-
-    return {
-      question: widget.config.question || "",
-      options,
-      showPercentages: widget.config.showPercentages || false,
-    };
+    return await Polls.getPollData(ctx, { widgetId });
   },
 });
 
@@ -56,12 +23,7 @@ export const getUserVote = internalQuery({
     widgetId: v.id("widgets"),
   },
   handler: async (ctx, { userId, widgetId }) => {
-    return await ctx.db
-      .query("pollVotes")
-      .withIndex("by_user_widget", (q) =>
-        q.eq("userId", userId).eq("widgetId", widgetId),
-      )
-      .first();
+    return await Polls.getUserVote(ctx, { userId, widgetId });
   },
 });
 
@@ -72,13 +34,7 @@ export const recordVote = internalMutation({
     optionId: v.string(),
   },
   handler: async (ctx, { widgetId, userId, optionId }) => {
-    // Record the vote
-    await ctx.db.insert("pollVotes", {
-      widgetId,
-      userId,
-      optionId,
-      createdAt: Date.now(),
-    });
+    await Polls.recordVote(ctx, { widgetId, userId, optionId });
   },
 });
 
@@ -125,12 +81,7 @@ export const checkUserVote = query({
     }
 
     const userId = identity.subject;
-    return await ctx.db
-      .query("pollVotes")
-      .withIndex("by_user_widget", (q) =>
-        q.eq("userId", userId).eq("widgetId", widgetId),
-      )
-      .first();
+    return await Polls.checkUserVote(ctx, { userId, widgetId });
   },
 });
 
