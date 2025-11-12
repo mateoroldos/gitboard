@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useGuestbook } from "./guestbook-context";
 import { GuestbookCommentComponent } from "./guestbook-comment";
@@ -13,7 +13,7 @@ import { GuestbookAuthGate } from "./guestbook-auth-gate";
 import { GuestbookEmptyState } from "./guestbook-empty-state";
 
 export function GuestbookModal() {
-  const { comments, isModalOpen, actions, status } = useGuestbook();
+  const { comments, isModalOpen, actions, loadMoreRef, status } = useGuestbook();
 
   const hasComments = comments && comments.length > 0;
 
@@ -40,20 +40,16 @@ export function GuestbookModal() {
                       comment={comment}
                     />
                   ))}
+                  {status === "LoadingMore" && (
+                    <div className="p-4 space-y-3">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-4 w-2/3" />
+                    </div>
+                  )}
+                  <div ref={loadMoreRef} className="h-1" />
                 </div>
               </div>
-
-              {status === "CanLoadMore" && (
-                <div className="pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => actions.loadMore(20)}
-                    className="w-full"
-                  >
-                    Load More Comments
-                  </Button>
-                </div>
-              )}
             </div>
           )}
 

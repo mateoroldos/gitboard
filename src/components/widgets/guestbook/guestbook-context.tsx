@@ -9,6 +9,7 @@ import type {
   UserCommentStatus,
   GuestbookConfig,
 } from "./types";
+import { useInfiniteScroll } from "./useInfiniteScroll";
 
 export interface GuestbookContextValue {
   comments: GuestbookComment[] | undefined;
@@ -18,11 +19,11 @@ export interface GuestbookContextValue {
   isEditing: boolean;
   isLoading: boolean;
   status: "LoadingFirstPage" | "CanLoadMore" | "LoadingMore" | "Exhausted";
+  loadMoreRef: (node?: Element | null) => void;
   actions: {
     openModal: () => void;
     closeModal: () => void;
     addComment: (comment: string) => void;
-    loadMore: (numItems: number) => void;
   };
 }
 
@@ -60,6 +61,12 @@ export function GuestbookProvider({
     mutationFn: addCommentAction,
   });
 
+  const loadMoreRef = useInfiniteScroll({
+    hasNextPage: status === "CanLoadMore",
+    isFetchingNextPage: status === "LoadingMore",
+    fetchNextPage: () => loadMore(20),
+  });
+
   const actions = {
     openModal: () => {
       if (!isEditing) {
@@ -77,9 +84,6 @@ export function GuestbookProvider({
         });
       }
     },
-    loadMore: (numItems: number) => {
-      loadMore(numItems);
-    },
   };
 
   const contextValue: GuestbookContextValue = {
@@ -90,6 +94,7 @@ export function GuestbookProvider({
     isEditing,
     isLoading,
     status,
+    loadMoreRef,
     actions,
   };
 
