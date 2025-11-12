@@ -23,9 +23,9 @@ export const createAuth = (
     logger: {
       disabled: optionsOnly,
     },
-    account: {
-      encryptOAuthTokens: true,
-    },
+    // account: {
+    //   encryptOAuthTokens: true,
+    // }, // refreshing token breaks when tokens are encrypted https://github.com/better-auth/better-auth/pull/5094
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     socialProviders: {
