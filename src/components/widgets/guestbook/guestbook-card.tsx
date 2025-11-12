@@ -4,15 +4,14 @@ import { useGuestbook } from "./guestbook-context";
 import { GuestbookSkeleton } from "./guestbook-skeleton";
 
 export function GuestbookCard() {
-  const { comments, actions, isEditing, isLoading } = useGuestbook();
+  const { stats, actions, isEditing, isStatsLoading } = useGuestbook();
 
-  if (isLoading) {
+  if (isStatsLoading) {
     return <GuestbookSkeleton />;
   }
 
-  const commentCount = comments?.length || 0;
-  const uniqueUsers = new Set(comments?.map((comment: any) => comment.userId))
-    .size;
+  const commentCount = stats?.totalComments || 0;
+  const uniqueUsers = stats?.uniqueUsers || 0;
 
   return (
     <div className="flex flex-col gap-8">
@@ -47,13 +46,13 @@ export function GuestbookCard() {
                 Latest visitors have left their mark
               </p>
               <div className="flex justify-center -space-x-2">
-                {comments
+                {stats?.recentAvatars
                   ?.slice(0, 3)
-                  .map((comment: any, index: number) => (
+                  .map((avatar, index: number) => (
                     <img
-                      key={comment._id}
-                      src={comment.avatarUrl}
-                      alt={comment.username}
+                      key={avatar._id}
+                      src={avatar.avatarUrl || ''}
+                      alt={avatar.username}
                       className="size-10 rounded-full border-2 border-background"
                       style={{ zIndex: 3 - index }}
                     />

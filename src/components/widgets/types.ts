@@ -20,7 +20,7 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   previewComponent?: React.ComponentType;
   customEditingComponent?: React.ComponentType;
 
-  configSchema: z.ZodObject<Record<string, z.ZodType>>;
+  configSchema?: z.ZodObject<Record<string, z.ZodType>>;
   defaultConfig: TConfig;
 
   size: {

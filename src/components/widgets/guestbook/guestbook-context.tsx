@@ -11,13 +11,26 @@ import type {
 } from "./types";
 import { useInfiniteScroll } from "./useInfiniteScroll";
 
+export interface GuestbookStats {
+  totalComments: number;
+  uniqueUsers: number;
+  recentAvatars: Array<{
+    _id: string;
+    userId: string;
+    username: string;
+    avatarUrl: string | null;
+  }>;
+}
+
 export interface GuestbookContextValue {
   comments: GuestbookComment[] | undefined;
+  stats: GuestbookStats | undefined;
   userStatus: UserCommentStatus | null;
   isModalOpen: boolean;
   isSubmitting: boolean;
   isEditing: boolean;
   isLoading: boolean;
+  isStatsLoading: boolean;
   status: "LoadingFirstPage" | "CanLoadMore" | "LoadingMore" | "Exhausted";
   loadMoreRef: (node?: Element | null) => void;
   actions: {
@@ -49,6 +62,11 @@ export function GuestbookProvider({
     { widgetId: widget._id },
     { initialNumItems: 20 },
   );
+
+  const { data: stats, isLoading: isStatsLoading } = useQuery({
+    ...convexQuery(api.guestbook.getGuestbookStats, { widgetId: widget._id }),
+    enabled: !isEditing,
+  });
 
   const { data: userStatus } = useQuery({
     ...convexQuery(api.guestbook.checkUserCanComment, { widgetId: widget._id }),
@@ -88,11 +106,13 @@ export function GuestbookProvider({
 
   const contextValue: GuestbookContextValue = {
     comments: results,
+    stats: stats as GuestbookStats | undefined,
     userStatus: userStatus as UserCommentStatus | null,
     isModalOpen,
     isSubmitting: addCommentMutation.isPending,
     isEditing,
     isLoading,
+    isStatsLoading,
     status,
     loadMoreRef,
     actions,

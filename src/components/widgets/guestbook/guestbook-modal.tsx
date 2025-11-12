@@ -11,9 +11,11 @@ import { GuestbookCommentComponent } from "./guestbook-comment";
 import { GuestbookForm } from "./guestbook-form";
 import { GuestbookAuthGate } from "./guestbook-auth-gate";
 import { GuestbookEmptyState } from "./guestbook-empty-state";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function GuestbookModal() {
-  const { comments, isModalOpen, actions, loadMoreRef, status } = useGuestbook();
+  const { comments, isModalOpen, actions, loadMoreRef, status } =
+    useGuestbook();
 
   const hasComments = comments && comments.length > 0;
 
@@ -31,9 +33,9 @@ export function GuestbookModal() {
           {!hasComments ? (
             <GuestbookEmptyState />
           ) : (
-            <div className="flex flex-col min-h-0">
-              <div className="min-h-[400px] flex-1 border overflow-y-auto">
-                <div className="space-y-0">
+            <div className="flex flex-col flex-1 min-h-0">
+              <div className="min-h-[400px] flex-1 overflow-y-auto">
+                <ScrollArea>
                   {comments.map((comment: any) => (
                     <GuestbookCommentComponent
                       key={comment._id}
@@ -48,12 +50,12 @@ export function GuestbookModal() {
                     </div>
                   )}
                   <div ref={loadMoreRef} className="h-1" />
-                </div>
+                </ScrollArea>
               </div>
             </div>
           )}
 
-          <div className="pt-4 border-t mt-4">
+          <div className="pt-4 mt-4">
             <GuestbookAuthGate>
               <GuestbookForm />
             </GuestbookAuthGate>
@@ -63,4 +65,3 @@ export function GuestbookModal() {
     </Dialog>
   );
 }
-

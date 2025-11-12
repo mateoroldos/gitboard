@@ -1,12 +1,7 @@
-import z from "zod";
 import { WidgetDefinition } from "../types";
 import { GuestbookWidget } from "./GuestbookWidget";
 
-const guestbookConfigSchema = z.object({});
-
-type GuestbookConfig = z.infer<typeof guestbookConfigSchema>;
-
-export const guestbookWidget: WidgetDefinition<GuestbookConfig> = {
+export const guestbookWidget: WidgetDefinition = {
   id: "guestbook",
   name: "Guestbook",
   description: "Let visitors leave comments and sign your guestbook",
@@ -14,7 +9,6 @@ export const guestbookWidget: WidgetDefinition<GuestbookConfig> = {
   icon: "📝",
 
   component: GuestbookWidget,
-  configSchema: guestbookConfigSchema,
 
   defaultConfig: {},
 

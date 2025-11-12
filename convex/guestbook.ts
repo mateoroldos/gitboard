@@ -156,6 +156,77 @@ export const addComment = action({
   },
 });
 
+export const getGuestbookStats = query({
+  args: {
+    widgetId: v.id("widgets"),
+  },
+  handler: async (ctx, { widgetId }): Promise<{
+    totalComments: number;
+    uniqueUsers: number;
+    recentAvatars: Array<{
+      _id: string;
+      userId: string;
+      username: string;
+      avatarUrl: string | null;
+    }>;
+  }> => {
+    const widget = await ctx.db.get(widgetId);
+    if (!widget || widget.widgetType !== "guestbook") {
+      return {
+        totalComments: 0,
+        uniqueUsers: 0,
+        recentAvatars: [],
+      };
+    }
+
+    // Get all comments for accurate totals
+    const allComments = await ctx.db
+      .query("guestbookComments")
+      .withIndex("by_widget_created", (q) => q.eq("widgetId", widgetId))
+      .collect();
+
+    const uniqueUserIds = [...new Set(allComments.map((c) => c.userId))];
+
+    // Get recent comments for avatar display
+    const recentComments = await ctx.db
+      .query("guestbookComments")
+      .withIndex("by_widget_created", (q) => q.eq("widgetId", widgetId))
+      .order("desc")
+      .take(3);
+
+    const recentAvatars: Array<{
+      _id: string;
+      userId: string;
+      username: string;
+      avatarUrl: string | null;
+    }> = await Promise.all(
+      recentComments.map(async (comment): Promise<{
+        _id: string;
+        userId: string;
+        username: string;
+        avatarUrl: string | null;
+      }> => {
+        const user: any = await ctx.runQuery(api.auth.getUserById, {
+          id: comment.userId,
+        });
+
+        return {
+          _id: comment._id,
+          userId: comment.userId,
+          username: user?.name || "Anon",
+          avatarUrl: (user?.image as string) || null,
+        };
+      }),
+    );
+
+    return {
+      totalComments: allComments.length,
+      uniqueUsers: uniqueUserIds.length,
+      recentAvatars,
+    };
+  },
+});
+
 export const checkUserCanComment = query({
   args: {
     widgetId: v.id("widgets"),
