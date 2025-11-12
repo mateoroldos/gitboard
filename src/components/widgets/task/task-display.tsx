@@ -1,7 +1,7 @@
 import { useTask } from "./task-context";
 import { getStatusColor, getPriorityColor } from "./utils";
 import { cn } from "@/lib/utils";
-import { Calendar, ExternalLink, Github } from "lucide-react";
+import { Calendar, Github } from "lucide-react";
 
 interface TaskDisplayProps {
   className?: string;
@@ -15,7 +15,9 @@ export function TaskDisplay({ className }: TaskDisplayProps) {
   }
 
   return (
-    <div className={cn("space-y-3", className)}>
+    <div
+      className={cn("space-y-3 flex flex-1 flex-col justify-center", className)}
+    >
       {/* Title */}
       <h3 className="font-semibold text-lg">{taskData.title}</h3>
 
@@ -69,4 +71,3 @@ export function TaskDisplay({ className }: TaskDisplayProps) {
     </div>
   );
 }
-

@@ -47,9 +47,9 @@ export const pollingWidget: WidgetDefinition<PollingConfig> = {
   },
 
   size: {
-    default: { width: 320, height: 280 },
-    min: { width: 280, height: 200 },
-    max: { width: 500, height: 400 },
+    default: { width: 340, height: 420 },
+    min: { width: 300, height: 400 },
+    max: { width: 500, height: 600 },
   },
 
   renderStyle: "card",

@@ -9,10 +9,10 @@ interface PollVoteButtonProps {
   size?: "default" | "sm" | "lg";
 }
 
-export function PollVoteButton({ 
-  className, 
-  variant = "default", 
-  size = "default" 
+export function PollVoteButton({
+  className,
+  variant = "default",
+  size = "default",
 }: PollVoteButtonProps) {
   const { selectedOption, isVoting, hasVoted } = usePoll();
   const { vote } = usePollActions();
@@ -22,15 +22,18 @@ export function PollVoteButton({
   }
 
   return (
-    <Button
-      onClick={vote}
-      disabled={!selectedOption || isVoting}
-      className={cn("w-full", className)}
-      variant={variant}
-      size={size}
-    >
-      {isVoting && <Loader className="animate-spin mr-2 h-4 w-4" />}
-      {isVoting ? "Voting..." : "Vote"}
-    </Button>
+    <div className="pr-4">
+      <Button
+        onClick={vote}
+        disabled={!selectedOption || isVoting}
+        className={cn("w-full", className)}
+        variant={variant}
+        size={size}
+      >
+        {isVoting && <Loader className="animate-spin mr-2 h-4 w-4" />}
+        {isVoting ? "Voting..." : "Vote"}
+      </Button>
+    </div>
   );
 }
+

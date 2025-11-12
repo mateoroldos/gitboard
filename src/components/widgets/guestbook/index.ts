@@ -14,10 +14,9 @@ export const guestbookWidget: WidgetDefinition = {
 
   size: {
     default: { width: 320, height: 280 },
-    min: { width: 280, height: 200 },
-    max: { width: 500, height: 400 },
+    min: { width: 320, height: 360 },
+    max: { width: 500, height: 600 },
   },
 
   renderStyle: "card",
 };
-

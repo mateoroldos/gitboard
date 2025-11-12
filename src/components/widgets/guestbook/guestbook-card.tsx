@@ -14,7 +14,7 @@ export function GuestbookCard() {
   const uniqueUsers = stats?.uniqueUsers || 0;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col flex-1 gap-8">
       <div className="flex-1 flex flex-col justify-center items-center text-center space-y-4">
         <div className="space-y-8">
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
@@ -42,7 +42,7 @@ export function GuestbookCard() {
             </p>
           ) : (
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Latest visitors have left their mark
               </p>
               <div className="flex justify-center -space-x-2">
@@ -51,7 +51,7 @@ export function GuestbookCard() {
                   .map((avatar, index: number) => (
                     <img
                       key={avatar._id}
-                      src={avatar.avatarUrl || ''}
+                      src={avatar.avatarUrl || ""}
                       alt={avatar.username}
                       className="size-10 rounded-full border-2 border-background"
                       style={{ zIndex: 3 - index }}
@@ -59,7 +59,9 @@ export function GuestbookCard() {
                   ))}
                 {uniqueUsers > 3 && (
                   <div className="size-10 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs text-muted-foreground font-medium">
-                    +{uniqueUsers - Math.min(3, stats?.recentAvatars?.length || 0)}
+                    +
+                    {uniqueUsers -
+                      Math.min(3, stats?.recentAvatars?.length || 0)}
                   </div>
                 )}
               </div>
@@ -78,4 +80,3 @@ export function GuestbookCard() {
     </div>
   );
 }
-

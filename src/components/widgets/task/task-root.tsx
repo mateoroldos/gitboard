@@ -8,14 +8,13 @@ interface TaskRootProps {
   className?: string;
 }
 
-export function TaskRoot({ children, className }: TaskRootProps) {
+export function TaskRoot({ children }: TaskRootProps) {
   const { widget, state } = useWidget<TaskConfig>();
 
   return (
-    <div className={className}>
-      <TaskProvider widget={widget} isEditing={state.isEditing}>
-        {children}
-      </TaskProvider>
-    </div>
+    <TaskProvider widget={widget} isEditing={state.isEditing}>
+      {children}
+    </TaskProvider>
   );
 }
+

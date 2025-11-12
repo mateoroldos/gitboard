@@ -1,9 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useWidget } from "./WidgetProvider";
-import { useCanvasContext } from "../canvas/CanvasContext";
-import { Settings, Trash2 } from "lucide-react";
 
 interface WidgetCardProps {
   children: React.ReactNode;
@@ -23,7 +20,7 @@ export function WidgetCard({ children, className }: WidgetCardProps) {
             <h3 className="font-medium text-sm">{widget.title}</h3>
           </div>
         )}
-        <div className="overflow-hidden">{children}</div>
+        <div className="overflow-hidden flex flex-1">{children}</div>
       </CardContent>
     </Card>
   );

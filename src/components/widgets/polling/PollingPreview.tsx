@@ -33,7 +33,7 @@ export function PollingPreview() {
         <PollEmptyState />
       ) : (
         <PollContext.Provider value={contextValue}>
-          <div className="space-y-4">
+          <div className="space-y-4 w-full overflow-hidden h-[350px] flex flex-col">
             <PollQuestion />
             <PollOptions />
             <PollResults showVotedMessage={false} />

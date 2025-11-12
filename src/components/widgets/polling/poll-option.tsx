@@ -29,7 +29,7 @@ export function PollOptionComponent({
     <button
       type="button"
       className={cn(
-        "w-full p-3 border rounded-lg transition-colors text-left",
+        "w-full p-3 border rounded transition-colors text-left",
         hasVoted
           ? isUserVote
             ? "border-primary bg-primary/10"
@@ -64,4 +64,3 @@ export function PollOptionComponent({
     </button>
   );
 }
-

@@ -27,7 +27,6 @@ export function TaskProvider({
   // Use backend data for live widgets, preview data for editing
   const { data: taskData } = useSuspenseQuery({
     ...convexQuery(api.task.getTaskData, { widgetId: widget._id }),
-    enabled: !isEditing,
   });
 
   // For editing mode, use preview data
@@ -39,9 +38,7 @@ export function TaskProvider({
   };
 
   return (
-    <TaskContext.Provider value={contextValue}>
-      {children}
-    </TaskContext.Provider>
+    <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>
   );
 }
 
@@ -52,3 +49,4 @@ export function useTask() {
   }
   return context;
 }
+

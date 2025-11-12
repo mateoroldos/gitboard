@@ -26,8 +26,8 @@ export const githubStarsWidget: WidgetDefinition<GitHubStarsConfig> = {
   },
 
   size: {
-    default: { width: 280, height: 120 },
-    min: { width: 200, height: 80 },
+    default: { width: 340, height: 160 },
+    min: { width: 290, height: 150 },
     max: { width: 400, height: 200 },
   },
 

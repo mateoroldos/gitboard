@@ -7,21 +7,25 @@ interface PollResultsProps {
   className?: string;
 }
 
-export function PollResults({ 
-  showTotal = true, 
+export function PollResults({
+  showTotal = true,
   showVotedMessage = true,
-  className 
+  className,
 }: PollResultsProps) {
   const { totalVotes, hasVoted } = usePoll();
 
   return (
-    <div className={cn("text-sm text-muted-foreground text-center space-y-1", className)}>
-      {showTotal && (
-        <div>Total votes: {totalVotes}</div>
+    <div
+      className={cn(
+        "text-sm pr-4 text-muted-foreground text-center space-y-1",
+        className,
       )}
+    >
+      {showTotal && <div>Total votes: {totalVotes}</div>}
       {hasVoted && showVotedMessage && (
         <div className="text-primary">You have voted in this poll</div>
       )}
     </div>
   );
 }
+

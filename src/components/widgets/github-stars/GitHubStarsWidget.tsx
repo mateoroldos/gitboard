@@ -17,7 +17,7 @@ export function GitHubStarsWidget() {
   const starCount = starsData?.stars ?? 0;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-1 items-center gap-3">
       {widget.config.showIcon && (
         <div className="text-2xl">
           <Star className="fill-amber-200 stroke-amber-300" />

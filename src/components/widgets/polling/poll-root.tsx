@@ -8,14 +8,12 @@ interface PollRootProps {
   className?: string;
 }
 
-export function PollRoot({ children, className }: PollRootProps) {
+export function PollRoot({ children }: PollRootProps) {
   const { widget, state } = useWidget<PollingConfig>();
 
   return (
-    <div className={className}>
-      <PollProvider widget={widget} isEditing={state.isEditing}>
-        {children}
-      </PollProvider>
-    </div>
+    <PollProvider widget={widget} isEditing={state.isEditing}>
+      {children}
+    </PollProvider>
   );
 }

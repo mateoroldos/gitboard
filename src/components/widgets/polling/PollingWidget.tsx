@@ -15,7 +15,7 @@ function PollContent() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full overflow-hidden flex flex-col">
       <PollQuestion />
       <PollOptions />
       <PollAuthGate>

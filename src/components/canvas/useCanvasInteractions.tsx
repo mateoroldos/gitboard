@@ -38,6 +38,15 @@ export function useCanvasInteractions({
     (e: WheelEvent) => {
       if (disabled) return;
 
+      // Check if the wheel event is happening within a scrollable widget area
+      const target = e.target as HTMLElement;
+      const scrollableElement = target.closest('[data-radix-scroll-area-viewport], .scroll-area, [style*="overflow"], [data-scrollable]');
+      
+      // If we're scrolling within a widget's scrollable area, allow default behavior
+      if (scrollableElement && target.closest("[data-widget]")) {
+        return;
+      }
+
       e.preventDefault();
 
       if (e.ctrlKey || e.metaKey) {
