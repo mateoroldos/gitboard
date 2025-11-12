@@ -170,7 +170,13 @@ function WidgetCard({ widget, onSelect }: WidgetCardProps) {
       className="p-4 border rounded-lg hover:border-primary hover:shadow-sm transition-all text-left group"
     >
       <div className="flex items-start gap-3">
-        <div className="text-2xl flex-shrink-0">{widget.icon}</div>
+        <div className="text-2xl flex-shrink-0">
+          {typeof widget.icon === 'string' ? (
+            widget.icon
+          ) : (
+            <widget.icon className="w-6 h-6" />
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           <h4 className="font-medium text-sm mb-1 group-hover:text-primary transition-colors">
             {widget.name}

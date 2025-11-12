@@ -8,6 +8,7 @@ import {
 import { WidgetDefinition } from "../types";
 import { PollingWidget } from "./PollingWidget";
 import { PollingPreview } from "./PollingPreview";
+import { BarChart3 } from "lucide-react";
 
 const pollingConfigSchema = createWidgetSchema({
   question: stringField({
@@ -34,7 +35,7 @@ export const pollingWidget: WidgetDefinition<PollingConfig> = {
   name: "Poll",
   description: "Create interactive polls for community engagement",
   category: "custom",
-  icon: "📊",
+  icon: BarChart3,
 
   component: PollingWidget,
   previewComponent: PollingPreview,

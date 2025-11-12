@@ -1,12 +1,13 @@
 import { WidgetDefinition } from "../types";
 import { GuestbookWidget } from "./GuestbookWidget";
+import { MessageSquare } from "lucide-react";
 
 export const guestbookWidget: WidgetDefinition = {
   id: "guestbook",
   name: "Guestbook",
   description: "Let visitors leave comments and sign your guestbook",
   category: "custom",
-  icon: "📝",
+  icon: MessageSquare,
 
   component: GuestbookWidget,
 

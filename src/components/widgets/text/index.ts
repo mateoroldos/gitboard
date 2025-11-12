@@ -8,6 +8,7 @@ import {
 import { WidgetDefinition } from "../types";
 import { TextWidget } from "./TextWidget";
 import { TextEditingOverlay } from "./TextEditingOverlay";
+import { Type } from "lucide-react";
 
 const textConfigSchema = createWidgetSchema({
   content: stringField({
@@ -46,7 +47,7 @@ export const textWidget: WidgetDefinition<TextConfig> = {
   name: "Text",
   description: "Display customizable text with font options and styling",
   category: "custom",
-  icon: "Type",
+  icon: Type,
 
   component: TextWidget,
   customEditingComponent: TextEditingOverlay,

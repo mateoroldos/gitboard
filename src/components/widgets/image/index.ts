@@ -8,6 +8,7 @@ import {
 import { WidgetDefinition } from "../types";
 import { ImageWidget } from "./ImageWidget";
 import { ImageEditingOverlay } from "./ImageEditingOverlay";
+import { Image } from "lucide-react";
 
 const imageConfigSchema = createWidgetSchema({
   title: stringField({
@@ -38,7 +39,7 @@ export const imageWidget: WidgetDefinition<ImageConfig> = {
   name: "Image",
   description: "Display images with customizable fit and styling options",
   category: "custom",
-  icon: "Image",
+  icon: Image,
 
   component: ImageWidget,
   customEditingComponent: ImageEditingOverlay,

@@ -1,6 +1,7 @@
 import type React from "react";
 import type * as z from "zod";
 import { Doc } from "convex/_generated/dataModel";
+import type { LucideIcon } from "lucide-react";
 
 export type WidgetCategory =
   | "github"
@@ -14,7 +15,7 @@ export interface WidgetDefinition<TConfig = Record<string, any>> {
   name: string;
   description: string;
   category: WidgetCategory;
-  icon: string;
+  icon: string | LucideIcon;
 
   component: React.ComponentType;
   previewComponent?: React.ComponentType;

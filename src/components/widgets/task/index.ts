@@ -9,6 +9,7 @@ import {
 import { WidgetDefinition } from "../types";
 import { TaskWidget } from "./TaskWidget";
 import { TaskPreview } from "./TaskPreview";
+import { CheckSquare } from "lucide-react";
 
 const taskConfigSchema = createWidgetSchema({
   title: stringField({
@@ -49,7 +50,7 @@ export const taskWidget: WidgetDefinition<TaskConfig> = {
   name: "Task",
   description: "Track individual task progress with status and details",
   category: "custom",
-  icon: "CheckSquare",
+  icon: CheckSquare,
 
   component: TaskWidget,
   previewComponent: TaskPreview,

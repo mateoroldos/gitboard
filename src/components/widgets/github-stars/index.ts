@@ -2,6 +2,7 @@ import * as z from "zod";
 import { booleanField, createWidgetSchema } from "../zod-helpers";
 import { WidgetDefinition } from "../types";
 import { GitHubStarsWidget } from "./GitHubStarsWidget";
+import { Star } from "lucide-react";
 
 const githubStarsConfigSchema = createWidgetSchema({
   showIcon: booleanField({
@@ -16,7 +17,7 @@ export const githubStarsWidget: WidgetDefinition<GitHubStarsConfig> = {
   name: "GitHub Stars",
   description: "Display repository star count with customizable appearance",
   category: "github",
-  icon: "⭐",
+  icon: Star,
 
   component: GitHubStarsWidget,
   configSchema: githubStarsConfigSchema,
