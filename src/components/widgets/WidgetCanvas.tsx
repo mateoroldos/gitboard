@@ -191,7 +191,7 @@ export function WidgetCanvas({
         left: 0,
         top: 0,
         cursor: isDraggable && !isResizing ? "grab" : "default",
-        zIndex: isDragging || isResizing ? 1000 : 0,
+        zIndex: isDragging || isResizing ? 10 : 0,
         transformOrigin: "0 0",
       }}
       className={`${isSelected && state.hasWriteAccess ? "outline-3 outline-blue-500" : ""}`}

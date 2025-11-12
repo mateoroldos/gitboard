@@ -1,7 +1,7 @@
 import { parseRepoString } from "@/lib/github";
-import { ActionCtx, QueryCtx } from "convex/_generated/server";
+import { ActionCtx, query, QueryCtx } from "convex/_generated/server";
 import { authComponent, createAuth } from "convex/auth";
-import { ConvexError } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export async function requireSession(ctx: ActionCtx | QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
@@ -75,3 +75,10 @@ export async function requireRepoAccess(ctx: ActionCtx, repo: string) {
 
   return { repo };
 }
+
+export const getUserById = query({
+  args: { id: v.id("user") },
+  handler: async (ctx, args) => {
+    return authComponent.getAnyUserById(ctx, args.id);
+  },
+});

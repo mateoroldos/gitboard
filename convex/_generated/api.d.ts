@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as boards from "../boards.js";
 import type * as github from "../github.js";
+import type * as guestbook from "../guestbook.js";
 import type * as http from "../http.js";
 import type * as image from "../image.js";
 import type * as model_auth from "../model/auth.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   boards: typeof boards;
   github: typeof github;
+  guestbook: typeof guestbook;
   http: typeof http;
   image: typeof image;
   "model/auth": typeof model_auth;

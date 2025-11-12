@@ -4,13 +4,14 @@ import { pollingWidget } from "./polling";
 import { taskWidget } from "./task";
 import { imageWidget } from "./image";
 import { textWidget } from "./text";
+import { guestbookWidget } from "./guestbook";
 
 export const widgetRegistry: Record<WidgetCategory, WidgetDefinition[]> = {
   github: [githubStarsWidget],
   analytics: [],
   notes: [],
   links: [],
-  custom: [pollingWidget, taskWidget, imageWidget, textWidget],
+  custom: [pollingWidget, taskWidget, imageWidget, textWidget, guestbookWidget],
 };
 
 // Helpers

@@ -25,7 +25,7 @@ export const createAuth = (
     },
     // account: {
     //   encryptOAuthTokens: true,
-    // }, // refreshing token breaks when tokens are encrypted https://github.com/better-auth/better-auth/pull/5094
+    // }, // refreshing token breaks when tokens are encrypted https://github.com/better-auth/better-auth/pull/509auth4
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     socialProviders: {
@@ -63,5 +63,14 @@ export const getUser = query({
     } catch (error) {
       return null;
     }
+  },
+});
+
+export const getUserById = query({
+  args: {
+    id: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return authComponent.getAnyUserById(ctx, args.id);
   },
 });
