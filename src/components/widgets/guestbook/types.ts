@@ -17,8 +17,3 @@ export interface UserCommentStatus {
   canComment: boolean;
   commentCount: number;
 }
-
-export interface GuestbookConfig {
-  // No configuration needed for guestbook
-}
-

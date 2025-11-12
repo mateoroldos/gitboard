@@ -1,14 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
-import { usePaginatedQuery, useAction } from "convex/react";
+import { usePaginatedQuery, useMutation as useCvxMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import type { WidgetInstance } from "../types";
-import type {
-  GuestbookComment,
-  UserCommentStatus,
-  GuestbookConfig,
-} from "./types";
+import type { GuestbookComment, UserCommentStatus } from "./types";
 import { useInfiniteScroll } from "./useInfiniteScroll";
 
 export interface GuestbookStats {
@@ -46,7 +42,7 @@ export const GuestbookContext = createContext<GuestbookContextValue | null>(
 
 interface GuestbookProviderProps {
   children: ReactNode;
-  widget: WidgetInstance<GuestbookConfig>;
+  widget: WidgetInstance;
   isEditing?: boolean;
 }
 
@@ -73,10 +69,8 @@ export function GuestbookProvider({
     enabled: !isEditing,
   });
 
-  const addCommentAction = useAction(api.guestbook.addComment);
-
   const addCommentMutation = useMutation({
-    mutationFn: addCommentAction,
+    mutationFn: useCvxMutation(api.guestbook.addComment),
   });
 
   const loadMoreRef = useInfiniteScroll({
@@ -107,7 +101,7 @@ export function GuestbookProvider({
   const contextValue: GuestbookContextValue = {
     comments: results,
     stats: stats as GuestbookStats | undefined,
-    userStatus: userStatus as UserCommentStatus | null,
+    userStatus: userStatus || { canComment: false, commentCount: 0 },
     isModalOpen,
     isSubmitting: addCommentMutation.isPending,
     isEditing,

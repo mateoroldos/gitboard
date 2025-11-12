@@ -3,9 +3,10 @@ import {
   action,
   internalMutation,
   internalQuery,
+  mutation,
 } from "./_generated/server";
 import { v } from "convex/values";
-import { requireSession } from "./model/auth";
+import { requireSession, requireRepoAccess } from "./model/auth";
 import { ConvexError } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { paginationOptsValidator } from "convex/server";
@@ -109,7 +110,7 @@ export const addCommentInternal = internalMutation({
   },
 });
 
-export const addComment = action({
+export const addComment = mutation({
   args: {
     widgetId: v.id("widgets"),
     comment: v.string(),
@@ -156,11 +157,85 @@ export const addComment = action({
   },
 });
 
+export const deleteCommentInternal = internalMutation({
+  args: {
+    commentId: v.id("guestbookComments"),
+  },
+  handler: async (ctx, { commentId }) => {
+    await ctx.db.delete(commentId);
+  },
+});
+
+export const deleteComment = action({
+  args: {
+    commentId: v.id("guestbookComments"),
+  },
+  handler: async (ctx, { commentId }) => {
+    await requireSession(ctx);
+
+    // Get the repo for this comment to check permissions
+    const repo = await ctx.runQuery(internal.guestbook.getCommentRepo, {
+      commentId,
+    });
+
+    if (!repo) {
+      throw new ConvexError({
+        message: "Comment not found",
+        code: 404,
+      });
+    }
+
+    // Check if user has write access to the repo
+    await requireRepoAccess(ctx, repo);
+
+    // Delete the comment
+    await ctx.runMutation(internal.guestbook.deleteCommentInternal, {
+      commentId,
+    });
+  },
+});
+
+export const getCommentById = internalQuery({
+  args: {
+    commentId: v.id("guestbookComments"),
+  },
+  handler: async (ctx, { commentId }) => {
+    return await ctx.db.get(commentId);
+  },
+});
+
+export const getCommentRepo = internalQuery({
+  args: {
+    commentId: v.id("guestbookComments"),
+  },
+  handler: async (ctx, { commentId }): Promise<string | null> => {
+    const comment = await ctx.db.get(commentId);
+    if (!comment) {
+      return null;
+    }
+
+    const widget = await ctx.db.get(comment.widgetId);
+    if (!widget) {
+      return null;
+    }
+
+    const board = await ctx.db.get(widget.boardId);
+    if (!board) {
+      return null;
+    }
+
+    return board.repo;
+  },
+});
+
 export const getGuestbookStats = query({
   args: {
     widgetId: v.id("widgets"),
   },
-  handler: async (ctx, { widgetId }): Promise<{
+  handler: async (
+    ctx,
+    { widgetId },
+  ): Promise<{
     totalComments: number;
     uniqueUsers: number;
     recentAvatars: Array<{
@@ -200,23 +275,27 @@ export const getGuestbookStats = query({
       username: string;
       avatarUrl: string | null;
     }> = await Promise.all(
-      recentComments.map(async (comment): Promise<{
-        _id: string;
-        userId: string;
-        username: string;
-        avatarUrl: string | null;
-      }> => {
-        const user: any = await ctx.runQuery(api.auth.getUserById, {
-          id: comment.userId,
-        });
+      recentComments.map(
+        async (
+          comment,
+        ): Promise<{
+          _id: string;
+          userId: string;
+          username: string;
+          avatarUrl: string | null;
+        }> => {
+          const user: any = await ctx.runQuery(api.auth.getUserById, {
+            id: comment.userId,
+          });
 
-        return {
-          _id: comment._id,
-          userId: comment.userId,
-          username: user?.name || "Anon",
-          avatarUrl: (user?.image as string) || null,
-        };
-      }),
+          return {
+            _id: comment._id,
+            userId: comment.userId,
+            username: user?.name || "Anon",
+            avatarUrl: (user?.image as string) || null,
+          };
+        },
+      ),
     );
 
     return {
@@ -234,7 +313,7 @@ export const checkUserCanComment = query({
   handler: async (ctx, { widgetId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return { canComment: false, commentCount: 0 };
+      return { canComment: false, commentCount: 0, canDelete: false };
     }
 
     const userId = identity.subject;
@@ -244,9 +323,27 @@ export const checkUserCanComment = query({
       .filter((q) => q.eq(q.field("widgetId"), widgetId))
       .collect();
 
+    // Check if user has delete permissions (repo write access)
+    let canDelete = false;
+    try {
+      const widget = await ctx.db.get(widgetId);
+      if (widget) {
+        const board = await ctx.db.get(widget.boardId);
+        if (board) {
+          // This is a simplified check - in a real implementation you'd want to
+          // check GitHub permissions here, but that requires an action context
+          // For now, we'll add a separate query for this
+          canDelete = false; // Will be determined by a separate action
+        }
+      }
+    } catch {
+      canDelete = false;
+    }
+
     return {
       canComment: comments.length < 5,
       commentCount: comments.length,
+      canDelete,
     };
   },
 });
