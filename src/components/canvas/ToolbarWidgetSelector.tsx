@@ -9,14 +9,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import type { WidgetDefinition, WidgetCategory } from "./types";
-import { getWidgetCategories, getWidgetsByCategory } from "./registry";
+import type { WidgetDefinition, WidgetCategory } from "../widgets/types";
+import { getWidgetCategories, getWidgetsByCategory } from "../widgets/registry";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "convex/_generated/api";
 import { useAction } from "convex/react";
-import { useCanvasContext } from "../canvas/CanvasContext";
+import { useCanvasContext } from "./CanvasContext";
 
-export function WidgetSelector() {
+export function ToolbarWidgetSelector() {
   const [open, setOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] =
     useState<WidgetCategory>("github");
@@ -79,9 +79,12 @@ export function WidgetSelector() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="cursor-pointer">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Widget
+        <Button
+          size="icon"
+          className="flex flex-col items-center rounded group"
+          title="More widgets"
+        >
+          <Plus className="size-4 transition-transform group-hover:-translate-y-[1px]" />
         </Button>
       </DialogTrigger>
       <DialogContent className="!max-w-6xl max-h-[80vh] overflow-hidden">
@@ -167,14 +170,14 @@ function WidgetCard({ widget, onSelect }: WidgetCardProps) {
   return (
     <button
       onClick={onSelect}
-      className="p-4 border rounded-lg hover:border-primary hover:shadow-sm transition-all text-left group"
+      className="p-4 border rounded hover:border-primary hover:shadow-sm transition-all text-left group"
     >
       <div className="flex items-start gap-3">
-        <div className="text-2xl flex-shrink-0">
-          {typeof widget.icon === 'string' ? (
+        <div className="bg-primary text-primary-foreground rounded p-1.5 text-2xl flex-shrink-0">
+          {typeof widget.icon === "string" ? (
             widget.icon
           ) : (
-            <widget.icon className="w-6 h-6" />
+            <widget.icon className="size-3.5" />
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -196,3 +199,4 @@ function WidgetCard({ widget, onSelect }: WidgetCardProps) {
     </button>
   );
 }
+

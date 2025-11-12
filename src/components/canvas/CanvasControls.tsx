@@ -45,9 +45,9 @@ export function CanvasControls() {
   const zoomPercentage = Math.round(viewport.zoom * 100);
 
   return (
-    <div className="fixed bottom-4 right-4 z-20 flex flex-col gap-2">
+    <div className="fixed bottom-5 right-5 z-20 flex flex-col gap-2">
       {showShortcuts && (
-        <div className="bg-background/80 backdrop-blur-sm border rounded-lg p-2 shadow-lg text-xs text-muted-foreground">
+        <div className="bg-background/80 rounded backdrop-blur-sm border p-2 shadow-lg text-xs text-muted-foreground">
           <div className="space-y-1">
             <div className="flex items-center gap-1">
               <Mouse className="h-3 w-3" />
@@ -74,7 +74,7 @@ export function CanvasControls() {
       )}
 
       <div className="flex flex-row gap-1 justify-end">
-        <div className="bg-background/80 flex flex-row divide-x backdrop-blur-sm border rounded-lg shadow-lg">
+        <div className="bg-background/80 rounded flex flex-row divide-x backdrop-blur-sm border shadow-lg">
           <div className="flex flex-row gap-1 flex-1 justify-between">
             <Button
               variant="ghost"
@@ -121,7 +121,7 @@ export function CanvasControls() {
           )}
         </div>
 
-        <div className="bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg">
+        <div className="bg-background/80 rounded backdrop-blur-sm border shadow-lg">
           <Button
             variant="ghost"
             size="sm"

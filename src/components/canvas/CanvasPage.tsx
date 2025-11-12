@@ -1,9 +1,9 @@
 import { Github } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
-import { WidgetSelector } from "../widgets/WidgetSelector";
 import { CanvasContainer } from "./CanvasContainer";
 import { CanvasProvider } from "./CanvasContext";
 import { CanvasControls } from "./CanvasControls";
+import { CanvasToolbar } from "./CanvasToolbar";
 import { Doc } from "convex/_generated/dataModel";
 
 export function CanvasPage({
@@ -35,12 +35,13 @@ export function CanvasPage({
           </Card>
         </a>
 
-        {hasWriteAccess && <WidgetSelector />}
+
       </nav>
 
       <main>
         <CanvasContainer />
         <CanvasControls />
+        <CanvasToolbar />
       </main>
     </CanvasProvider>
   );
