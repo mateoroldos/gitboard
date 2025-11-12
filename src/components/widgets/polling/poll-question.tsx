@@ -13,7 +13,7 @@ export function PollQuestion({ className }: PollQuestionProps) {
   }
 
   return (
-    <h3 className={cn("font-semibold pr-4", className)}>{pollData.question}</h3>
+    <h3 className={cn("font-medium pr-4", className)}>{pollData.question}</h3>
   );
 }
 

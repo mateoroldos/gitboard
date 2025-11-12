@@ -16,8 +16,8 @@ export function WidgetCard({ children, className }: WidgetCardProps) {
     >
       <CardContent className="h-full w-full flex flex-col">
         {widget.title && (
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-sm">{widget.title}</h3>
+          <div className="py-0.5 border-t border flex bg-secondary px-2 w-fit rounded text-secondary-foreground items-center justify-between mb-3">
+            <h3 className="font-medium text-xs">{widget.title}</h3>
           </div>
         )}
         <div className="overflow-hidden flex flex-1">{children}</div>

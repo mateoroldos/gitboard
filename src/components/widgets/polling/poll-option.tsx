@@ -2,6 +2,7 @@ import { usePollOption, usePollActions } from "./poll-context";
 import { PollProgressBar } from "./poll-progress-bar";
 import { cn } from "@/lib/utils";
 import type { PollOption } from "./types";
+import { CheckSquare } from "lucide-react";
 
 interface PollOptionProps {
   option: PollOption;
@@ -43,14 +44,12 @@ export function PollOptionComponent({
       disabled={hasVoted}
     >
       <div className="flex justify-between items-center">
-        <span className="flex items-center gap-2">
+        <span className="flex items-center gap-2 text-sm">
+          {isUserVote && <CheckSquare className="size-3.5" />}
           {option.text}
-          {isUserVote && (
-            <span className="text-primary text-sm">✓ Your vote</span>
-          )}
         </span>
         {showPercentages && (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {percentage.toFixed(1)}% ({option.votes})
           </span>
         )}

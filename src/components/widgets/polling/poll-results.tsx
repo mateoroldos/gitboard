@@ -17,7 +17,7 @@ export function PollResults({
   return (
     <div
       className={cn(
-        "text-sm pr-4 text-muted-foreground text-center space-y-1",
+        "text-xs pr-4 text-muted-foreground text-center space-y-1",
         className,
       )}
     >
@@ -28,4 +28,3 @@ export function PollResults({
     </div>
   );
 }
-
