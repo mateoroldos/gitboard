@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "convex/_generated/api";
@@ -27,25 +27,22 @@ export function CanvasWidgets() {
     setConfigDialogOpen(true);
   };
 
+  const autoFittedRef = useRef(false);
+
   // Auto-fit to content when widgets first load
-  useMemo(() => {
+  useEffect(() => {
     if (
       widgets.length > 0 &&
       viewport.zoom === 1 &&
       viewport.x === 0 &&
-      viewport.y === 0
+      viewport.y === 0 &&
+      !autoFittedRef.current
     ) {
       // Only auto-fit if we're at the default viewport position
       fitToContent(widgets);
+      autoFittedRef.current = true;
     }
-  }, [
-    widgets.length,
-    fitToContent,
-    viewport.zoom,
-    viewport.x,
-    viewport.y,
-    widgets,
-  ]);
+  }, [widgets.length, fitToContent, viewport.zoom, viewport.x, viewport.y]);
 
   if (widgets.length === 0) {
     return (

@@ -41,6 +41,12 @@ export const Route = createFileRoute("/$owner/$name")({
       convexAction(api.auth.checkRepoWriteAccess, { repo: `${owner}/${name}` }),
     );
 
+    context.queryClient.prefetchQuery(
+      convexQuery(api.widgets.getWidgetsByBoard, {
+        boardId: context.board._id,
+      }),
+    );
+
     return {
       board: context.board,
       hasWriteAccess,
@@ -102,13 +108,7 @@ function CanvasContainer() {
           height: "100%",
         }}
       >
-        <Suspense
-          fallback={
-            <div className="container mx-auto min-h-screen flex flex-1 items-center">
-              <GridSkeleton count={6} />
-            </div>
-          }
-        >
+        <Suspense>
           <CanvasWidgets />
         </Suspense>
       </div>
