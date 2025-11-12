@@ -4,6 +4,7 @@ import { useWidget } from "./WidgetProvider";
 import { useCanvasContext } from "@/components/canvas/CanvasContext";
 import { getWidgetDefinitionByType } from "./registry";
 import { EditingOverlay } from "./EditingOverlay";
+import { WidgetContextMenu } from "./WidgetContextMenu";
 
 interface WidgetCanvasProps {
   children: React.ReactNode;
@@ -194,7 +195,7 @@ export function WidgetCanvas({
         zIndex: isDragging || isResizing ? 10 : 0,
         transformOrigin: "0 0",
       }}
-      className={`${isSelected && state.hasWriteAccess ? "outline-3 outline-blue-500" : ""}`}
+      className={`shadow-transparent ${isSelected && state.hasWriteAccess ? "outline-3 outline-blue-500" : ""}`}
       whileDrag={{
         scale: 1.02 * viewport.zoom,
         opacity: 0.9,
@@ -211,7 +212,7 @@ export function WidgetCanvas({
         damping: 30,
       }}
     >
-      {children}
+      <WidgetContextMenu>{children}</WidgetContextMenu>
 
       {isSelected && state.hasWriteAccess && (
         <>
@@ -237,7 +238,7 @@ export function WidgetCanvas({
                   }
                   onPanEnd={handleResizeEnd}
                 />
-                
+
                 <motion.div
                   className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-ne-resize"
                   style={{ top: -9, right: -9 }}
@@ -256,7 +257,7 @@ export function WidgetCanvas({
                   }
                   onPanEnd={handleResizeEnd}
                 />
-                
+
                 <motion.div
                   className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-sw-resize"
                   style={{ bottom: -9, left: -9 }}
@@ -275,7 +276,7 @@ export function WidgetCanvas({
                   }
                   onPanEnd={handleResizeEnd}
                 />
-                
+
                 <motion.div
                   className="absolute size-3.5 bg-background border-blue-500 border-3 rounded shadow-sm cursor-se-resize"
                   style={{ bottom: -9, right: -9 }}
