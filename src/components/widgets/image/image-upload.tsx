@@ -107,7 +107,12 @@ export function ImageUpload({
                 <div className="text-sm text-muted-foreground">
                   or click to select a file
                 </div>
-                <Button size="sm" className="mt-2" onClick={open}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="mt-2"
+                  onClick={open}
+                >
                   Choose Image
                 </Button>
               </div>
