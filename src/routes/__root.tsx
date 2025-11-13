@@ -16,6 +16,7 @@ import { authClient } from "@/lib/auth-client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getThemeServerFn } from "@/lib/theme";
+import { useDynamicFavicon } from "@/hooks/useDynamicFavicon";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/Header";
@@ -79,6 +80,8 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const context = useRouteContext({ from: Route.id });
   const theme = Route.useLoaderData();
+
+  useDynamicFavicon(theme);
 
   return (
     <ConvexBetterAuthProvider
