@@ -20,6 +20,7 @@ import { useDynamicFavicon } from "@/hooks/useDynamicFavicon";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/Header";
+import { Suspense } from "react";
 
 // Get auth information for SSR using available cookies
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
@@ -90,7 +91,9 @@ function RootComponent() {
     >
       <ThemeProvider theme={theme}>
         <RootDocument>
-          <Header />
+          <Suspense>
+            <Header />
+          </Suspense>
           <Outlet />
         </RootDocument>
       </ThemeProvider>
