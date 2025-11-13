@@ -34,7 +34,7 @@ export function Header() {
             href="https://github.com/mateoroldos/gitboard"
             className={`${buttonVariants({ variant: "outline" })} !rounded group`}
           >
-            <Star className="transition group-hover:fill-amber-200 group-hover:stroke-amber-300" />
+            <Star className="transition group-hover:fill-amber-300 group-hover:stroke-amber-400 group-hover:dark:fill-amber-200 group-hover:dark:stroke-amber-300" />
             {stars.toLocaleString()}
           </a>
         )}

@@ -5,13 +5,21 @@ import { taskWidget } from "./task";
 import { imageWidget } from "./image";
 import { textWidget } from "./text";
 import { guestbookWidget } from "./guestbook";
+import { mapWidget } from "./map";
 
 export const widgetRegistry: Record<WidgetCategory, WidgetDefinition[]> = {
   github: [githubStarsWidget],
   analytics: [],
   notes: [],
   links: [],
-  custom: [pollingWidget, taskWidget, imageWidget, textWidget, guestbookWidget],
+  custom: [
+    pollingWidget,
+    taskWidget,
+    imageWidget,
+    textWidget,
+    guestbookWidget,
+    mapWidget,
+  ],
 };
 
 // Helpers

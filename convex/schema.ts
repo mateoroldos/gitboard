@@ -22,6 +22,7 @@ export default defineSchema({
       width: v.number(),
       height: v.number(),
     }),
+    rotation: v.optional(v.number()),
     title: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -45,4 +46,14 @@ export default defineSchema({
     .index("by_widget", ["widgetId"])
     .index("by_user", ["userId"])
     .index("by_widget_created", ["widgetId", "createdAt"]),
+
+  mapPins: defineTable({
+    widgetId: v.id("widgets"),
+    userId: v.string(),
+    latitude: v.number(),
+    longitude: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_widget", ["widgetId"])
+    .index("by_user_widget", ["userId", "widgetId"]),
 });
