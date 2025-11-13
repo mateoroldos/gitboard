@@ -24,8 +24,6 @@ interface CanvasContextType {
   hasWriteAccess: boolean;
   canvasRef: RefObject<HTMLDivElement | null>;
   viewport: Viewport;
-  selectedWidgetId: string | null;
-  setSelectedWidgetId: (id: string | null) => void;
   panTo: (x: number, y: number) => void;
   zoomTo: (zoom: number, centerX?: number, centerY?: number) => void;
   panBy: (deltaX: number, deltaY: number) => void;
@@ -67,7 +65,6 @@ export function CanvasProvider({
   hasWriteAccess,
 }: CanvasProviderProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null);
   const [viewport, setViewport] = useState<Viewport>({
     x: 0,
     y: 0,
@@ -206,8 +203,6 @@ export function CanvasProvider({
       hasWriteAccess,
       canvasRef,
       viewport,
-      selectedWidgetId,
-      setSelectedWidgetId,
       panTo,
       zoomTo,
       panBy,
@@ -223,8 +218,6 @@ export function CanvasProvider({
       hasWriteAccess,
       canvasRef,
       viewport,
-      selectedWidgetId,
-      setSelectedWidgetId,
       panTo,
       zoomTo,
       panBy,

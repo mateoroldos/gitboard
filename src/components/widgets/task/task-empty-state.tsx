@@ -1,6 +1,6 @@
 import { CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 interface TaskEmptyStateProps {
   className?: string;

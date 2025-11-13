@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { PollProvider } from "./poll-context";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import type { PollingConfig } from "./types";
 
 interface PollRootProps {

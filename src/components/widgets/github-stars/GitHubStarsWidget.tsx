@@ -3,7 +3,7 @@ import { convexAction } from "@convex-dev/react-query";
 import { parseRepoString } from "@/lib/github";
 import { api } from "convex/_generated/api";
 import { Star } from "lucide-react";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 export function GitHubStarsWidget() {
   const { widget, repository } = useWidget();

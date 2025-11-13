@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { MapProvider } from "./map-context";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import type { MapConfig } from "./types";
 
 interface MapRootProps {

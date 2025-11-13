@@ -8,18 +8,20 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useWidget } from "./WidgetProvider";
-import { getWidgetDefinitionByType } from "./registry";
+import { getWidgetDefinitionByType } from "../registry";
+import { useCanvasContext } from "@/components/canvas/CanvasContext";
 
 interface WidgetContextMenuProps {
   children: React.ReactNode;
 }
 
 export function WidgetContextMenu({ children }: WidgetContextMenuProps) {
-  const { actions, widget, state } = useWidget();
+  const { actions, widget } = useWidget();
+  const { hasWriteAccess } = useCanvasContext();
   const widgetDefinition = getWidgetDefinitionByType(widget.widgetType);
 
   // Only show context menu if user has write access
-  if (!state.hasWriteAccess) {
+  if (!hasWriteAccess) {
     return <>{children}</>;
   }
 
@@ -49,4 +51,3 @@ export function WidgetContextMenu({ children }: WidgetContextMenuProps) {
     </ContextMenu>
   );
 }
-

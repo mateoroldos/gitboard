@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import {
   Popover,
   PopoverContent,

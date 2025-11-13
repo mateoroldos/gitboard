@@ -6,7 +6,7 @@ import {
   Type,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 export function TextEditingOverlay() {
   const { widget, actions } = useWidget();

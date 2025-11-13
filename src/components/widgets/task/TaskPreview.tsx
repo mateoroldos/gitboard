@@ -3,7 +3,7 @@ import { TaskDisplay } from "./task-display";
 import { TaskEmptyState } from "./task-empty-state";
 import type { TaskConfig } from "./types";
 import { createPreviewTaskData } from "./utils";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 export function TaskPreview() {
   const { widget } = useWidget();

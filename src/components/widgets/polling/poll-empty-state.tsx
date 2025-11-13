@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 interface PollEmptyStateProps {
   className?: string;

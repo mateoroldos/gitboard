@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { TaskProvider } from "./task-context";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import type { TaskConfig } from "./types";
 
 interface TaskRootProps {

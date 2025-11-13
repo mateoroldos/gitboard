@@ -1,11 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import {
-  useSuspenseQuery,
-  useMutation,
-  useQueryClient,
-  useQuery,
-} from "@tanstack/react-query";
-import { convexQuery, convexAction } from "@convex-dev/react-query";
+import { useSuspenseQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
 import { api } from "convex/_generated/api";
 import type { WidgetInstance } from "../types";
 import type { PollData, UserVote, PollingConfig } from "./types";

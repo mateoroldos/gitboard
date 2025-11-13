@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import { TextEditor } from "./text-editor";
 import type { TextConfig } from "./types";
 

@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
+import { useCanvasContext } from "@/components/canvas/CanvasContext";
 
 interface ImageAuthGateProps {
   children: ReactNode;
@@ -8,12 +9,12 @@ interface ImageAuthGateProps {
 }
 
 export function ImageAuthGate({ children, fallback }: ImageAuthGateProps) {
-  const { state } = useWidget();
+  const { hasWriteAccess } = useCanvasContext();
 
   return (
     <>
       <Authenticated>
-        {state.hasWriteAccess
+        {hasWriteAccess
           ? children
           : fallback || (
               <div className="flex items-center justify-center w-full h-full">
@@ -43,4 +44,3 @@ export function ImageAuthGate({ children, fallback }: ImageAuthGateProps) {
     </>
   );
 }
-

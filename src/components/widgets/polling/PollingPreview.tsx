@@ -5,7 +5,7 @@ import { PollResults } from "./poll-results";
 import { PollEmptyState } from "./poll-empty-state";
 import type { PollingConfig } from "./types";
 import { createPreviewPollData } from "./utils";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 export function PollingPreview() {
   const { widget } = useWidget();

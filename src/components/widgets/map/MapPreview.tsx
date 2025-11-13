@@ -5,7 +5,7 @@ import { MapStats } from "./map-stats";
 import { MapEmptyState } from "./map-empty-state";
 import type { MapConfig } from "./types";
 import { createPreviewMapData } from "./utils";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 export function MapPreview() {
   const { widget } = useWidget();

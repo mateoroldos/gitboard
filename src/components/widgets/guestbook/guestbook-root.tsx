@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { GuestbookProvider } from "./guestbook-context";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 
 interface GuestbookRootProps {
   children: ReactNode;

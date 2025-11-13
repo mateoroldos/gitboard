@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ImageUpload } from "./image-upload";
 import { ImageAuthGate } from "./image-auth-gate";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import type { ImageConfig } from "./types";
 
 export function ImageEmptyState() {

@@ -6,14 +6,13 @@ import {
   useEffect,
   useState,
   useCallback,
-  useMemo,
 } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAction } from "convex/react";
 import { api } from "convex/_generated/api";
-import { WidgetInstance } from "./types";
-import { useCanvasContext } from "../canvas/CanvasContext";
 import debounce from "debounce";
+import { WidgetInstance } from "../types";
+import { useCanvasContext } from "@/components/canvas/CanvasContext";
 
 interface WidgetActions<TConfig> {
   deleteWidget: () => void;
@@ -27,8 +26,6 @@ interface WidgetActions<TConfig> {
 interface WidgetState {
   isEditing: boolean;
   isPreview: boolean;
-  isDragging: boolean;
-  hasWriteAccess: boolean;
 }
 
 interface WidgetContextValue<TConfig = Record<string, any>> {
@@ -56,12 +53,11 @@ export function WidgetProvider<TConfig = Record<string, any>>({
   widget,
   isEditing = false,
   isPreview = false,
-  isDragging = false,
   onConfigChange,
   onDelete,
   debounceMs = 500,
 }: WidgetProviderProps<TConfig>) {
-  const { hasWriteAccess, repoString: repository } = useCanvasContext();
+  const { repoString: repository } = useCanvasContext();
 
   const [optimisticWidget, setOptimisticWidget] = useState<Partial<
     Pick<WidgetInstance<TConfig>, "position" | "size" | "config">
@@ -150,8 +146,6 @@ export function WidgetProvider<TConfig = Record<string, any>>({
   const state: WidgetState = {
     isEditing,
     isPreview,
-    isDragging,
-    hasWriteAccess,
   };
 
   const displayWidget = {

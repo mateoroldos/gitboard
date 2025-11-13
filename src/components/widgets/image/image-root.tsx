@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { ImageProvider } from "./image-context";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import type { ImageConfig } from "./types";
 
 interface ImageRootProps {

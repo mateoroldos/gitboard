@@ -1,7 +1,7 @@
 import { TextRoot } from "./text-root";
 import { TextDisplay } from "./text-display";
 import { TextEmptyState } from "./text-empty-state";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import { createTextDataFromConfig } from "./utils";
 import type { TextConfig } from "./types";
 

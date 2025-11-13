@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import { Textarea } from "../../ui/textarea";
 import type { TextConfig } from "./types";
 

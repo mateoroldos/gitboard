@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { useWidget } from "../WidgetProvider";
+import { useWidget } from "../widget/WidgetProvider";
 import { TextEditor } from "./text-editor";
 import {
   getFontFamilyClass,
