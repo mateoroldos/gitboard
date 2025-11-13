@@ -8,6 +8,37 @@ import { WidgetProvider } from "./widget/WidgetProvider";
 import { WidgetResizable } from "./widget/WidgetResizable";
 import { WidgetContextMenu } from "./widget/WidgetContextMenu";
 import { WidgetEditingOverlay } from "./widget/WidgetEditingOverlay";
+import { WidgetNotFound } from "./WidgetNotFound";
+
+interface WidgetComposition {
+  useCard: boolean;
+  useDraggable: boolean;
+  useResizable: boolean;
+  useContextMenu: boolean;
+  useEditingOverlay: boolean;
+}
+
+function WidgetComposer({
+  children,
+  composition,
+}: {
+  children: React.ReactNode;
+  composition: WidgetComposition;
+}) {
+  let content = children;
+
+  if (composition.useCard) content = <WidgetCard>{content}</WidgetCard>;
+  if (composition.useEditingOverlay)
+    content = <WidgetEditingOverlay>{content}</WidgetEditingOverlay>;
+  if (composition.useContextMenu)
+    content = <WidgetContextMenu>{content}</WidgetContextMenu>;
+  if (composition.useResizable)
+    content = <WidgetResizable>{content}</WidgetResizable>;
+  if (composition.useDraggable)
+    content = <WidgetDraggable>{content}</WidgetDraggable>;
+
+  return <>{content}</>;
+}
 
 interface WidgetRendererProps {
   widget: WidgetInstance;
@@ -24,37 +55,11 @@ export function WidgetRenderer({
 
   if (!widgetDef) {
     return (
-      <WidgetProvider
+      <WidgetNotFound
         widget={widget}
-        isEditing={isEditing}
-        isPreview={isEditing}
         onConfigChange={onConfigChange}
-      >
-        <WidgetCanvasBase>
-          <WidgetDraggable>
-            <WidgetResizable>
-              <WidgetContextMenu>
-                <WidgetCard>
-                  <div className="p-4 border border-destructive/40 rounded-lg bg-destructive/10 group">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-medium text-destructive">
-                        Unknown Widget
-                      </h3>
-                    </div>
-                    <p className="text-sm text-destructive/80">
-                      Widget type "{widget.widgetType}" not found in registry.
-                    </p>
-                    <p className="text-xs text-destructive/60 mt-2">
-                      This widget may have been removed or renamed. You can
-                      safely delete it.
-                    </p>
-                  </div>
-                </WidgetCard>
-              </WidgetContextMenu>
-            </WidgetResizable>
-          </WidgetDraggable>
-        </WidgetCanvasBase>
-      </WidgetProvider>
+        isEditing={isEditing}
+      />
     );
   }
 
@@ -64,6 +69,14 @@ export function WidgetRenderer({
       : widgetDef.component;
 
   const shouldUseCard = widgetDef.renderStyle !== "raw";
+
+  const composition: WidgetComposition = {
+    useCard: shouldUseCard,
+    useDraggable: true,
+    useResizable: true,
+    useContextMenu: true,
+    useEditingOverlay: true,
+  };
 
   if (!isEditing) {
     return (
@@ -75,17 +88,9 @@ export function WidgetRenderer({
       >
         <WidgetCanvasProvider>
           <WidgetCanvasBase>
-            <WidgetDraggable>
-              <WidgetResizable>
-                <WidgetContextMenu>
-                  <WidgetEditingOverlay>
-                    <WidgetCard>
-                      <WidgetComponent />
-                    </WidgetCard>
-                  </WidgetEditingOverlay>
-                </WidgetContextMenu>
-              </WidgetResizable>
-            </WidgetDraggable>
+            <WidgetComposer composition={composition}>
+              <WidgetComponent />
+            </WidgetComposer>
           </WidgetCanvasBase>
         </WidgetCanvasProvider>
       </WidgetProvider>
@@ -99,13 +104,17 @@ export function WidgetRenderer({
       isPreview={isEditing}
       onConfigChange={onConfigChange}
     >
-      {shouldUseCard ? (
-        <WidgetCard>
-          <WidgetComponent />
-        </WidgetCard>
-      ) : (
+      <WidgetComposer
+        composition={{
+          ...composition,
+          useDraggable: false,
+          useResizable: false,
+          useContextMenu: false,
+          useEditingOverlay: false,
+        }}
+      >
         <WidgetComponent />
-      )}
+      </WidgetComposer>
     </WidgetProvider>
   );
 }
