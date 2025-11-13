@@ -73,16 +73,6 @@ export function TextDisplay() {
 
   const lineHeight = getLineHeight(fontSize);
 
-  const style = {
-    backgroundColor:
-      textData.backgroundColor !== "transparent"
-        ? textData.backgroundColor
-        : undefined,
-    padding: `${textData.padding}px`,
-    fontSize: `${fontSize}px`,
-    lineHeight: `${lineHeight}px`,
-  };
-
   const handleDoubleClick = () => {
     if (!state.isPreview) {
       setIsEditing(true);
@@ -129,7 +119,15 @@ export function TextDisplay() {
     <div
       ref={containerRef}
       className={`w-full h-full text-foreground ${fontFamilyClass} ${textAlignClass} ${fontWeightClass} whitespace-pre-wrap break-words cursor-pointer hover:bg-accent/20 transition-colors ${shouldCenterVertically ? "flex items-center" : "flex flex-col justify-center"}`}
-      style={style}
+      style={{
+        backgroundColor:
+          textData.backgroundColor !== "transparent"
+            ? textData.backgroundColor
+            : undefined,
+        padding: `${textData.padding}px`,
+        fontSize: `${fontSize}px`,
+        lineHeight: `${lineHeight}px`,
+      }}
       onDoubleClick={handleDoubleClick}
       title={state.isPreview ? undefined : "Double-click to edit"}
     >

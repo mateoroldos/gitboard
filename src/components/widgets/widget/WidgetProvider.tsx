@@ -35,7 +35,7 @@ interface WidgetContextValue<TConfig = Record<string, any>> {
   state: WidgetState;
 }
 
-const WidgetContext = createContext<WidgetContextValue | null>(null);
+const WidgetContext = createContext<WidgetContextValue<any> | null>(null);
 
 interface WidgetProviderProps<TConfig = Record<string, any>> {
   children: ReactNode;
@@ -97,7 +97,7 @@ export function WidgetProvider<TConfig = Record<string, any>>({
   const deleteWidget = useCallback(() => {
     if (onDelete) {
       onDelete();
-    } else if (confirm("Are you sure you want to delete this widget?")) {
+    } else {
       debouncedUpdateWidget.flush();
       deleteWidgetMutation.mutate({ id: widget._id });
     }
