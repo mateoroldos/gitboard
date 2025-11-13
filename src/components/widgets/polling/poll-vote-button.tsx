@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
-import { usePoll, usePollActions } from "./poll-context";
 import { cn } from "@/lib/utils";
+import { usePoll } from "./poll-state-context";
 
 interface PollVoteButtonProps {
   className?: string;
@@ -14,8 +14,7 @@ export function PollVoteButton({
   variant = "default",
   size = "default",
 }: PollVoteButtonProps) {
-  const { selectedOption, isVoting, hasVoted } = usePoll();
-  const { vote } = usePollActions();
+  const { actions, selectedOption, isVoting, hasVoted } = usePoll();
 
   if (hasVoted) {
     return null;
@@ -24,7 +23,7 @@ export function PollVoteButton({
   return (
     <div className="pr-4">
       <Button
-        onClick={vote}
+        onClick={actions.vote}
         disabled={!selectedOption || isVoting}
         className={cn("w-full", className)}
         variant={variant}
@@ -36,4 +35,3 @@ export function PollVoteButton({
     </div>
   );
 }
-

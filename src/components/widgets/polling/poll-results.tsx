@@ -1,5 +1,5 @@
-import { usePoll } from "./poll-context";
 import { cn } from "@/lib/utils";
+import { usePoll } from "./poll-state-context";
 
 interface PollResultsProps {
   showTotal?: boolean;

@@ -1,5 +1,5 @@
-import { usePoll } from "./poll-context";
 import { cn } from "@/lib/utils";
+import { usePoll } from "./poll-state-context";
 
 interface PollQuestionProps {
   className?: string;
@@ -16,4 +16,3 @@ export function PollQuestion({ className }: PollQuestionProps) {
     <h3 className={cn("font-medium pr-4", className)}>{pollData.question}</h3>
   );
 }
-

@@ -1,4 +1,5 @@
-import { usePollOption, usePollActions } from "./poll-context";
+import { usePollOption } from "./hooks/usePollComputed";
+import { usePoll } from "./poll-state-context";
 import { PollProgressBar } from "./poll-progress-bar";
 import { cn } from "@/lib/utils";
 import type { PollOption } from "./types";
@@ -15,14 +16,18 @@ export function PollOptionComponent({
   showPercentages = true,
   className,
 }: PollOptionProps) {
-  const { percentage, isSelected, isUserVote, hasVoted } = usePollOption(
+  const { actions, pollData, userVote, selectedOption, hasVoted } = usePoll();
+  const { percentage, isUserVote } = usePollOption(
     option.id,
+    pollData,
+    userVote,
   );
-  const { selectOption } = usePollActions();
+
+  const isSelected = selectedOption === option.id;
 
   const handleClick = () => {
     if (!hasVoted) {
-      selectOption(option.id);
+      actions.selectOption(option.id);
     }
   };
 

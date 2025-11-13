@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import { usePoll } from "./poll-context";
 import { PollOptionComponent } from "./poll-option";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { usePoll } from "./poll-state-context";
 
 interface PollOptionsProps {
   children?: ReactNode;
