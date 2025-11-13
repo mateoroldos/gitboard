@@ -49,7 +49,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Gitboard",
       },
     ],
     links: [
@@ -109,7 +109,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-dvh">
+      <body className="h-screen">
         {children}
         {process.env.NODE_ENV === "development" && (
           <TanStackDevtools

@@ -12,7 +12,7 @@ import { useAction } from "convex/react";
 import { Loader, Plus } from "lucide-react";
 import { Suspense } from "react";
 import * as z from "zod";
-import { FieldError } from "@/components/ui/field";
+import { FieldDescription, FieldError } from "@/components/ui/field";
 
 export const Route = createFileRoute("/_protected/create")({
   component: RouteComponent,
@@ -76,12 +76,12 @@ function RouteComponent() {
   });
 
   return (
-    <div className="container mx-auto flex items-center justify-center mt-24">
+    <div className="container mx-auto flex h-screen items-center justify-center">
       <div className="max-w-6xl w-full space-y-12 flex items-center flex-col">
         <div className="text-center">
           <h1 className="text-4xl font-bold">GitBoard</h1>
           <p className="text-muted-foreground">
-            The open source canvas for open source projects
+            An open source canvas for open source projects
           </p>
         </div>
 
@@ -100,7 +100,7 @@ function RouteComponent() {
                 field.state.meta.isTouched && !field.state.meta.isValid;
 
               return (
-                <div>
+                <div className="space-y-1">
                   <Label htmlFor={field.name}>GitHub Repository</Label>
                   <Suspense fallback={<Skeleton className="w-full h-9" />}>
                     <RepoSelector
@@ -109,6 +109,11 @@ function RouteComponent() {
                       placeholder="Select a repository..."
                     />
                   </Suspense>
+                  <FieldDescription className="text-xs">
+                    Select a repository from the list or type owner/repo. You
+                    must have write access to the repo in order to create the
+                    GitBoard.
+                  </FieldDescription>
                   {isInvalid && (
                     <FieldError className="mt-2 text-sm text-destructive">
                       {field.state.meta.errors}
