@@ -7,11 +7,13 @@ import {
 import { Pin } from "lucide-react";
 import { useMap } from "./map-context";
 import { MapAuthGate } from "./map-auth-gate";
+import { authClient } from "@/lib/auth-client";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 export function MapDisplay() {
   const { mapData, userPin, hasPin, actions, isEditing } = useMap();
+  const { data: session } = authClient.useSession();
 
   if (!mapData) {
     return null;
@@ -27,6 +29,9 @@ export function MapDisplay() {
 
   const handleClick = (projection: any) => (evt: any) => {
     if (isEditing) return;
+
+    // Don't allow pin placement if user is not authenticated
+    if (!session) return;
 
     const clickDuration = Date.now() - mouseDownTime;
     const mouseMovement = Math.sqrt(
