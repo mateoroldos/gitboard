@@ -65,7 +65,6 @@ export function WidgetRenderer({
 
   const shouldUseCard = widgetDef.renderStyle !== "raw";
 
-  // For canvas widgets (not editing/preview), wrap with WidgetCanvas for positioning and controls
   if (!isEditing) {
     return (
       <WidgetProvider
@@ -93,7 +92,6 @@ export function WidgetRenderer({
     );
   }
 
-  // For preview/editing, return the widget directly without canvas positioning
   return (
     <WidgetProvider
       widget={widget}
