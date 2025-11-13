@@ -39,7 +39,7 @@ export function CanvasWidgets() {
       !autoFittedRef.current
     ) {
       // Only auto-fit if we're at the default viewport position
-      fitToContent(widgets);
+      fitToContent(widgets, 0.7);
       autoFittedRef.current = true;
     }
   }, [widgets.length, fitToContent, viewport.zoom, viewport.x, viewport.y]);

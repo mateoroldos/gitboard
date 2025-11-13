@@ -33,6 +33,7 @@ interface CanvasContextType {
       position: { x: number; y: number };
       size: { width: number; height: number };
     }>,
+    minZoom?: number,
   ) => void;
   worldToScreen: (worldPos: { x: number; y: number }) => {
     x: number;
@@ -140,6 +141,7 @@ export function CanvasProvider({
         position: { x: number; y: number };
         size: { width: number; height: number };
       }>,
+      minZoom?: number,
     ) => {
       if (widgets.length === 0) return;
 
@@ -161,16 +163,20 @@ export function CanvasProvider({
 
       const scaleX = viewport.width / contentWidth;
       const scaleY = viewport.height / contentHeight;
-      const scale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+      const calculatedScale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+      const scale = Math.max(minZoom || MIN_ZOOM, calculatedScale);
 
       const centerX = (minX + maxX) / 2;
       const centerY = (minY + maxY) / 2;
 
+      // If we're using minZoom, position to top-left instead of center
+      const isUsingMinZoom = scale === minZoom;
+
       setViewport((prev) => ({
         ...prev,
         zoom: scale,
-        x: prev.width / 2 / scale - centerX,
-        y: prev.height / 2 / scale - centerY,
+        x: isUsingMinZoom ? -minX + padding / scale : prev.width / 2 / scale - centerX,
+        y: isUsingMinZoom ? -minY + padding / scale : prev.height / 2 / scale - centerY,
       }));
     },
     [viewport.width, viewport.height],
