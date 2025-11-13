@@ -129,7 +129,7 @@ export function MapDisplay() {
 
           return (
             <Marker key={pin.id} coordinates={[pin.longitude, pin.latitude]}>
-              <foreignObject x="-10" y="-20" width="20" height="20">
+              <foreignObject x="-4" y="-8" width="20" height="20">
                 <Pin
                   size={8}
                   style={{
