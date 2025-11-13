@@ -3,13 +3,12 @@ import { useCanvasContext } from "./CanvasContext";
 import { CanvasWidgets } from "./CanvasWidgets";
 
 export function CanvasContainer() {
-  const { canvasRef, viewport, setSelectedWidgetId } = useCanvasContext();
+  const { canvasRef, viewport } = useCanvasContext();
 
   return (
     <div
       ref={canvasRef}
       className="h-screen w-screen absolute top-0 left-0 overflow-hidden"
-      onClick={() => setSelectedWidgetId(null)}
       style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, oklch(from var(--muted-foreground) l c h / 0.25) 1px, transparent 0)`,
         backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
