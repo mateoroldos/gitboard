@@ -75,7 +75,7 @@ export function GuestbookCard() {
         className="w-full mt-4"
         disabled={isEditing}
       >
-        {commentCount === 0 ? "Sign Guestbook" : "View Guestbook"}
+        Open Guestbook
       </Button>
     </div>
   );
