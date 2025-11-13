@@ -28,10 +28,10 @@ export function CanvasPage({
       <nav className="py-4 flex flex-row justify-center items-center w-fit mx-auto relative z-20">
         <a
           href={`https://github.com/${repoString}`}
-          className={`${buttonVariants({ variant: "outline" })} !rounded`}
+          className={`${buttonVariants()} !rounded group shadow-lg`}
           target="_blank"
         >
-          <Github className="size-4 text-muted-foreground/70 group-hover:text-primary transition-all" />
+          <Github className="size-4 text-primary-foreground/50 group-hover:text-primary-foreground/80 transition-all" />
           {repoString}
         </a>
       </nav>
