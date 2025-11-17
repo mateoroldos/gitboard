@@ -32,6 +32,7 @@ export function Header() {
         {stars !== null && (
           <a
             href="https://github.com/mateoroldos/gitboard"
+            target="_blank"
             className={`${buttonVariants({ variant: "outline" })} !rounded group`}
           >
             <Star className="transition group-hover:fill-amber-300 group-hover:stroke-amber-400 group-hover:dark:fill-amber-200 group-hover:dark:stroke-amber-300" />
